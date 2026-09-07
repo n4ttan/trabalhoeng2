@@ -23,22 +23,22 @@ React → Express → Controller → Service → Repository → MySQL
 
 ## Estrutura do projeto
 
+```text
 projetocondominio/
 ├── backend/
 │   ├── .env
 │   ├── .gitignore
 │   ├── package.json
 │   ├── package-lock.json
-│   ├── node_modules/
 │   └── src/
 │       ├── controllers/
 │       ├── repositories/
 │       ├── services/
 │       └── server.js
-│
 ├── frontend/
 ├── database/
 │   └── schema.sql
 ├── docs/
 ├── tests/
 └── README.md
+```
