@@ -9,3 +9,11 @@ CREATE TABLE IF NOT EXISTS mensagens (
 
 INSERT INTO mensagens (texto)
 VALUES ('Olá Mundo!');
+
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    perfil ENUM('ADMIN_PLATAFORMA', 'CANDIDATO', 'SINDICO') NOT NULL
+);
