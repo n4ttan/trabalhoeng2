@@ -1,22 +1,21 @@
 const connection = require('./database');
 
-function criarPedidoSindico(usuarioId) {
+function buscarMensagem() {
     return new Promise((resolve, reject) => {
         connection.query(
-            'INSERT INTO pedidos_sindico (usuario_id) VALUES (?)',
-            [usuarioId],
+            'SELECT * FROM mensagens LIMIT 1',
             (error, results) => {
                 if (error) {
                     reject(error);
                     return;
                 }
 
-                resolve(results.insertId);
+                resolve(results[0]);
             }
         );
     });
 }
 
 module.exports = {
-    criarPedidoSindico
+    buscarMensagem
 };

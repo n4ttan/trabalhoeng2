@@ -1,8 +1,8 @@
 const pedidoSindicoRepository = require('../repositories/pedidoSindicoRepository');
 
 // Orquestra a regra de negócio para criação do pedido.
-async function criarPedidoSindico(usuarioId) {
-    return pedidoSindicoRepository.criarPedidoSindico(usuarioId);
+async function criarPedidoSindico(usuario_id, deferido) {
+    return pedidoSindicoRepository.criarPedidoSindico(usuario_id, deferido);
 }
 
 // Encapsula a regra de negócio de aprovação de pedido.

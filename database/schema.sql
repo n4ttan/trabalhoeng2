@@ -17,3 +17,9 @@ CREATE TABLE usuarios (
     senha VARCHAR(255) NOT NULL,
     perfil ENUM('ADMIN_PLATAFORMA', 'CANDIDATO', 'SINDICO') NOT NULL
 );
+
+CREATE TABLE pedidos_sindico(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT,
+    deferido BOOLEAN,
+)
