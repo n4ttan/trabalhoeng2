@@ -48,7 +48,66 @@ function excluirUsuarioEPedido(usuarioId) {
     });
 }
 
+// Salva o código de validação e sua data de expiração para o usuário informado.
+function salvarTokenValidacao(usuarioId, token, expiraEm) {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            'UPDATE usuarios SET token_validacao = ?, token_expira_em = ? WHERE id = ?',
+            [token, expiraEm, usuarioId],
+            (error, results) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                resolve(results.affectedRows);
+            }
+        );
+    });
+}
+
+// Busca um usuário pelo e-mail, usado para validar o token informado.
+function buscarPorEmail(email) {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            'SELECT * FROM usuarios WHERE email = ?',
+            [email],
+            (error, results) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                resolve(results[0]);
+            }
+        );
+    });
+}
+
+// Confirma o token e avança o status do cadastro para pendente de aprovação.
+function confirmarEmail(usuarioId) {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            `UPDATE usuarios
+             SET status_cadastro = 'PENDENTE_APROVACAO', token_validacao = NULL, token_expira_em = NULL
+             WHERE id = ? AND status_cadastro = 'AGUARDANDO_EMAIL'`,
+            [usuarioId],
+            (error, results) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                resolve(results.affectedRows);
+            }
+        );
+    });
+}
+
 module.exports = {
     criarUsuario,
-    excluirUsuarioEPedido
+    excluirUsuarioEPedido,
+    salvarTokenValidacao,
+    buscarPorEmail,
+    confirmarEmail
 };

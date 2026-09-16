@@ -12,10 +12,15 @@ async function criarUsuario(req, res) {
             perfil
         );
 
+	const codigoValidacao = await usuarioService.gerarESalvarTokenValidacao(usuarioId);
+
+        console.log(`Código de validação para ${email}: ${codigoValidacao}`);
+
         res.status(201).json({
-            mensagem: 'Usuário criado com sucesso',
+            mensagem: 'Usuário criado com sucesso. Verifique seu e-mail para validar o cadastro.',
             usuarioId: usuarioId
         });
+
     } catch (error) {
         console.error('Erro ao criar usuário:', error);
 
@@ -51,7 +56,46 @@ async function excluirUsuarioEPedido(req, res) {
     }
 }
 
+
+// Recebe o e-mail e o código digitado pelo morador e confirma a validação.
+async function validarEmail(req, res) {
+    try {
+        const { email, codigo } = req.body;
+
+        await usuarioService.validarEmail(email, codigo);
+
+        res.json({
+            mensagem: 'E-mail validado com sucesso. Aguarde a aprovação do síndico.'
+        });
+    } catch (error) {
+        console.error('Erro ao validar e-mail:', error);
+
+        if (error.message === 'USUARIO_NAO_ENCONTRADO') {
+            res.status(404).json({ erro: 'Usuário não encontrado' });
+            return;
+        }
+
+        if (error.message === 'CODIGO_INVALIDO') {
+            res.status(400).json({ erro: 'Código de validação incorreto' });
+            return;
+        }
+
+        if (error.message === 'CODIGO_EXPIRADO') {
+            res.status(400).json({ erro: 'Código de validação expirado' });
+            return;
+        }
+
+        if (error.message === 'CADASTRO_JA_VALIDADO') {
+            res.status(400).json({ erro: 'Este cadastro já foi validado anteriormente' });
+            return;
+        }
+
+        res.status(500).json({ erro: 'Erro ao validar e-mail' });
+    }
+}
+
 module.exports = {
     criarUsuario,
-    excluirUsuarioEPedido
+    excluirUsuarioEPedido,
+    validarEmail
 };

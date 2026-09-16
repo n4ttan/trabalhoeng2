@@ -20,6 +20,9 @@ app.post('/pedidos-sindico', pedidoSindicoController.criarPedidoSindico);
 // Cria um novo usuário no sistema.
 app.post('/usuarios', usuarioController.criarUsuario);
 
+// Confirma o código de validação enviado ao e-mail do morador.
+app.post('/usuarios/validar-email', usuarioController.validarEmail);
+
 // Inicia o servidor na porta 3000.
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
