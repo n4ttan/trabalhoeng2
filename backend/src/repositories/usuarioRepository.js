@@ -104,10 +104,36 @@ function confirmarEmail(usuarioId) {
     });
 }
 
+async function listarPendentes() {
+  const [rows] = await db.query(
+    "SELECT id, nome, email, unidade, status_cadastro FROM usuarios WHERE status_cadastro = 'PENDENTE_APROVACAO'"
+  );
+  return rows;
+}
+
+async function aprovarMorador(usuarioId) {
+  const [result] = await db.query(
+    "UPDATE usuarios SET status_cadastro = 'APROVADO' WHERE id = ? AND status_cadastro = 'PENDENTE_APROVACAO'",
+    [usuarioId]
+  );
+  return result.affectedRows > 0;
+}
+
+async function rejeitarMorador(usuarioId) {
+  const [result] = await db.query(
+    "UPDATE usuarios SET status_cadastro = 'REJEITADO' WHERE id = ? AND status_cadastro = 'PENDENTE_APROVACAO'",
+    [usuarioId]
+  );
+  return result.affectedRows > 0;
+}
+
 module.exports = {
     criarUsuario,
     excluirUsuarioEPedido,
     salvarTokenValidacao,
     buscarPorEmail,
-    confirmarEmail
+    confirmarEmail,
+    listarPendentes,
+    aprovarMorador,
+    rejeitarMorador
 };
