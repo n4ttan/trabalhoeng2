@@ -36,3 +36,11 @@ app.patch(
     '/pedidos-sindico/:pedidoId/aprovar',
     pedidoSindicoController.aprovarPedidoSindico
 );
+
+app.get('/usuarios/pendentes', usuarioController.listarPendentes);
+
+app.patch('/usuarios/:usuarioId/aprovar', usuarioController.aprovarMorador);
+
+app.patch('/usuarios/:usuarioId/rejeitar', usuarioController.rejeitarMorador);
+
+

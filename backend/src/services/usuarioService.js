@@ -60,9 +60,36 @@ async function validarEmail(email, codigoInformado) {
     return true;
 }
 
+async function listarPendentes() {
+  return await usuarioRepository.listarPendentes();
+}
+
+async function aprovarMorador(usuarioId) {
+  const aprovado = await usuarioRepository.aprovarMorador(usuarioId);
+  if (!aprovado) {
+    const error = new Error("Usuário não encontrado ou não está pendente de aprovação");
+    error.status = 404;
+    throw error;
+  }
+  return { mensagem: "Morador aprovado com sucesso" };
+}
+
+async function rejeitarMorador(usuarioId) {
+  const rejeitado = await usuarioRepository.rejeitarMorador(usuarioId);
+  if (!rejeitado) {
+    const error = new Error("Usuário não encontrado ou não está pendente de aprovação");
+    error.status = 404;
+    throw error;
+  }
+  return { mensagem: "Morador rejeitado com sucesso" };
+}
+
 module.exports = {
     criarUsuario,
     excluirUsuarioEPedido,
     gerarESalvarTokenValidacao,
-    validarEmail
+    validarEmail,
+    listarPendentes,
+  aprovarMorador,
+  rejeitarMorador
 };

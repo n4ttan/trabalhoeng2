@@ -94,8 +94,40 @@ async function validarEmail(req, res) {
     }
 }
 
+async function listarPendentes(req, res) {
+  try {
+    const moradores = await usuarioService.listarPendentes();
+    return res.status(200).json(moradores);
+  } catch (error) {
+    return res.status(error.status || 500).json({ mensagem: error.message });
+  }
+}
+
+async function aprovarMorador(req, res) {
+  try {
+    const { usuarioId } = req.params;
+    const resultado = await usuarioService.aprovarMorador(usuarioId);
+    return res.status(200).json(resultado);
+  } catch (error) {
+    return res.status(error.status || 500).json({ mensagem: error.message });
+  }
+}
+
+async function rejeitarMorador(req, res) {
+  try {
+    const { usuarioId } = req.params;
+    const resultado = await usuarioService.rejeitarMorador(usuarioId);
+    return res.status(200).json(resultado);
+  } catch (error) {
+    return res.status(error.status || 500).json({ mensagem: error.message });
+  }
+}
+
 module.exports = {
     criarUsuario,
     excluirUsuarioEPedido,
-    validarEmail
+    validarEmail,
+    listarPendentes,
+  aprovarMorador,
+  rejeitarMorador
 };
