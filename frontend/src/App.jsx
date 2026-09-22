@@ -17,8 +17,6 @@ function App() {
 
     return (
         <main>
-            <h1>{mensagem}</h1>
-
              <PedidoSindicoPage />
         </main>
     );
