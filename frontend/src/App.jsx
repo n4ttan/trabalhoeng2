@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import PedidoSindicoPage from './pages/PedidoSindicoPage';
 
 function App() {
     const [mensagem, setMensagem] = useState('');
@@ -17,7 +16,7 @@ function App() {
 
     return (
         <main>
-             <PedidoSindicoPage />
+            <h1>{mensagem}</h1>
         </main>
     );
 }
