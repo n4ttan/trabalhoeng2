@@ -13,6 +13,7 @@ function HomePage() {
                 setMensagem(data.texto);
             })
             .catch(error => {
+
                 console.error(
                     'Erro ao buscar mensagem:',
                     error
@@ -48,8 +49,18 @@ function HomePage() {
 
                 <div>
 
-                    <Link to="/pedido-sindico">
-                        Gestão de Síndico
+                    <Link to="/permissao-sindico">
+                        Permissão do Síndico
+                    </Link>
+
+                </div>
+
+                <br />
+
+                <div>
+
+                    <Link to="/autorizacao-sindico">
+                        Autorização do Síndico
                     </Link>
 
                 </div>

@@ -6,9 +6,15 @@ import {
 
 import HomePage from './pages/HomePage';
 import CadastroMoradorPage from './pages/CadastroMoradorPage';
-import PedidoSindicoPage from './pages/PedidoSindicoPage';
+
+import PermissaoSindicoPage
+    from './pages/PermissaoSindicoPage';
+
+import AutorizacaoSindicoPage
+    from './pages/AutorizacaoSindicoPage';
 
 function App() {
+
     return (
         <BrowserRouter>
 
@@ -25,8 +31,13 @@ function App() {
                 />
 
                 <Route
-                    path="/pedido-sindico"
-                    element={<PedidoSindicoPage />}
+                    path="/permissao-sindico"
+                    element={<PermissaoSindicoPage />}
+                />
+
+                <Route
+                    path="/autorizacao-sindico"
+                    element={<AutorizacaoSindicoPage />}
                 />
 
             </Routes>
