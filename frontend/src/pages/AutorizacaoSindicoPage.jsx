@@ -1,55 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import {
-    listarPedidosPendentes,
-    aprovarPedidoSindico
-} from '../services/autorizacaoSindicoApi';
+import { aprovarPedidoSindico }
+    from '../services/autorizacaoSindicoApi';
 
 import './PedidoSindicoPage.css';
 
-
 function AutorizacaoSindicoPage() {
 
-    const [pedidos, setPedidos] = useState([]);
+    const [pedidoId, setPedidoId] = useState('');
     const [mensagem, setMensagem] = useState('');
-    const [carregando, setCarregando] = useState(true);
-    const [aprovandoId, setAprovandoId] = useState(null);
+    const [aprovando, setAprovando] = useState(false);
 
+    async function autorizarPedido(event) {
 
-    async function carregarPedidos() {
+        event.preventDefault();
 
-        try {
-
-            setCarregando(true);
-            setMensagem('');
-
-            const dados = await listarPedidosPendentes();
-
-            setPedidos(dados);
-
-        } catch (error) {
-
-            setMensagem(error.message);
-
-        } finally {
-
-            setCarregando(false);
+        if (!pedidoId) {
+            setMensagem('Digite o ID do pedido.');
+            return;
         }
-    }
-
-
-    useEffect(() => {
-
-        carregarPedidos();
-
-    }, []);
-
-
-    async function autorizarPedido(pedidoId) {
 
         try {
 
-            setAprovandoId(pedidoId);
+            setAprovando(true);
             setMensagem('');
 
             const resultado =
@@ -60,7 +33,7 @@ function AutorizacaoSindicoPage() {
                 'Pedido autorizado com sucesso!'
             );
 
-            await carregarPedidos();
+            setPedidoId('');
 
         } catch (error) {
 
@@ -68,10 +41,9 @@ function AutorizacaoSindicoPage() {
 
         } finally {
 
-            setAprovandoId(null);
+            setAprovando(false);
         }
     }
-
 
     return (
 
@@ -86,84 +58,52 @@ function AutorizacaoSindicoPage() {
                     </h1>
 
                     <p>
-                        Solicitações pendentes para se tornar síndico.
+                        Autorize uma solicitação para
+                        se tornar síndico.
                     </p>
 
                 </div>
 
-
                 <section className="secao-sindico">
 
                     <h2>
-                        Solicitações pendentes
+                        Autorizar solicitação
                     </h2>
 
+                    <form
+                        className="formulario-sindico"
+                        onSubmit={autorizarPedido}
+                    >
 
-                    {carregando && (
+                        <label htmlFor="pedidoId">
+                            ID do pedido
+                        </label>
 
-                        <p>
-                            Carregando solicitações...
-                        </p>
+                        <input
+                            id="pedidoId"
+                            type="number"
+                            min="1"
+                            value={pedidoId}
+                            onChange={(event) =>
+                                setPedidoId(event.target.value)
+                            }
+                            placeholder="Digite o ID do pedido"
+                        />
 
-                    )}
-
-
-                    {!carregando &&
-                        pedidos.length === 0 && (
-
-                            <p>
-                                Nenhuma solicitação pendente.
-                            </p>
-
-                        )
-                    }
-
-
-                    {pedidos.map((pedido) => (
-
-                        <div
-                            key={pedido.pedido_id}
-                            className="pedido-pendente"
+                        <button
+                            type="submit"
+                            className="botao-aprovar"
+                            disabled={aprovando}
                         >
 
-                            <p>
-                                <strong>
-                                    ID do usuário:
-                                </strong>{' '}
+                            {aprovando
+                                ? 'Autorizando...'
+                                : 'Autorizar pedido'
+                            }
 
-                                {pedido.usuario_id}
-                            </p>
+                        </button>
 
-
-                            <button
-                                type="button"
-                                className="botao-aprovar"
-
-                                onClick={() =>
-                                    autorizarPedido(
-                                        pedido.pedido_id
-                                    )
-                                }
-
-                                disabled={
-                                    aprovandoId ===
-                                    pedido.pedido_id
-                                }
-                            >
-
-                                {
-                                    aprovandoId ===
-                                    pedido.pedido_id
-                                        ? 'Autorizando...'
-                                        : 'Autorizar'
-                                }
-
-                            </button>
-
-                        </div>
-
-                    ))}
-
+                    </form>
 
                     {mensagem && (
 
@@ -180,6 +120,5 @@ function AutorizacaoSindicoPage() {
         </div>
     );
 }
-
 
 export default AutorizacaoSindicoPage;
