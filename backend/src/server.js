@@ -23,6 +23,9 @@ app.post('/usuarios', usuarioController.criarUsuario);
 // Confirma o código de validação enviado ao e-mail do morador.
 app.post('/usuarios/validar-email', usuarioController.validarEmail);
 
+// Gera e envia um novo código para cadastros que ainda aguardam validação do e-mail.
+app.post('/usuarios/reenviar-codigo', usuarioController.reenviarCodigo);
+
 // Inicia o servidor na porta 3000.
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');

@@ -5,7 +5,7 @@ const API_URL = 'http://localhost:3000';
 
 // true = testa só o frontend
 // false = usa o backend de verdade
-const MODO_TESTE = true;
+const MODO_TESTE = false;
 
 function App() {
     const [etapa, setEtapa] = useState('cadastro');

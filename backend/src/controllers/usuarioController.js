@@ -1,32 +1,46 @@
 const usuarioService = require('../services/usuarioService');
+const { sendVerificationCode } = require('../services/emailService');
 
-// Controla o cadastro de usuário e devolve o ID gerado no banco.
+// Responde com a mensagem do erro só quando ele é de negócio (tem status); senão, texto genérico.
+function responderErro(res, error, mensagemGenerica) {
+    if (error.status) {
+        res.status(error.status).json({ erro: error.message, codigo: error.codigo });
+        return;
+    }
+
+    res.status(500).json({ erro: mensagemGenerica });
+}
+
+// Controla o cadastro de morador e devolve o ID gerado no banco.
 async function criarUsuario(req, res) {
     try {
-        const { nome, email, senha, perfil } = req.body;
+        const { nome, email, senha, unidade } = req.body;
 
-        const usuarioId = await usuarioService.criarUsuario(
-            nome,
-            email,
-            senha,
-            perfil
-        );
+        const usuario = await usuarioService.criarUsuario(nome, email, senha, unidade);
 
-	const codigoValidacao = await usuarioService.gerarESalvarTokenValidacao(usuarioId);
+        const codigoValidacao = await usuarioService.gerarESalvarTokenValidacao(usuario.usuarioId);
 
-        console.log(`Código de validação para ${email}: ${codigoValidacao}`);
+        // Envia o código por e-mail; se falhar, o morador pode pedir reenvio.
+        try {
+            await sendVerificationCode(usuario.email, codigoValidacao);
+        } catch (erroEmail) {
+            console.error('Erro ao enviar e-mail de validação:', erroEmail);
+        }
 
         res.status(201).json({
             mensagem: 'Usuário criado com sucesso. Verifique seu e-mail para validar o cadastro.',
-            usuarioId: usuarioId
+            usuarioId: usuario.usuarioId
         });
 
     } catch (error) {
         console.error('Erro ao criar usuário:', error);
 
-        res.status(500).json({
-            erro: 'Erro ao criar usuário'
-        });
+        if (error.code === 'ER_DUP_ENTRY') {
+            res.status(409).json({ erro: 'E-mail já cadastrado' });
+            return;
+        }
+
+        responderErro(res, error, 'Erro ao criar usuário');
     }
 }
 
@@ -70,27 +84,30 @@ async function validarEmail(req, res) {
     } catch (error) {
         console.error('Erro ao validar e-mail:', error);
 
-        if (error.message === 'USUARIO_NAO_ENCONTRADO') {
-            res.status(404).json({ erro: 'Usuário não encontrado' });
-            return;
+        responderErro(res, error, 'Erro ao validar e-mail');
+    }
+}
+
+// Gera e envia um novo código; a resposta é a mesma exista ou não o e-mail.
+async function reenviarCodigo(req, res) {
+    try {
+        const novoCodigo = await usuarioService.reenviarCodigo(req.body.email);
+
+        if (novoCodigo) {
+            try {
+                await sendVerificationCode(novoCodigo.email, novoCodigo.codigo);
+            } catch (erroEmail) {
+                console.error('Erro ao reenviar e-mail de validação:', erroEmail);
+            }
         }
 
-        if (error.message === 'CODIGO_INVALIDO') {
-            res.status(400).json({ erro: 'Código de validação incorreto' });
-            return;
-        }
+        res.json({
+            mensagem: 'Se o e-mail estiver aguardando validação, enviamos um novo código.'
+        });
+    } catch (error) {
+        console.error('Erro ao reenviar código:', error);
 
-        if (error.message === 'CODIGO_EXPIRADO') {
-            res.status(400).json({ erro: 'Código de validação expirado' });
-            return;
-        }
-
-        if (error.message === 'CADASTRO_JA_VALIDADO') {
-            res.status(400).json({ erro: 'Este cadastro já foi validado anteriormente' });
-            return;
-        }
-
-        res.status(500).json({ erro: 'Erro ao validar e-mail' });
+        responderErro(res, error, 'Erro ao reenviar código');
     }
 }
 
@@ -127,6 +144,7 @@ module.exports = {
     criarUsuario,
     excluirUsuarioEPedido,
     validarEmail,
+    reenviarCodigo,
     listarPendentes,
   aprovarMorador,
   rejeitarMorador

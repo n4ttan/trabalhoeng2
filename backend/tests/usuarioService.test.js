@@ -1,0 +1,340 @@
+jest.mock('../src/repositories/usuarioRepository', () => ({
+    criarUsuario: jest.fn(),
+    excluirUsuarioEPedido: jest.fn(),
+    salvarTokenValidacao: jest.fn(),
+    buscarPorEmail: jest.fn(),
+    reservarTentativaValidacao: jest.fn(),
+    confirmarEmail: jest.fn(),
+    listarPendentes: jest.fn(),
+    aprovarMorador: jest.fn(),
+    rejeitarMorador: jest.fn(),
+}));
+
+jest.mock('../src/services/emailService', () => ({
+    sendVerificationCode: jest.fn(),
+}));
+
+const usuarioRepository = require('../src/repositories/usuarioRepository');
+const usuarioService = require('../src/services/usuarioService');
+
+beforeEach(() => {
+    jest.resetAllMocks();
+});
+
+describe('gerarCodigoValidacao', () => {
+    test('retorna string com 6 dígitos numéricos em 50 execuções', () => {
+        for (let i = 0; i < 50; i++) {
+            const codigo = usuarioService.gerarCodigoValidacao();
+            expect(typeof codigo).toBe('string');
+            expect(codigo).toMatch(/^\d{6}$/);
+        }
+    });
+});
+
+describe('gerarESalvarTokenValidacao', () => {
+    test('chama salvarTokenValidacao com o código e expiração ~15 minutos no futuro', async () => {
+        usuarioRepository.salvarTokenValidacao.mockResolvedValue();
+
+        const antes = Date.now();
+        const codigo = await usuarioService.gerarESalvarTokenValidacao(42);
+        const depois = Date.now();
+
+        expect(codigo).toMatch(/^\d{6}$/);
+        expect(usuarioRepository.salvarTokenValidacao).toHaveBeenCalledTimes(1);
+        const [usuarioId, codigoSalvo, expiraEm] =
+            usuarioRepository.salvarTokenValidacao.mock.calls[0];
+
+        expect(usuarioId).toBe(42);
+        expect(codigoSalvo).toBe(codigo);
+        expect(expiraEm).toBeInstanceOf(Date);
+
+        const quinzeMin = 15 * 60 * 1000;
+        expect(expiraEm.getTime()).toBeGreaterThanOrEqual(antes + quinzeMin);
+        expect(expiraEm.getTime()).toBeLessThanOrEqual(depois + quinzeMin);
+    });
+});
+
+describe('validarEmail', () => {
+    const futuro = () => new Date(Date.now() + 10 * 60 * 1000);
+    const passado = () => new Date(Date.now() - 10 * 60 * 1000);
+
+    const usuarioBase = (extra = {}) => ({
+        id: 7,
+        status_cadastro: 'AGUARDANDO_EMAIL',
+        token_validacao: '123456',
+        token_expira_em: futuro(),
+        tentativas_validacao: 0,
+        ...extra,
+    });
+
+    // Captura o erro lançado para poder checar status e codigo.
+    async function capturarErro(promessa) {
+        try {
+            await promessa;
+        } catch (erro) {
+            return erro;
+        }
+        throw new Error('Era esperado que a promessa fosse rejeitada');
+    }
+
+    test('sucesso quando o código está correto e não expirou', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(usuarioBase());
+        usuarioRepository.reservarTentativaValidacao.mockResolvedValue(true);
+        usuarioRepository.confirmarEmail.mockResolvedValue(1);
+
+        await expect(
+            usuarioService.validarEmail('a@b.com', '123456')
+        ).resolves.toBe(true);
+        expect(usuarioRepository.buscarPorEmail).toHaveBeenCalledWith('a@b.com');
+        expect(usuarioRepository.confirmarEmail).toHaveBeenCalledWith(7);
+    });
+
+    test('sucesso avança o status via confirmarEmail (que zera as tentativas no banco)', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(
+            usuarioBase({ tentativas_validacao: 3 })
+        );
+        usuarioRepository.reservarTentativaValidacao.mockResolvedValue(true);
+        usuarioRepository.confirmarEmail.mockResolvedValue(1);
+
+        await usuarioService.validarEmail('a@b.com', '123456');
+
+        expect(usuarioRepository.confirmarEmail).toHaveBeenCalledTimes(1);
+        expect(usuarioRepository.confirmarEmail).toHaveBeenCalledWith(7);
+    });
+
+    test('aceita o código enviado como número', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(usuarioBase());
+        usuarioRepository.reservarTentativaValidacao.mockResolvedValue(true);
+        usuarioRepository.confirmarEmail.mockResolvedValue(1);
+
+        await expect(
+            usuarioService.validarEmail('a@b.com', 123456)
+        ).resolves.toBe(true);
+    });
+
+    test('aceita o código com espaços nas pontas', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(usuarioBase());
+        usuarioRepository.reservarTentativaValidacao.mockResolvedValue(true);
+        usuarioRepository.confirmarEmail.mockResolvedValue(1);
+
+        await expect(
+            usuarioService.validarEmail('a@b.com', ' 123456 ')
+        ).resolves.toBe(true);
+    });
+
+    test('lança USUARIO_NAO_ENCONTRADO (404) quando o e-mail não existe', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(null);
+
+        const erro = await capturarErro(
+            usuarioService.validarEmail('x@y.com', '123456')
+        );
+
+        expect(erro.codigo).toBe('USUARIO_NAO_ENCONTRADO');
+        expect(erro.status).toBe(404);
+        expect(usuarioRepository.confirmarEmail).not.toHaveBeenCalled();
+    });
+
+    test('lança CODIGO_INVALIDO (400) quando o código não confere', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(usuarioBase());
+        usuarioRepository.reservarTentativaValidacao.mockResolvedValue(true);
+
+        const erro = await capturarErro(
+            usuarioService.validarEmail('a@b.com', '000000')
+        );
+
+        expect(erro.codigo).toBe('CODIGO_INVALIDO');
+        expect(erro.status).toBe(400);
+        expect(usuarioRepository.reservarTentativaValidacao).toHaveBeenCalledTimes(1);
+        expect(usuarioRepository.confirmarEmail).not.toHaveBeenCalled();
+    });
+
+    test('rejeita quando o token no banco é null, sem gastar tentativa', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(
+            usuarioBase({ token_validacao: null })
+        );
+
+        const erro = await capturarErro(
+            usuarioService.validarEmail('a@b.com', null)
+        );
+
+        expect(erro.codigo).toBe('CODIGO_INVALIDO');
+        expect(usuarioRepository.reservarTentativaValidacao).not.toHaveBeenCalled();
+        expect(usuarioRepository.confirmarEmail).not.toHaveBeenCalled();
+    });
+
+    test('lança CODIGO_EXPIRADO (400) quando o código correto expirou, sem gastar tentativa', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(
+            usuarioBase({ token_expira_em: passado() })
+        );
+
+        const erro = await capturarErro(
+            usuarioService.validarEmail('a@b.com', '123456')
+        );
+
+        expect(erro.codigo).toBe('CODIGO_EXPIRADO');
+        expect(erro.status).toBe(400);
+        expect(usuarioRepository.reservarTentativaValidacao).not.toHaveBeenCalled();
+        expect(usuarioRepository.confirmarEmail).not.toHaveBeenCalled();
+    });
+
+    test('lança CADASTRO_JA_VALIDADO quando o status não é AGUARDANDO_EMAIL', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(
+            usuarioBase({ status_cadastro: 'PENDENTE_APROVACAO', token_validacao: null })
+        );
+
+        const erro = await capturarErro(
+            usuarioService.validarEmail('a@b.com', '123456')
+        );
+
+        expect(erro.codigo).toBe('CADASTRO_JA_VALIDADO');
+        expect(usuarioRepository.confirmarEmail).not.toHaveBeenCalled();
+    });
+
+    test('lança CADASTRO_JA_VALIDADO quando confirmarEmail afeta 0 linhas', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(usuarioBase());
+        usuarioRepository.reservarTentativaValidacao.mockResolvedValue(true);
+        usuarioRepository.confirmarEmail.mockResolvedValue(0);
+
+        const erro = await capturarErro(
+            usuarioService.validarEmail('a@b.com', '123456')
+        );
+
+        expect(erro.codigo).toBe('CADASTRO_JA_VALIDADO');
+    });
+
+    test('a 5ª tentativa errada retorna CODIGO_BLOQUEADO (429)', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(
+            usuarioBase({ tentativas_validacao: 4 })
+        );
+        usuarioRepository.reservarTentativaValidacao.mockResolvedValue(true);
+
+        const erro = await capturarErro(
+            usuarioService.validarEmail('a@b.com', '000000')
+        );
+
+        expect(erro.codigo).toBe('CODIGO_BLOQUEADO');
+        expect(erro.status).toBe(429);
+    });
+
+    test('5 tentativas erradas seguidas terminam em CODIGO_BLOQUEADO', async () => {
+        // Simula o contador que o banco manteria entre as chamadas.
+        let tentativas = 0;
+        usuarioRepository.buscarPorEmail.mockImplementation(async () =>
+            usuarioBase({ tentativas_validacao: tentativas })
+        );
+        usuarioRepository.reservarTentativaValidacao.mockImplementation(
+            async (id, maximo) => {
+                if (tentativas >= maximo) return false;
+                tentativas += 1;
+                return true;
+            }
+        );
+
+        const codigos = [];
+        for (let i = 0; i < 5; i++) {
+            const erro = await capturarErro(
+                usuarioService.validarEmail('a@b.com', '000000')
+            );
+            codigos.push(erro.codigo);
+        }
+
+        expect(codigos).toEqual([
+            'CODIGO_INVALIDO',
+            'CODIGO_INVALIDO',
+            'CODIGO_INVALIDO',
+            'CODIGO_INVALIDO',
+            'CODIGO_BLOQUEADO',
+        ]);
+
+        // Depois de bloqueado, nem o código certo é aceito.
+        const erroCorreto = await capturarErro(
+            usuarioService.validarEmail('a@b.com', '123456')
+        );
+        expect(erroCorreto.codigo).toBe('CODIGO_BLOQUEADO');
+        expect(erroCorreto.status).toBe(429);
+        expect(usuarioRepository.confirmarEmail).not.toHaveBeenCalled();
+    });
+
+    test('CODIGO_BLOQUEADO quando já havia 5 tentativas, mesmo com o código certo', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(
+            usuarioBase({ tentativas_validacao: 5 })
+        );
+
+        const erro = await capturarErro(
+            usuarioService.validarEmail('a@b.com', '123456')
+        );
+
+        expect(erro.codigo).toBe('CODIGO_BLOQUEADO');
+        expect(usuarioRepository.reservarTentativaValidacao).not.toHaveBeenCalled();
+        expect(usuarioRepository.confirmarEmail).not.toHaveBeenCalled();
+    });
+
+    test('CODIGO_BLOQUEADO quando a reserva atômica da tentativa é negada', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(usuarioBase());
+        usuarioRepository.reservarTentativaValidacao.mockResolvedValue(false);
+
+        const erro = await capturarErro(
+            usuarioService.validarEmail('a@b.com', '123456')
+        );
+
+        expect(erro.codigo).toBe('CODIGO_BLOQUEADO');
+        expect(usuarioRepository.confirmarEmail).not.toHaveBeenCalled();
+    });
+});
+
+describe('reenviarCodigo', () => {
+    test('para AGUARDANDO_EMAIL gera e salva novo código (o repositório zera as tentativas)', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue({
+            id: 9,
+            status_cadastro: 'AGUARDANDO_EMAIL',
+            tentativas_validacao: 5,
+        });
+        usuarioRepository.salvarTokenValidacao.mockResolvedValue(1);
+
+        const resultado = await usuarioService.reenviarCodigo(' a@b.com ');
+
+        expect(usuarioRepository.buscarPorEmail).toHaveBeenCalledWith('a@b.com');
+        expect(resultado.email).toBe('a@b.com');
+        expect(resultado.codigo).toMatch(/^\d{6}$/);
+
+        expect(usuarioRepository.salvarTokenValidacao).toHaveBeenCalledTimes(1);
+        const [usuarioId, codigoSalvo, expiraEm] =
+            usuarioRepository.salvarTokenValidacao.mock.calls[0];
+        expect(usuarioId).toBe(9);
+        expect(codigoSalvo).toBe(resultado.codigo);
+        expect(expiraEm.getTime()).toBeGreaterThan(Date.now());
+    });
+
+    test.each(['PENDENTE_APROVACAO', 'APROVADO', 'REJEITADO'])(
+        'devolve null e não gera código para status %s',
+        async (status) => {
+            usuarioRepository.buscarPorEmail.mockResolvedValue({
+                id: 9,
+                status_cadastro: status,
+            });
+
+            await expect(usuarioService.reenviarCodigo('a@b.com')).resolves.toBeNull();
+            expect(usuarioRepository.salvarTokenValidacao).not.toHaveBeenCalled();
+        }
+    );
+
+    test('devolve null quando o e-mail não existe (sem revelar cadastro)', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue(undefined);
+
+        await expect(usuarioService.reenviarCodigo('x@y.com')).resolves.toBeNull();
+        expect(usuarioRepository.salvarTokenValidacao).not.toHaveBeenCalled();
+    });
+
+    test('lança EMAIL_INVALIDO (400) para e-mail malformado', async () => {
+        let erro;
+        try {
+            await usuarioService.reenviarCodigo('sem-arroba');
+        } catch (e) {
+            erro = e;
+        }
+
+        expect(erro.codigo).toBe('EMAIL_INVALIDO');
+        expect(erro.status).toBe(400);
+        expect(usuarioRepository.buscarPorEmail).not.toHaveBeenCalled();
+    });
+});
