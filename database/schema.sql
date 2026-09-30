@@ -2,20 +2,27 @@ CREATE DATABASE IF NOT EXISTS condominio;
 
 USE condominio;
 
+
 CREATE TABLE IF NOT EXISTS mensagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     texto VARCHAR(255) NOT NULL
 );
 
+
 INSERT INTO mensagens (texto)
 VALUES ('Olá Mundo!');
 
-CREATE TABLE usuarios (
+
+CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
-    perfil ENUM('ADMIN_PLATAFORMA', 'CANDIDATO', 'SINDICO') NOT NULL
+    perfil ENUM(
+        'ADMIN_PLATAFORMA',
+        'CANDIDATO',
+        'SINDICO'
+    ) NOT NULL
 );
 
 ALTER TABLE usuarios MODIFY perfil ENUM('ADMIN_PLATAFORMA', 'CANDIDATO', 'SINDICO', 'MORADOR') NOT NULL;
@@ -24,3 +31,18 @@ ALTER TABLE usuarios ADD COLUMN status_cadastro ENUM('AGUARDANDO_EMAIL', 'PENDEN
 ALTER TABLE usuarios ADD COLUMN token_validacao VARCHAR(255);
 ALTER TABLE usuarios ADD COLUMN token_expira_em DATETIME;
 ALTER TABLE usuarios ADD COLUMN tentativas_validacao INT NOT NULL DEFAULT 0;
+
+
+
+CREATE TABLE IF NOT EXISTS pedidos_sindico (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    usuario_id INT NOT NULL,
+
+    deferido BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT fk_pedido_usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id)
+        ON DELETE CASCADE
+);

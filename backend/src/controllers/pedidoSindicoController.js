@@ -3,9 +3,9 @@ const pedidoSindicoService = require('../services/pedidoSindicoService');
 // Controla a criação e aprovação de pedidos de síndico, delegando a lógica para o serviço correspondente.
 async function criarPedidoSindico(req, res) {
     try {
-        const { usuarioId } = req.body;
+        const { usuario_id, deferido } = req.body;
 
-        const pedidoId = await pedidoSindicoService.criarPedidoSindico(usuarioId);
+        const pedidoId = await pedidoSindicoService.criarPedidoSindico(usuario_id, deferido);
 
         res.status(201).json({
             mensagem: 'Pedido de cadastro de síndico criado com sucesso',
