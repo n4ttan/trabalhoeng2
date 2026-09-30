@@ -23,10 +23,6 @@ async function criarUsuario(req, res) {
             perfil
         );
 
-        const codigoValidacao = await usuarioService.gerarESalvarTokenValidacao(usuarioId);
-
-        console.log(`Código de validação para ${email}: ${codigoValidacao}`);
-
         res.status(201).json({
             mensagem: 'Usuário criado com sucesso. Verifique seu e-mail para validar o cadastro.',
             usuarioId: usuarioId
@@ -34,6 +30,11 @@ async function criarUsuario(req, res) {
 
     } catch (error) {
         console.error('Erro ao criar usuário:', error);
+
+        if (error.codigo === 'PERFIL_INVALIDO') {
+            res.status(400).json({ erro: error.message });
+            return;
+        }
 
         if (error.code === 'ER_DUP_ENTRY') {
             res.status(409).json({ erro: 'E-mail já cadastrado' });

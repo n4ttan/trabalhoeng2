@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './CadastroMoradorValidacaoPage.css';
 
 import {
@@ -25,6 +25,21 @@ function CadastroMoradorValidacaoPage() {
 
     // true depois de 5 tentativas incorretas; só um novo código libera a validação.
     const [bloqueado, setBloqueado] = useState(false);
+
+    // Segundos restantes até o botão de reenvio ser liberado de novo.
+    const [espera, setEspera] = useState(0);
+
+    useEffect(() => {
+        if (espera <= 0) {
+            return undefined;
+        }
+
+        const temporizador = setTimeout(() => {
+            setEspera((restante) => restante - 1);
+        }, 1000);
+
+        return () => clearTimeout(temporizador);
+    }, [espera]);
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -82,6 +97,7 @@ function CadastroMoradorValidacaoPage() {
             );
 
             setBloqueado(false);
+            setEspera(60);
             setEtapa('validacao');
         } catch (error) {
             setErro(error.message);
@@ -147,6 +163,7 @@ function CadastroMoradorValidacaoPage() {
 
             setBloqueado(false);
             setCodigo('');
+            setEspera(60);
             setMensagem(
                 data.mensagem ||
                     'Enviamos um novo código para o seu e-mail.'
@@ -162,6 +179,7 @@ function CadastroMoradorValidacaoPage() {
         setEtapa('cadastro');
         setCodigo('');
         setBloqueado(false);
+        setEspera(0);
         limparMensagens();
     }
 
@@ -368,9 +386,11 @@ function CadastroMoradorValidacaoPage() {
                                 className="botao-secundario"
                                 type="button"
                                 onClick={handleReenviar}
-                                disabled={carregando}
+                                disabled={carregando || espera > 0}
                             >
-                                Reenviar código
+                                {espera > 0
+                                    ? `Reenviar em ${espera}s`
+                                    : 'Reenviar código'}
                             </button>
 
                             <button

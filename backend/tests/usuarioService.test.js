@@ -34,9 +34,28 @@ describe('criarUsuario', () => {
         expect(hash).not.toBe('segredo');
         expect(usuarioRepository.criarMorador).not.toHaveBeenCalled();
     });
+
+    test.each(['SINDICO', 'ADMIN_PLATAFORMA', 'MORADOR', '', undefined])(
+        'rejeita perfil %p com 400 PERFIL_INVALIDO e não grava',
+        async (perfil) => {
+            await expect(
+                usuarioService.criarUsuario('Ana', 'ana@x.com', 'segredo', perfil)
+            ).rejects.toMatchObject({ status: 400, codigo: 'PERFIL_INVALIDO', message: 'Perfil inválido.' });
+            expect(usuarioRepository.criarUsuario).not.toHaveBeenCalled();
+        }
+    );
 });
 
 describe('criarMorador', () => {
+    test('ignora qualquer perfil enviado de fora e grava MORADOR', async () => {
+        usuarioRepository.criarMorador.mockResolvedValue(3);
+
+        // Um 5º argumento (perfil) vindo de fora não deve influenciar o resultado.
+        await usuarioService.criarMorador('Ana', 'ana@x.com', 'segredo', 'A1', 'SINDICO');
+
+        expect(usuarioRepository.criarMorador.mock.calls[0][3]).toBe('MORADOR');
+    });
+
     test('cadastra como MORADOR com unidade e devolve id e e-mail normalizado', async () => {
         usuarioRepository.criarMorador.mockResolvedValue(9);
 
@@ -54,6 +73,11 @@ describe('criarMorador', () => {
         ['sem unidade', ['Ana', 'a@x.com', 'segredo', ''], 'CAMPOS_OBRIGATORIOS'],
         ['e-mail inválido', ['Ana', 'invalido', 'segredo', 'A1'], 'EMAIL_INVALIDO'],
         ['senha curta', ['Ana', 'a@x.com', '123', 'A1'], 'SENHA_CURTA'],
+        ['senha vazia', ['Ana', 'a@x.com', '', 'A1'], 'CAMPOS_OBRIGATORIOS'],
+        ['nome com mais de 100 caracteres', ['a'.repeat(101), 'a@x.com', 'segredo', 'A1'], 'NOME_LONGO'],
+        ['e-mail com mais de 255 caracteres', ['Ana', `${'a'.repeat(250)}@x.com`, 'segredo', 'A1'], 'EMAIL_LONGO'],
+        ['unidade com mais de 20 caracteres', ['Ana', 'a@x.com', 'segredo', 'U'.repeat(21)], 'UNIDADE_LONGA'],
+        ['senha com mais de 72 caracteres', ['Ana', 'a@x.com', 's'.repeat(73), 'A1'], 'SENHA_LONGA'],
     ])('rejeita %s', async (_, args, codigo) => {
         await expect(usuarioService.criarMorador(...args)).rejects.toMatchObject({ status: 400, codigo });
         expect(usuarioRepository.criarMorador).not.toHaveBeenCalled();
@@ -356,6 +380,35 @@ describe('reenviarCodigo', () => {
             expect(usuarioRepository.salvarTokenValidacao).not.toHaveBeenCalled();
         }
     );
+
+    // Código criado há `segundos` atrás: a expiração é criação + 15 minutos.
+    const codigoCriadoHa = (segundos) => new Date(Date.now() - segundos * 1000 + 15 * 60 * 1000);
+
+    test('dentro de 60 s do último código não gera nem devolve novo código', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue({
+            id: 9,
+            status_cadastro: 'AGUARDANDO_EMAIL',
+            token_expira_em: codigoCriadoHa(30),
+        });
+
+        await expect(usuarioService.reenviarCodigo('a@b.com')).resolves.toBeNull();
+        expect(usuarioRepository.salvarTokenValidacao).not.toHaveBeenCalled();
+    });
+
+    test('após 60 s do último código gera e devolve novo código', async () => {
+        usuarioRepository.buscarPorEmail.mockResolvedValue({
+            id: 9,
+            status_cadastro: 'AGUARDANDO_EMAIL',
+            token_expira_em: codigoCriadoHa(61),
+        });
+        usuarioRepository.salvarTokenValidacao.mockResolvedValue(1);
+
+        const resultado = await usuarioService.reenviarCodigo('a@b.com');
+
+        expect(resultado).toMatchObject({ email: 'a@b.com' });
+        expect(resultado.codigo).toMatch(/^\d{6}$/);
+        expect(usuarioRepository.salvarTokenValidacao).toHaveBeenCalledTimes(1);
+    });
 
     test('devolve null quando o e-mail não existe (sem revelar cadastro)', async () => {
         usuarioRepository.buscarPorEmail.mockResolvedValue(undefined);

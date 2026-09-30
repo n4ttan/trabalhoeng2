@@ -10,6 +10,9 @@ function erroNegocio(status, codigo, mensagem) {
     return erro;
 }
 
+const VALIDADE_CODIGO_MS = 15 * 60 * 1000;
+const INTERVALO_REENVIO_MS = 60 * 1000;
+
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Valida os dados do cadastro de morador e devolve os valores já normalizados.
@@ -30,11 +33,32 @@ function validarDadosCadastro(nome, email, senha, unidade) {
         throw erroNegocio(400, 'SENHA_CURTA', 'A senha deve possuir pelo menos 6 caracteres.');
     }
 
+    if (nomeLimpo.length > 100) {
+        throw erroNegocio(400, 'NOME_LONGO', 'O nome deve possuir no máximo 100 caracteres.');
+    }
+
+    if (emailLimpo.length > 255) {
+        throw erroNegocio(400, 'EMAIL_LONGO', 'O e-mail deve possuir no máximo 255 caracteres.');
+    }
+
+    if (unidadeLimpa.length > 20) {
+        throw erroNegocio(400, 'UNIDADE_LONGA', 'A unidade deve possuir no máximo 20 caracteres.');
+    }
+
+    if (senha.length > 72) {
+        throw erroNegocio(400, 'SENHA_LONGA', 'A senha deve possuir no máximo 72 caracteres.');
+    }
+
     return { nome: nomeLimpo, email: emailLimpo, unidade: unidadeLimpa };
 }
 
+// Cadastro legado (fluxo de candidato a síndico): só aceita o perfil CANDIDATO.
 // Criptografa a senha antes de persistir o usuário para não salvar texto puro.
 async function criarUsuario(nome, email, senha, perfil) {
+    if (perfil !== 'CANDIDATO') {
+        throw erroNegocio(400, 'PERFIL_INVALIDO', 'Perfil inválido.');
+    }
+
     const senhaHash = await bcrypt.hash(senha, 10);
 
     return usuarioRepository.criarUsuario(
@@ -75,8 +99,7 @@ function gerarCodigoValidacao() {
 async function gerarESalvarTokenValidacao(usuarioId) {
     const codigo = gerarCodigoValidacao();
 
-    const expiraEm = new Date();
-    expiraEm.setMinutes(expiraEm.getMinutes() + 15);
+    const expiraEm = new Date(Date.now() + VALIDADE_CODIGO_MS);
 
     await usuarioRepository.salvarTokenValidacao(usuarioId, codigo, expiraEm);
 
@@ -161,6 +184,16 @@ async function reenviarCodigo(email) {
 
     if (!usuario || usuario.status_cadastro !== 'AGUARDANDO_EMAIL') {
         return null;
+    }
+
+    // Dentro do intervalo mínimo não gera nem envia outro código (evita zerar as tentativas
+    // em loop). A criação do código é deduzida da expiração; a resposta é a mesma de sempre.
+    if (usuario.token_expira_em) {
+        const criadoEm = new Date(usuario.token_expira_em).getTime() - VALIDADE_CODIGO_MS;
+
+        if (Date.now() - criadoEm < INTERVALO_REENVIO_MS) {
+            return null;
+        }
     }
 
     // salvarTokenValidacao zera as tentativas junto com o novo código.
