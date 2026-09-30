@@ -1,5 +1,6 @@
 jest.mock('../src/repositories/usuarioRepository', () => ({
     criarUsuario: jest.fn(),
+    criarMorador: jest.fn(),
     excluirUsuarioEPedido: jest.fn(),
     salvarTokenValidacao: jest.fn(),
     buscarPorEmail: jest.fn(),
@@ -19,6 +20,44 @@ const usuarioService = require('../src/services/usuarioService');
 
 beforeEach(() => {
     jest.resetAllMocks();
+});
+
+describe('criarUsuario', () => {
+    test('repassa o perfil recebido, sem unidade, e devolve o id', async () => {
+        usuarioRepository.criarUsuario.mockResolvedValue(7);
+
+        const id = await usuarioService.criarUsuario('Ana', 'ana@x.com', 'segredo', 'CANDIDATO');
+
+        expect(id).toBe(7);
+        const [nome, email, hash, perfil, extra] = usuarioRepository.criarUsuario.mock.calls[0];
+        expect([nome, email, perfil, extra]).toEqual(['Ana', 'ana@x.com', 'CANDIDATO', undefined]);
+        expect(hash).not.toBe('segredo');
+        expect(usuarioRepository.criarMorador).not.toHaveBeenCalled();
+    });
+});
+
+describe('criarMorador', () => {
+    test('cadastra como MORADOR com unidade e devolve id e e-mail normalizado', async () => {
+        usuarioRepository.criarMorador.mockResolvedValue(9);
+
+        const r = await usuarioService.criarMorador(' Ana ', ' ana@x.com ', 'segredo', ' A-101 ');
+
+        expect(r).toEqual({ usuarioId: 9, email: 'ana@x.com' });
+        const [nome, email, hash, perfil, unidade] = usuarioRepository.criarMorador.mock.calls[0];
+        expect([nome, email, perfil, unidade]).toEqual(['Ana', 'ana@x.com', 'MORADOR', 'A-101']);
+        expect(hash).not.toBe('segredo');
+        expect(usuarioRepository.criarUsuario).not.toHaveBeenCalled();
+    });
+
+    test.each([
+        ['campos vazios', ['', 'a@x.com', 'segredo', 'A1'], 'CAMPOS_OBRIGATORIOS'],
+        ['sem unidade', ['Ana', 'a@x.com', 'segredo', ''], 'CAMPOS_OBRIGATORIOS'],
+        ['e-mail inválido', ['Ana', 'invalido', 'segredo', 'A1'], 'EMAIL_INVALIDO'],
+        ['senha curta', ['Ana', 'a@x.com', '123', 'A1'], 'SENHA_CURTA'],
+    ])('rejeita %s', async (_, args, codigo) => {
+        await expect(usuarioService.criarMorador(...args)).rejects.toMatchObject({ status: 400, codigo });
+        expect(usuarioRepository.criarMorador).not.toHaveBeenCalled();
+    });
 });
 
 describe('gerarCodigoValidacao', () => {

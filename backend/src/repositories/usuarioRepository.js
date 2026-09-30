@@ -1,7 +1,25 @@
 const connection = require('./database');
 
-// Insere um novo usuário no banco com nome, email, senha já tratada, perfil e unidade.
-function criarUsuario(nome, email, senha, perfil, unidade) {
+// Insere um novo usuário no banco com nome, email, senha já tratada e perfil.
+function criarUsuario(nome, email, senha, perfil) {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            'INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?, ?, ?, ?)',
+            [nome, email, senha, perfil],
+            (error, results) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                resolve(results.insertId);
+            }
+        );
+    });
+}
+
+// Insere um novo morador no banco com nome, email, senha já tratada, perfil e unidade.
+function criarMorador(nome, email, senha, perfil, unidade) {
     return new Promise((resolve, reject) => {
         connection.query(
             'INSERT INTO usuarios (nome, email, senha, perfil, unidade) VALUES (?, ?, ?, ?, ?)',
@@ -180,6 +198,7 @@ function rejeitarMorador(usuarioId) {
 
 module.exports = {
     criarUsuario,
+    criarMorador,
     excluirUsuarioEPedido,
     salvarTokenValidacao,
     buscarPorEmail,

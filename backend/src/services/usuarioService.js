@@ -33,12 +33,24 @@ function validarDadosCadastro(nome, email, senha, unidade) {
     return { nome: nomeLimpo, email: emailLimpo, unidade: unidadeLimpa };
 }
 
+// Criptografa a senha antes de persistir o usuário para não salvar texto puro.
+async function criarUsuario(nome, email, senha, perfil) {
+    const senhaHash = await bcrypt.hash(senha, 10);
+
+    return usuarioRepository.criarUsuario(
+        nome,
+        email,
+        senhaHash,
+        perfil
+    );
+}
+
 // Valida os dados, criptografa a senha e cadastra sempre como MORADOR.
-async function criarUsuario(nome, email, senha, unidade) {
+async function criarMorador(nome, email, senha, unidade) {
     const dados = validarDadosCadastro(nome, email, senha, unidade);
     const senhaHash = await bcrypt.hash(senha, 10);
 
-    const usuarioId = await usuarioRepository.criarUsuario(
+    const usuarioId = await usuarioRepository.criarMorador(
         dados.nome,
         dados.email,
         senhaHash,
@@ -183,6 +195,7 @@ async function rejeitarMorador(usuarioId) {
 
 module.exports = {
     criarUsuario,
+    criarMorador,
     excluirUsuarioEPedido,
     gerarCodigoValidacao,
     gerarESalvarTokenValidacao,

@@ -11,12 +11,47 @@ function responderErro(res, error, mensagemGenerica) {
     res.status(500).json({ erro: mensagemGenerica });
 }
 
-// Controla o cadastro de morador e devolve o ID gerado no banco.
+// Controla o cadastro de usuário e devolve o ID gerado no banco.
 async function criarUsuario(req, res) {
+    try {
+        const { nome, email, senha, perfil } = req.body;
+
+        const usuarioId = await usuarioService.criarUsuario(
+            nome,
+            email,
+            senha,
+            perfil
+        );
+
+        const codigoValidacao = await usuarioService.gerarESalvarTokenValidacao(usuarioId);
+
+        console.log(`Código de validação para ${email}: ${codigoValidacao}`);
+
+        res.status(201).json({
+            mensagem: 'Usuário criado com sucesso. Verifique seu e-mail para validar o cadastro.',
+            usuarioId: usuarioId
+        });
+
+    } catch (error) {
+        console.error('Erro ao criar usuário:', error);
+
+        if (error.code === 'ER_DUP_ENTRY') {
+            res.status(409).json({ erro: 'E-mail já cadastrado' });
+            return;
+        }
+
+        res.status(500).json({
+            erro: 'Erro ao criar usuário'
+        });
+    }
+}
+
+// Controla o cadastro de morador com validação de e-mail e devolve o ID gerado no banco.
+async function criarMorador(req, res) {
     try {
         const { nome, email, senha, unidade } = req.body;
 
-        const usuario = await usuarioService.criarUsuario(nome, email, senha, unidade);
+        const usuario = await usuarioService.criarMorador(nome, email, senha, unidade);
 
         const codigoValidacao = await usuarioService.gerarESalvarTokenValidacao(usuario.usuarioId);
 
@@ -33,14 +68,14 @@ async function criarUsuario(req, res) {
         });
 
     } catch (error) {
-        console.error('Erro ao criar usuário:', error);
+        console.error('Erro ao criar morador:', error);
 
         if (error.code === 'ER_DUP_ENTRY') {
             res.status(409).json({ erro: 'E-mail já cadastrado' });
             return;
         }
 
-        responderErro(res, error, 'Erro ao criar usuário');
+        responderErro(res, error, 'Erro ao criar morador');
     }
 }
 
@@ -142,6 +177,7 @@ async function rejeitarMorador(req, res) {
 
 module.exports = {
     criarUsuario,
+    criarMorador,
     excluirUsuarioEPedido,
     validarEmail,
     reenviarCodigo,
