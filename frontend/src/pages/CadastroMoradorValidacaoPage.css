@@ -1,0 +1,330 @@
+.morador-validacao * {
+    box-sizing: border-box;
+}
+
+.morador-validacao {
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px 20px;
+
+    background: linear-gradient(
+        135deg,
+        #eef2ff 0%,
+        #f8fafc 50%,
+        #eff6ff 100%
+    );
+}
+
+.morador-validacao .card-cadastro {
+    width: 100%;
+    max-width: 620px;
+
+    padding: 42px;
+
+    background: white;
+
+    border: 1px solid #e4e7ec;
+    border-radius: 18px;
+
+    box-shadow: 0 20px 50px rgba(16, 24, 40, 0.08);
+}
+
+.morador-validacao .cabecalho {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.morador-validacao .icone-principal {
+    width: 60px;
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 18px;
+
+    background: #eff6ff;
+
+    border-radius: 50%;
+
+    font-size: 28px;
+}
+
+.morador-validacao .nome-sistema {
+    display: block;
+
+    margin-bottom: 10px;
+
+    color: #2563eb;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.morador-validacao .cabecalho h1,
+.morador-validacao .tela-sucesso h1 {
+    margin: 0 0 10px;
+
+    color: #101828;
+
+    font-size: 30px;
+}
+
+.morador-validacao .cabecalho p {
+    margin: 0;
+
+    color: #667085;
+
+    line-height: 1.6;
+}
+
+.morador-validacao .email-destaque {
+    display: block;
+
+    margin-top: 8px;
+
+    color: #344054;
+}
+
+.morador-validacao .formulario {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+.morador-validacao .campo {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.morador-validacao .campo label {
+    color: #344054;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.morador-validacao .campo input {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #d0d5dd;
+    border-radius: 9px;
+
+    outline: none;
+
+    font-size: 15px;
+}
+
+.morador-validacao .campo input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(37, 99, 235, 0.1);
+}
+
+.morador-validacao .campo input::placeholder {
+    color: #98a2b3;
+}
+
+.morador-validacao .ajuda-campo {
+    color: #667085;
+
+    font-size: 13px;
+}
+
+.morador-validacao .linha-senhas {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 16px;
+}
+
+.morador-validacao .botao-principal,
+.morador-validacao .botao-secundario {
+    width: 100%;
+
+    min-height: 48px;
+
+    padding: 13px 20px;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.morador-validacao .botao-principal {
+    border: none;
+
+    background: #2563eb;
+    color: white;
+}
+
+.morador-validacao .botao-principal:hover {
+    background: #1d4ed8;
+}
+
+.morador-validacao .botao-secundario {
+    border: 1px solid #d0d5dd;
+
+    background: white;
+    color: #344054;
+}
+
+.morador-validacao .botao-secundario:hover {
+    background: #f9fafb;
+}
+
+.morador-validacao button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.6;
+}
+
+.morador-validacao .alerta {
+    padding: 13px 15px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+.morador-validacao .alerta-erro {
+    background: #fef3f2;
+
+    border: 1px solid #fecdca;
+
+    color: #b42318;
+}
+
+.morador-validacao .alerta-sucesso {
+    background: #ecfdf3;
+
+    border: 1px solid #abefc6;
+
+    color: #067647;
+}
+
+.morador-validacao .aviso-formulario {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 13px;
+
+    text-align: center;
+
+    line-height: 1.5;
+}
+
+.morador-validacao .input-codigo {
+    text-align: center;
+
+    font-family: monospace;
+
+    font-size: 28px !important;
+    font-weight: bold;
+
+    letter-spacing: 10px;
+}
+
+.morador-validacao .tela-sucesso {
+    text-align: center;
+}
+
+.morador-validacao .icone-sucesso {
+    width: 68px;
+    height: 68px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 20px;
+
+    border-radius: 50%;
+
+    background: #dcfae6;
+    color: #079455;
+
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.morador-validacao .descricao-sucesso {
+    color: #667085;
+}
+
+.morador-validacao .status-cadastro {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    margin-top: 24px;
+
+    padding: 16px;
+
+    background: #fffaeb;
+
+    border: 1px solid #fedf89;
+    border-radius: 10px;
+}
+
+.morador-validacao .status-cadastro span {
+    color: #667085;
+
+    font-size: 13px;
+}
+
+.morador-validacao .status-cadastro strong {
+    color: #b54708;
+}
+
+.morador-validacao .texto-final {
+    margin-top: 20px;
+
+    color: #667085;
+
+    line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+    .morador-validacao {
+        padding: 20px 14px;
+    }
+
+    .morador-validacao .card-cadastro {
+        padding: 28px 20px;
+    }
+
+    .morador-validacao .linha-senhas {
+        grid-template-columns: 1fr;
+    }
+
+    .morador-validacao .cabecalho h1,
+    .morador-validacao .tela-sucesso h1 {
+        font-size: 25px;
+    }
+}

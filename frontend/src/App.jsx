@@ -7,6 +7,9 @@ import {
 import HomePage from './pages/HomePage';
 import CadastroMoradorPage from './pages/CadastroMoradorPage';
 
+import CadastroMoradorValidacaoPage
+    from './pages/CadastroMoradorValidacaoPage';
+
 import PermissaoSindicoPage
     from './pages/PermissaoSindicoPage';
 
@@ -28,6 +31,11 @@ function App() {
                 <Route
                     path="/cadastro-morador"
                     element={<CadastroMoradorPage />}
+                />
+
+                <Route
+                    path="/morador/cadastro"
+                    element={<CadastroMoradorValidacaoPage />}
                 />
 
                 <Route

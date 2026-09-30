@@ -49,6 +49,16 @@ function HomePage() {
 
                 <div>
 
+                    <Link to="/morador/cadastro">
+                        Cadastro de Morador com Validação de E-mail
+                    </Link>
+
+                </div>
+
+                <br />
+
+                <div>
+
                     <Link to="/permissao-sindico">
                         Permissão do Síndico
                     </Link>

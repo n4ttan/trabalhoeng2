@@ -20,8 +20,14 @@ app.post('/pedidos-sindico', pedidoSindicoController.criarPedidoSindico);
 // Cria um novo usuário no sistema.
 app.post('/usuarios', usuarioController.criarUsuario);
 
+// Cadastra um morador (perfil fixo, com unidade) e envia o código de validação por e-mail.
+app.post('/usuarios/moradores', usuarioController.criarMorador);
+
 // Confirma o código de validação enviado ao e-mail do morador.
 app.post('/usuarios/validar-email', usuarioController.validarEmail);
+
+// Gera e envia um novo código para cadastros que ainda aguardam validação do e-mail.
+app.post('/usuarios/reenviar-codigo', usuarioController.reenviarCodigo);
 
 // Inicia o servidor na porta 3000.
 app.listen(3000, () => {
