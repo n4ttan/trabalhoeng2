@@ -20,7 +20,7 @@ describe('usuarioRepository - integração', () => {
         );
     });
 
-    it('deve criar um usuário no banco de dados', async () => {
+it('deve criar um usuário no banco de dados', async () => {
         const email = `teste.integracao.${Date.now()}@email.com`;
 
         usuarioId = await usuarioRepository.criarUsuario(
@@ -45,7 +45,7 @@ describe('usuarioRepository - integração', () => {
         expect(usuarios[0].perfil).toBe('CANDIDATO');
     });
 
-    it('deve criar um morador no banco de dados', async () => {
+it('deve criar um morador no banco de dados', async () => {
     const email = `morador.integracao.${Date.now()}@email.com`;
 
     const usuarioId = await usuarioRepository.criarMorador(
@@ -384,5 +384,103 @@ it('deve rejeitar um morador pendente', async () => {
         [usuarioId]
     );
 });
+
+//testando as excessões 
+it('deve retornar um erro quando as informações do criarUsuário forem incorretas', async () => {
+
+    await expect(
+        usuarioRepository.criarUsuario(
+            null,
+            'null@gmail.com',
+            'senha-teste',
+            'FUNCIONARIO'
+        )
+
+    ).rejects.toThrow();
+
+});
+
+it('deve retornar um erro quando as informações do criarMorador forem incorretas', async () => {
+
+    await expect(
+        usuarioRepository.criarMorador(
+            null,
+            'null@gmail.com',
+            'senha-teste',
+            'FUNCIONARIO',
+            null
+        )
+
+    ).rejects.toThrow();
+
+});
+
+it('deve retornar um erro quando o id do ExcluirUsuarioEPedido não existir', async () => {
+
+    await expect(
+        usuarioRepository.excluirUsuarioEPedido(
+            'string'
+        )
+
+    ).rejects.toThrow();
+
+});
+
+it('deve retornar um erro quando a requisição do salvarTokenValidacao não for correto', async () => {
+
+    await expect(
+        usuarioRepository.salvarTokenValidacao(
+            [1, 2],
+            '123456',
+            '2030-01-01 10:00:00'
+        )
+
+    ).rejects.toThrow();
+
+});
+
+it('deve retornar undefined quando o e-mail não existir no banco de dados', async () => {
+    
+    const usuario = await usuarioRepository.buscarPorEmail('email_fantasma@teste.com');
+    
+    expect(usuario).toBeUndefined();
+});
+
+it('deve retornar um erro ao buscar por e-mail devido a falha de sintaxe', async () => {
+
+    await expect(
+        usuarioRepository.buscarPorEmail(['email1', 'email2'])
+    ).rejects.toThrow();
+});
+
+it('deve retornar um erro ao tentar reservar tentativa devido a erro de sintaxe', async () => {
+    
+    await expect(
+        usuarioRepository.reservarTentativaValidacao([1, 2], 5)
+    ).rejects.toThrow();
+});
+
+it('deve retornar um erro ao tentar confirmar email devido a erro de sintaxe', async () => {
+    
+    await expect(
+        usuarioRepository.confirmarEmail([1, 2])
+    ).rejects.toThrow();
+});
+
+it('deve retornar um erro ao listar pendentes simulando queda no banco', async () => {
+   
+    const spy = jest.spyOn(connection, 'query').mockImplementationOnce((sql, callback) => {
+        callback(new Error('Simulação de falha no banco de dados'), null);
+    });
+
+    await expect(
+        usuarioRepository.listarPendentes()
+    ).rejects.toThrow();
+
+    
+    spy.mockRestore();
+});
+
+
 
 });

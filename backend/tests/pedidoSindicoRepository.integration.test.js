@@ -112,4 +112,88 @@ it('deve retornar false quando o pedido não existir', async () => {
     expect(resultado).toBe(false);
 });
 
+it('deve retornar um erro ao tentar criar um pedido com falha de sintaxe', async () => {
+
+    await expect(
+        pedidoSindicoRepository.criarPedidoSindico([1, 2], false)
+    ).rejects.toThrow();
+});
+
+it('deve retornar erro se falhar ao iniciar a transação (beginTransaction)', async () => {
+
+    const spy = jest.spyOn(connection, 'beginTransaction').mockImplementationOnce((callback) => {
+        callback(new Error('Falha no beginTransaction'));
+    });
+
+    await expect(
+        pedidoSindicoRepository.aprovarPedidoSindico(1)
+    ).rejects.toThrow('Falha no beginTransaction');
+
+    spy.mockRestore();
+});
+
+it('deve retornar erro se falhar ao iniciar a transação (beginTransaction)', async () => {
+    const spy = jest.spyOn(connection, 'beginTransaction').mockImplementationOnce((...args) => {
+        const callback = args[args.length - 1]; // Pega sempre o último argumento
+        callback(new Error('Falha no beginTransaction'));
+    });
+
+    await expect(
+        pedidoSindicoRepository.aprovarPedidoSindico(1)
+    ).rejects.toThrow('Falha no beginTransaction');
+
+    spy.mockRestore();
+});
+
+it('deve fazer rollback e retornar erro se a primeira query (atualizar pedido) falhar', async () => {
+    const spy = jest.spyOn(connection, 'query').mockImplementationOnce((...args) => {
+        const callback = args[args.length - 1];
+        callback(new Error('Falha na primeira query'));
+    });
+
+    await expect(
+        pedidoSindicoRepository.aprovarPedidoSindico(1)
+    ).rejects.toThrow('Falha na primeira query');
+
+    spy.mockRestore();
+});
+
+it('deve fazer rollback e retornar erro se a segunda query (atualizar usuário) falhar', async () => {
+    const spy = jest.spyOn(connection, 'query')
+        .mockImplementationOnce((...args) => {
+            const callback = args[args.length - 1];
+            callback(null, { affectedRows: 1 }); // 1ª Query: Sucesso
+        })
+        .mockImplementationOnce((...args) => {
+            const callback = args[args.length - 1];
+            callback(new Error('Falha na segunda query')); // 2ª Query: Erro!
+        });
+
+    await expect(
+        pedidoSindicoRepository.aprovarPedidoSindico(1)
+    ).rejects.toThrow('Falha na segunda query');
+
+    spy.mockRestore();
+});
+
+it('deve fazer rollback e retornar erro se o commit final falhar', async () => {
+    // Aqui usamos mockImplementation normal para deixar TODAS as queries passarem
+    const spyQuery = jest.spyOn(connection, 'query').mockImplementation((...args) => {
+        const callback = args[args.length - 1];
+        callback(null, { affectedRows: 1 });
+    });
+
+    const spyCommit = jest.spyOn(connection, 'commit').mockImplementationOnce((...args) => {
+        const callback = args[args.length - 1];
+        callback(new Error('Falha no commit'));
+    });
+
+    await expect(
+        pedidoSindicoRepository.aprovarPedidoSindico(1)
+    ).rejects.toThrow('Falha no commit');
+
+    spyQuery.mockRestore();
+    spyCommit.mockRestore();
+});
+
 });
