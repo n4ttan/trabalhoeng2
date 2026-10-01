@@ -23,7 +23,7 @@ describe('Teste de Conexão com o Banco de Dados (database.js)', () => {
                 connect: jest.fn((callback) => {
 
                     callback(new Error('Falha de conexão simulada (Acesso negado)'));
-                })git c
+                })
             })
         }));
 
