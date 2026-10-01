@@ -46,6 +46,75 @@ describe('criarUsuario', () => {
     );
 });
 
+describe('listarPendentes', () => {
+    it('deve listar os moradores pendentes', async () => {
+        const pendentes = [
+            {
+                id: 1,
+                nome: 'João da Silva',
+                email: 'joao@email.com'
+            }
+        ];
+
+        usuarioRepository.listarPendentes.mockResolvedValue(pendentes);
+
+        const resultado = await usuarioService.listarPendentes();
+
+        expect(usuarioRepository.listarPendentes).toHaveBeenCalledTimes(1);
+        expect(resultado).toEqual(pendentes);
+    });
+});
+
+describe('aprovarMorador', () => {
+    it('deve aprovar o morador', async () => {
+        usuarioRepository.aprovarMorador.mockResolvedValue(true);
+
+        const resultado = await usuarioService.aprovarMorador(1);
+
+        expect(usuarioRepository.aprovarMorador).toHaveBeenCalledWith(1);
+        expect(resultado).toEqual({
+            mensagem: 'Morador aprovado com sucesso'
+        });
+    });
+
+    it('deve lançar erro quando o morador não puder ser aprovado', async () => {
+        usuarioRepository.aprovarMorador.mockResolvedValue(false);
+
+        await expect(
+            usuarioService.aprovarMorador(1)
+        ).rejects.toMatchObject({
+            status: 404
+        });
+
+        expect(usuarioRepository.aprovarMorador).toHaveBeenCalledWith(1);
+    });
+});
+
+describe('rejeitarMorador', () => {
+    it('deve rejeitar o morador', async () => {
+        usuarioRepository.rejeitarMorador.mockResolvedValue(true);
+
+        const resultado = await usuarioService.rejeitarMorador(1);
+
+        expect(usuarioRepository.rejeitarMorador).toHaveBeenCalledWith(1);
+        expect(resultado).toEqual({
+            mensagem: 'Morador rejeitado com sucesso'
+        });
+    });
+
+    it('deve lançar erro quando o morador não puder ser rejeitado', async () => {
+        usuarioRepository.rejeitarMorador.mockResolvedValue(false);
+
+        await expect(
+            usuarioService.rejeitarMorador(1)
+        ).rejects.toMatchObject({
+            status: 404
+        });
+
+        expect(usuarioRepository.rejeitarMorador).toHaveBeenCalledWith(1);
+    });
+});
+
 describe('criarMorador', () => {
     test('ignora qualquer perfil enviado de fora e grava MORADOR', async () => {
         usuarioRepository.criarMorador.mockResolvedValue(3);
