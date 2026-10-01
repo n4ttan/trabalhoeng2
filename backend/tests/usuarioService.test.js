@@ -199,7 +199,6 @@ describe('validarEmail', () => {
         ...extra,
     });
 
-    // Captura o erro lançado para poder checar status e codigo.
     async function capturarErro(promessa) {
         try {
             await promessa;
@@ -349,7 +348,6 @@ describe('validarEmail', () => {
     });
 
     test('5 tentativas erradas seguidas terminam em CODIGO_BLOQUEADO', async () => {
-        // Simula o contador que o banco manteria entre as chamadas.
         let tentativas = 0;
         usuarioRepository.buscarPorEmail.mockImplementation(async () =>
             usuarioBase({ tentativas_validacao: tentativas })
@@ -378,7 +376,6 @@ describe('validarEmail', () => {
             'CODIGO_BLOQUEADO',
         ]);
 
-        // Depois de bloqueado, nem o código certo é aceito.
         const erroCorreto = await capturarErro(
             usuarioService.validarEmail('a@b.com', '123456')
         );
@@ -450,7 +447,6 @@ describe('reenviarCodigo', () => {
         }
     );
 
-    // Código criado há `segundos` atrás: a expiração é criação + 15 minutos.
     const codigoCriadoHa = (segundos) => new Date(Date.now() - segundos * 1000 + 15 * 60 * 1000);
 
     test('dentro de 60 s do último código não gera nem devolve novo código', async () => {

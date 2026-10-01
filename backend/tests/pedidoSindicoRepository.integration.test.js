@@ -162,11 +162,11 @@ it('deve fazer rollback e retornar erro se a segunda query (atualizar usuário) 
     const spy = jest.spyOn(connection, 'query')
         .mockImplementationOnce((...args) => {
             const callback = args[args.length - 1];
-            callback(null, { affectedRows: 1 }); // 1ª Query: Sucesso
+            callback(null, { affectedRows: 1 }); 
         })
         .mockImplementationOnce((...args) => {
             const callback = args[args.length - 1];
-            callback(new Error('Falha na segunda query')); // 2ª Query: Erro!
+            callback(new Error('Falha na segunda query')); 
         });
 
     await expect(

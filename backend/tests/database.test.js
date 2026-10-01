@@ -6,7 +6,6 @@ describe('Teste de Conexão com o Banco de Dados (database.js)', () => {
 
         jest.resetModules(); 
         
-        // Espiões para ler o que o seu arquivo vai imprimir no terminal
         consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     });
