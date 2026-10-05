@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
-    perfil ENUM('ADMIN_PLATAFORMA', 'USUARIO', 'CANDIDATO', 'SINDICO', 'MORADOR') NOT NULL,
+    perfil ENUM('ADMIN_PLATAFORMA', 'USUARIO', 'CANDIDATO', 'SINDICO', 'MORADOR', 'ADMIN') NOT NULL,
     unidade VARCHAR(20),
     status_cadastro ENUM('AGUARDANDO_EMAIL', 'PENDENTE_APROVACAO', 'APROVADO', 'REJEITADO') DEFAULT 'AGUARDANDO_EMAIL',
     token_validacao VARCHAR(255),
@@ -36,4 +36,13 @@ CREATE TABLE IF NOT EXISTS pedidos_sindico (
         FOREIGN KEY (usuario_id)
         REFERENCES usuarios(id)
         ON DELETE CASCADE
+);
+
+INSERT INTO usuarios (nome, email, senha, perfil, status_cadastro) 
+VALUES (
+    'Administrador Geral', 
+    'admin@condominio.com', 
+    '$2b$10$Nx.nvEbDklACp6msJ4t1XOqnZ9C3bhiKuPvHL4fGC2KSmzvkh6MJi', 
+    'ADMIN', 
+    'APROVADO' 
 );

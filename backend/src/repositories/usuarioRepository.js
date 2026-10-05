@@ -196,6 +196,24 @@ function rejeitarMorador(usuarioId) {
     });
 }
 
+function rebaixarUsuario(usuarioId) {
+    return new Promise((resolve, reject) => {
+        const query = `
+            UPDATE usuarios 
+            SET perfil = 'MORADOR' 
+            WHERE id = ?
+        `;
+
+        connection.query(query, [usuarioId], (error, results) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+            resolve(results.affectedRows > 0);
+        });
+    });
+}
+
 module.exports = {
     criarUsuario,
     criarMorador,
@@ -206,5 +224,6 @@ module.exports = {
     confirmarEmail,
     listarPendentes,
     aprovarMorador,
-    rejeitarMorador
+    rejeitarMorador,
+    rebaixarUsuario
 };

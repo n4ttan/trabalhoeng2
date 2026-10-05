@@ -226,6 +226,18 @@ async function rejeitarMorador(usuarioId) {
   return { mensagem: "Morador rejeitado com sucesso" };
 }
 
+async function rebaixarUsuario(usuarioId) {
+    const rebaixado = await usuarioRepository.rebaixarUsuario(usuarioId);
+    
+    if (!rebaixado) {
+        const error = new Error("Usuário não encontrado");
+        error.status = 404;
+        throw error;
+    }
+    
+    return { mensagem: "Privilégios revogados. Usuário rebaixado para morador." };
+}
+
 module.exports = {
     criarUsuario,
     criarMorador,
@@ -236,5 +248,6 @@ module.exports = {
     reenviarCodigo,
     listarPendentes,
   aprovarMorador,
-  rejeitarMorador
+  rejeitarMorador,
+  rebaixarUsuario
 };

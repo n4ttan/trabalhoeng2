@@ -3,10 +3,9 @@ const pedidoSindicoService = require('../services/pedidoSindicoService');
 // Controla a criação e aprovação de pedidos de síndico, delegando a lógica para o serviço correspondente.
 async function criarPedidoSindico(req, res) {
     try {
-        const { usuario_id, deferido } = req.body;
+       const usuarioId = req.usuario.id;
 
-        const pedidoId = await pedidoSindicoService.criarPedidoSindico(usuario_id, deferido);
-
+        const pedidoId = await pedidoSindicoService.criarPedidoSindico(usuarioId);
         res.status(201).json({
             mensagem: 'Pedido de cadastro de síndico criado com sucesso',
             pedidoId: pedidoId
@@ -46,7 +45,33 @@ async function aprovarPedidoSindico(req, res) {
     }
 }
 
+async function reprovarPedidoSindico(req, res) {
+    try {
+        const { pedidoId } = req.params;
+
+        const resultado = await pedidoSindicoService.reprovarPedidoSindico(pedidoId);
+
+        if (resultado === false) {
+            res.status(404).json({
+                erro: 'Pedido não encontrado'
+            });
+            return;
+        }
+
+        res.json({
+            mensagem: 'Pedido de síndico reprovado com sucesso'
+        });
+    } catch (error) {
+        console.error('Erro ao reprovar pedido de síndico:', error);
+
+        res.status(500).json({
+            erro: 'Erro ao reprovar pedido de síndico'
+        });
+    }
+}
+
 module.exports = {
     criarPedidoSindico,
-    aprovarPedidoSindico
+    aprovarPedidoSindico,
+    reprovarPedidoSindico
 };

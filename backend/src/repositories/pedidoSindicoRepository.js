@@ -1,20 +1,21 @@
 const connection = require('./database');
 
 // Cria um registro de pedido de síndico para o usuário informado.
-function criarPedidoSindico(usuario_id, deferido) {
+function criarPedidoSindico(usuarioId) {
     return new Promise((resolve, reject) => {
-        connection.query(
-            'INSERT INTO pedidos_sindico (usuario_id, deferido) VALUES (?, ?)',
-            [usuario_id, deferido],
-            (error, results) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
+        const query = `
+            INSERT INTO pedidos_sindico (usuario_id, deferido) 
+            VALUES (?, FALSE)
+        `;
 
-                resolve(results.insertId);
+        // Passamos apenas o usuarioId na lista de parâmetros (o array)
+        connection.query(query, [usuarioId], (error, results) => {
+            if (error) {
+                reject(error);
+                return;
             }
-        );
+            resolve(results.insertId);
+        });
     });
 }
 
@@ -86,7 +87,27 @@ function aprovarPedidoSindico(pedidoId) {
     });
 }
 
+function reprovarPedidoSindico(pedidoId) {
+    return new Promise((resolve, reject) => {
+        const query = `
+            UPDATE pedidos_sindico
+            SET deferido = FALSE
+            WHERE id = ?
+        `;
+
+        connection.query(query, [pedidoId], (error, results) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+
+            resolve(results.affectedRows > 0);
+        });
+    });
+}
+
 module.exports = {
     criarPedidoSindico,
-    aprovarPedidoSindico
+    aprovarPedidoSindico,
+    reprovarPedidoSindico
 };

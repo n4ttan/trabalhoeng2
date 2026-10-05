@@ -176,6 +176,22 @@ async function rejeitarMorador(req, res) {
   }
 }
 
+async function rebaixarUsuario(req, res) {
+    try {
+        const { usuarioId } = req.params;
+        const resultado = await usuarioService.rebaixarUsuario(usuarioId);
+        
+        res.json(resultado);
+    } catch (error) {
+        console.error('Erro ao rebaixar usuário:', error);
+        
+        const status = error.status || 500;
+        res.status(status).json({ 
+            erro: error.message || 'Erro interno ao rebaixar usuário' 
+        });
+    }
+}
+
 module.exports = {
     criarUsuario,
     criarMorador,
@@ -184,5 +200,6 @@ module.exports = {
     reenviarCodigo,
     listarPendentes,
   aprovarMorador,
-  rejeitarMorador
+  rejeitarMorador,
+  rebaixarUsuario
 };

@@ -5,7 +5,7 @@ const mensagemController = require('./controllers/mensagemController');
 const pedidoSindicoController = require('./controllers/pedidoSindicoController');
 const usuarioController = require('./controllers/usuarioController');
 const authController = require('./controllers/authController');
-const { verificarToken, verificarSindico } = require('./middleware/auth');
+const { verificarToken, verificarSindico, verificarAdmin } = require('./middleware/auth');
 
 // Inicializa a API Express.
 const app = express();
@@ -26,8 +26,8 @@ app.get(
 
 // Cria um pedido para o usuário se candidatar ao cargo de síndico.
 app.post(
-    verificarToken,
     '/pedidos-sindico', 
+    verificarToken,
     pedidoSindicoController.criarPedidoSindico);
 
 // Cria um novo usuário no sistema.
@@ -57,35 +57,49 @@ app.listen(3000, () => {
 
 // Remove um usuário e também todos os pedidos de síndico vinculados a ele.
 app.delete(
+    '/usuarios/:usuarioId',
     verificarToken,
     verificarSindico,
-    '/usuarios/:usuarioId',
     usuarioController.excluirUsuarioEPedido);
 
 // Aprova um pedido pendente e atualiza o perfil do usuário para síndico.
 app.patch(
+    '/admin/pedidos-sindico/:pedidoId/aprovar',
     verificarToken,
-    verificarSindico,
-    '/pedidos-sindico/:pedidoId/aprovar',
+    verificarAdmin,
     pedidoSindicoController.aprovarPedidoSindico
 );
 
+app.patch(
+    '/admin/pedidos-sindico/:pedidoId/reprovar',
+    verificarToken,
+    verificarAdmin,
+    pedidoSindicoController.reprovarPedidoSindico
+);
+
+app.patch(
+    '/admin/usuarios/:usuarioId/rebaixar',
+    verificarToken,
+    verificarAdmin, 
+    usuarioController.rebaixarUsuario
+);
+
 app.get(
+    '/usuarios/pendentes', 
     verificarToken,
     verificarSindico,
-    '/usuarios/pendentes', 
     usuarioController.listarPendentes);
 
 app.patch(
+    '/usuarios/:usuarioId/aprovar', 
     verificarToken,
     verificarSindico,
-    '/usuarios/:usuarioId/aprovar', 
     usuarioController.aprovarMorador);
 
 app.patch(
+    '/usuarios/:usuarioId/rejeitar', 
     verificarToken,
     verificarSindico,
-    '/usuarios/:usuarioId/rejeitar', 
     usuarioController.rejeitarMorador);
 
 

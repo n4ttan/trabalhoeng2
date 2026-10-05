@@ -30,7 +30,7 @@ function verificarToken(req, res, next){
 
 function verificarSindico(req, res, next){
 
-    if (req.usuario.perfil !== 'SINDICO'){
+    if (!req.usuario.perfil === 'SINDICO' || !req.usuario.perfil === 'ADMIN'){
         return res.status(403).json({ mensagem: 'Acesso negado. Apenas síndicos podem fazer isso.' });
     }
     next();
@@ -44,5 +44,14 @@ function verificarMorador(req, res, next){
     next();
 }
 
+function verificarAdmin(req, res, next) {
+    if (req.usuario.perfil !== 'ADMIN') {
+        return res.status(403).json({ 
+            mensagem: 'Acesso negado: Requer privilégios de administrador geral.' 
+        });
+    }
+    next();
+}
 
-module.exports = {verificarToken, verificarSindico};
+
+module.exports = {verificarToken, verificarSindico, verificarMorador, verificarAdmin};
