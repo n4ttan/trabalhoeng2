@@ -1,39 +1,89 @@
 const API_URL = 'http://localhost:3000';
 
-export async function criarUsuario(nome, email, senha) {
 
-    const response = await fetch(
-        `${API_URL}/usuarios`,
-        {
-            method: 'POST',
+function obterToken() {
 
-            headers: {
-                'Content-Type': 'application/json'
-            },
-
-            body: JSON.stringify({
-                nome,
-                email,
-                senha,
-                perfil: 'CANDIDATO'
-            })
-        }
+    return localStorage.getItem(
+        'morada_token'
     );
+
+}
+
+
+async function requisicao(
+    url,
+    options = {}
+) {
+
+    const token =
+        obterToken();
+
+
+    const response =
+        await fetch(
+            `${API_URL}${url}`,
+            {
+                ...options,
+
+                headers: {
+                    'Content-Type':
+                        'application/json',
+
+                    ...(options.headers || {}),
+
+                    ...(token
+                        ? {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                        : {})
+                }
+            }
+        );
+
 
     let data;
 
     try {
-        data = await response.json();
+
+        data =
+            await response.json();
+
     } catch {
+
         data = {};
+
     }
+
 
     if (!response.ok) {
+
         throw new Error(
             data.erro ||
-            'Erro ao cadastrar usuário.'
+            data.mensagem ||
+            'Erro ao realizar operação.'
         );
+
     }
 
+
     return data;
+
+}
+
+
+/*
+ * EXCLUIR USUÁRIO
+ */
+export async function excluirUsuario(
+    usuarioId
+) {
+
+    return await requisicao(
+        `/usuarios/${usuarioId}`,
+        {
+            method: 'DELETE'
+        }
+    );
+
 }

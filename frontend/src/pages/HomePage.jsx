@@ -1,81 +1,207 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import './HomePage.css';
 
 function HomePage() {
-
-    const [mensagem, setMensagem] = useState('');
-
-    useEffect(() => {
-
-        fetch('http://localhost:3000/')
-            .then(response => response.json())
-            .then(data => {
-                setMensagem(data.texto);
-            })
-            .catch(error => {
-
-                console.error(
-                    'Erro ao buscar mensagem:',
-                    error
-                );
-
-                setMensagem('Sistema do Condomínio');
-            });
-
-    }, []);
-
     return (
-        <main>
+        <main className="home">
 
-            <div>
+            <header className="home-header">
 
-                <h1>
-                    {mensagem}
-                </h1>
+                <div className="home-logo">
+                    <div className="home-logo-icon">
+                        🏠
+                    </div>
 
-                <h2>
-                    Sistema do Condomínio
-                </h2>
+                    <div>
+                        <strong>Morada</strong>
+                        <span>Residências</span>
+                    </div>
+                </div>
 
-                <div>
+                <Link
+                    to="/login"
+                    className="home-login"
+                >
+                    Entrar
+                </Link>
 
-                    <Link to="/cadastro-morador">
-                        Cadastro de Morador
-                    </Link>
+            </header>
+
+            <section className="hero">
+
+                <div className="hero-content">
+
+                    <span className="hero-tag">
+                        SISTEMA DO CONDOMÍNIO
+                    </span>
+
+                    <h1>
+                        Tudo para o seu
+                        <strong> condomínio</strong>
+                        <br />
+                        em um só lugar.
+                    </h1>
+
+                    <p>
+                        Gerencie seu acesso, acompanhe sua
+                        residência e tenha uma experiência
+                        mais simples dentro do condomínio.
+                    </p>
+
+                    <div className="hero-actions">
+
+                        <Link
+                            to="/morador/cadastro"
+                            className="btn-primary"
+                        >
+                            Criar minha conta
+                        </Link>
+
+                        <Link
+                            to="/login"
+                            className="btn-secondary"
+                        >
+                            Já tenho uma conta
+                        </Link>
+
+                    </div>
 
                 </div>
 
-                <br />
+                <div className="hero-visual">
 
-                <div>
+                    <div className="hero-card hero-card-main">
 
-                    <Link to="/morador/cadastro">
-                        Cadastro de Morador com Validação de E-mail
-                    </Link>
+                        <div className="hero-card-top">
+                            <span>Morada</span>
+
+                            <span className="hero-status">
+                                ● Ativo
+                            </span>
+                        </div>
+
+                        <div className="hero-house">
+                            🏢
+                        </div>
+
+                        <h3>
+                            Sua residência,
+                            <br />
+                            conectada.
+                        </h3>
+
+                        <p>
+                            Acompanhe tudo de forma simples.
+                        </p>
+
+                    </div>
+
+                    <div className="floating-card floating-card-top">
+                        <span className="floating-icon">
+                            ✓
+                        </span>
+
+                        <div>
+                            <strong>
+                                Acesso seguro
+                            </strong>
+
+                            <small>
+                                Seu cadastro protegido
+                            </small>
+                        </div>
+                    </div>
+
+                    <div className="floating-card floating-card-bottom">
+                        <span className="floating-icon">
+                            👤
+                        </span>
+
+                        <div>
+                            <strong>
+                                Moradores
+                            </strong>
+
+                            <small>
+                                Administração simplificada
+                            </small>
+                        </div>
+                    </div>
 
                 </div>
 
-                <br />
+            </section>
 
-                <div>
+            <section className="home-features">
 
-                    <Link to="/permissao-sindico">
-                        Permissão do Síndico
-                    </Link>
+                <div className="feature">
+
+                    <div className="feature-icon">
+                        👤
+                    </div>
+
+                    <div>
+                        <h3>
+                            Cadastro simples
+                        </h3>
+
+                        <p>
+                            Faça seu cadastro e valide seu
+                            e-mail rapidamente.
+                        </p>
+                    </div>
 
                 </div>
 
-                <br />
+                <div className="feature">
 
-                <div>
+                    <div className="feature-icon">
+                        ✉
+                    </div>
 
-                    <Link to="/autorizacao-sindico">
-                        Autorização do Síndico
-                    </Link>
+                    <div>
+                        <h3>
+                            Validação segura
+                        </h3>
+
+                        <p>
+                            Confirme sua identidade através
+                            do código enviado para seu e-mail.
+                        </p>
+                    </div>
 
                 </div>
 
-            </div>
+                <div className="feature">
+
+                    <div className="feature-icon">
+                        🛡
+                    </div>
+
+                    <div>
+                        <h3>
+                            Gestão do condomínio
+                        </h3>
+
+                        <p>
+                            Síndicos podem acompanhar e
+                            administrar os cadastros.
+                        </p>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <footer className="home-footer">
+                <span>
+                    © Morada Residências
+                </span>
+
+                <span>
+                    Sistema de gestão condominial
+                </span>
+            </footer>
 
         </main>
     );

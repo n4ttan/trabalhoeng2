@@ -4,8 +4,11 @@ import {
     Route
 } from 'react-router-dom';
 
-import HomePage from './pages/HomePage';
-import CadastroMoradorPage from './pages/CadastroMoradorPage';
+import HomePage
+    from './pages/HomePage';
+
+import LoginPage
+    from './pages/LoginPage';
 
 import CadastroMoradorValidacaoPage
     from './pages/CadastroMoradorValidacaoPage';
@@ -16,36 +19,78 @@ import PermissaoSindicoPage
 import AutorizacaoSindicoPage
     from './pages/AutorizacaoSindicoPage';
 
+import PainelSindicoPage
+    from './pages/PainelSindicoPage';
+
+
 function App() {
 
     return (
+
         <BrowserRouter>
 
             <Routes>
 
+                {/* Página inicial */}
                 <Route
                     path="/"
-                    element={<HomePage />}
+                    element={
+                        <HomePage />
+                    }
                 />
 
+
+                {/* Login */}
+                <Route
+                    path="/login"
+                    element={
+                        <LoginPage />
+                    }
+                />
+
+
+                {/* Cadastro do morador */}
                 <Route
                     path="/cadastro-morador"
-                    element={<CadastroMoradorPage />}
+                    element={
+                        <CadastroMoradorValidacaoPage />
+                    }
                 />
 
+
+                {/* Cadastro / validação */}
                 <Route
                     path="/morador/cadastro"
-                    element={<CadastroMoradorValidacaoPage />}
+                    element={
+                        <CadastroMoradorValidacaoPage />
+                    }
                 />
 
+
+                {/* Solicitação para ser síndico */}
                 <Route
                     path="/permissao-sindico"
-                    element={<PermissaoSindicoPage />}
+                    element={
+                        <PermissaoSindicoPage />
+                    }
                 />
 
+
+                {/* Autorização de síndico */}
                 <Route
                     path="/autorizacao-sindico"
-                    element={<AutorizacaoSindicoPage />}
+                    element={
+                        <AutorizacaoSindicoPage />
+                    }
+                />
+
+
+                {/* Painel administrativo */}
+                <Route
+                    path="/painel-sindico"
+                    element={
+                        <PainelSindicoPage />
+                    }
                 />
 
             </Routes>
@@ -53,5 +98,6 @@ function App() {
         </BrowserRouter>
     );
 }
+
 
 export default App;
