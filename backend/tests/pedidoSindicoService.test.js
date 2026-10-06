@@ -15,11 +15,11 @@ describe('criarPedidoSindico', () => {
         pedidoSindicoRepository.criarPedidoSindico.mockResolvedValue(1);
 
         const resultado =
-            await pedidoSindicoService.criarPedidoSindico(1, true);
+            await pedidoSindicoService.criarPedidoSindico(1);
 
         expect(
             pedidoSindicoRepository.criarPedidoSindico
-        ).toHaveBeenCalledWith(1, true);
+        ).toHaveBeenCalledWith(1);
 
         expect(resultado).toBe(1);
     });

@@ -4,7 +4,7 @@ const pedidoSindicoService = require('../services/pedidoSindicoService');
 async function criarPedidoSindico(req, res) {
     try {
        const usuarioId = req.usuario.id;
-
+        
         const pedidoId = await pedidoSindicoService.criarPedidoSindico(usuarioId);
         res.status(201).json({
             mensagem: 'Pedido de cadastro de síndico criado com sucesso',

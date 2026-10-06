@@ -1,6 +1,7 @@
 jest.mock('../src/services/pedidoSindicoService', () => ({
     criarPedidoSindico: jest.fn(),
     aprovarPedidoSindico: jest.fn(),
+    reprovarPedidoSindico: jest.fn(),
 }));
 
 const pedidoSindicoService = require('../src/services/pedidoSindicoService');
@@ -23,9 +24,8 @@ afterEach(() => {
 describe('criarPedidoSindico', () => {
     it('deve criar um pedido de cadastro de síndico', async () => {
         const req = {
-            body: {
-                usuario_id: 1,
-                deferido: true
+            usuario: {
+                id: 1
             }
         };
 
@@ -42,7 +42,7 @@ describe('criarPedidoSindico', () => {
 
         expect(
             pedidoSindicoService.criarPedidoSindico
-        ).toHaveBeenCalledWith(1, true);
+        ).toHaveBeenCalledWith(1);
 
         expect(res.status)
             .toHaveBeenCalledWith(201);
@@ -55,33 +55,32 @@ describe('criarPedidoSindico', () => {
     });
 
     it('deve retornar erro 500 quando ocorrer um erro ao criar o pedido', async () => {
-        const req = {
-            body: {
-                usuario_id: 1,
-                deferido: true
-            }
-        };
+    const req = {
+        usuario: {
+            id: 1
+        }
+    };
 
-        const res = {
-            status: jest.fn(),
-            json: jest.fn()
-        };
+    const res = {
+        status: jest.fn(),
+        json: jest.fn()
+    };
 
-        res.status.mockReturnValue(res);
+    res.status.mockReturnValue(res);
 
-        pedidoSindicoService.criarPedidoSindico
-            .mockRejectedValue(new Error('Erro de teste'));
+    pedidoSindicoService.criarPedidoSindico
+        .mockRejectedValue(new Error('Erro de teste'));
 
-        await pedidoSindicoController.criarPedidoSindico(req, res);
+    await pedidoSindicoController.criarPedidoSindico(req, res);
 
-        expect(res.status)
-            .toHaveBeenCalledWith(500);
+    expect(res.status)
+        .toHaveBeenCalledWith(500);
 
-        expect(res.json)
-            .toHaveBeenCalledWith({
-                erro: 'Erro ao criar pedido de síndico'
-            });
-    });
+    expect(res.json)
+        .toHaveBeenCalledWith({
+            erro: 'Erro ao criar pedido de síndico'
+        });
+});
 });
 
 describe('aprovarPedidoSindico', () => {
@@ -169,4 +168,91 @@ describe('aprovarPedidoSindico', () => {
                 erro: 'Erro ao aprovar pedido de síndico'
             });
     });
+
+    describe('reprovarPedidoSindico', () => {
+    it('deve reprovar o pedido de cadastro de síndico', async () => {
+        const req = {
+            params: {
+                pedidoId: 10
+            }
+        };
+
+        const res = {
+            status: jest.fn(),
+            json: jest.fn()
+        };
+
+        res.status.mockReturnValue(res);
+
+        pedidoSindicoService.reprovarPedidoSindico
+            .mockResolvedValue(true);
+
+        await pedidoSindicoController.reprovarPedidoSindico(req, res);
+
+        expect(
+            pedidoSindicoService.reprovarPedidoSindico
+        ).toHaveBeenCalledWith(10);
+
+        expect(res.json)
+            .toHaveBeenCalledWith({
+                mensagem: 'Pedido de síndico reprovado com sucesso'
+            });
+    });
+
+    it('deve retornar erro 404 quando o pedido não for encontrado ao reprovar', async () => {
+        const req = {
+            params: {
+                pedidoId: 10
+            }
+        };
+
+        const res = {
+            status: jest.fn(),
+            json: jest.fn()
+        };
+
+        res.status.mockReturnValue(res);
+
+        pedidoSindicoService.reprovarPedidoSindico
+            .mockResolvedValue(false);
+
+        await pedidoSindicoController.reprovarPedidoSindico(req, res);
+
+        expect(res.status)
+            .toHaveBeenCalledWith(404);
+
+        expect(res.json)
+            .toHaveBeenCalledWith({
+                erro: 'Pedido não encontrado'
+            });
+    });
+
+    it('deve retornar erro 500 quando ocorrer um erro ao reprovar o pedido', async () => {
+        const req = {
+            params: {
+                pedidoId: 10
+            }
+        };
+
+        const res = {
+            status: jest.fn(),
+            json: jest.fn()
+        };
+
+        res.status.mockReturnValue(res);
+
+        pedidoSindicoService.reprovarPedidoSindico
+            .mockRejectedValue(new Error('Erro de teste'));
+
+        await pedidoSindicoController.reprovarPedidoSindico(req, res);
+
+        expect(res.status)
+            .toHaveBeenCalledWith(500);
+
+        expect(res.json)
+            .toHaveBeenCalledWith({
+                erro: 'Erro ao reprovar pedido de síndico'
+            });
+    });
+});
 });
