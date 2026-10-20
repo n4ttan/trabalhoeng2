@@ -88,7 +88,7 @@ it('deve excluir o usuário e os pedidos associados', async () => {
     );
 
     await connection.promise().query(
-        'INSERT INTO pedidos_sindico (usuario_id) VALUES (?)',
+        'INSERT INTO pedidos_sindico (usuario_id, condominio_id) VALUES (?, 1)',
         [usuarioId]
     );
 

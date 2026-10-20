@@ -26,6 +26,9 @@ describe('criarPedidoSindico', () => {
         const req = {
             usuario: {
                 id: 1
+            },
+            body: {
+                condominioId: 2
             }
         };
 
@@ -42,7 +45,7 @@ describe('criarPedidoSindico', () => {
 
         expect(
             pedidoSindicoService.criarPedidoSindico
-        ).toHaveBeenCalledWith(1);
+        ).toHaveBeenCalledWith(1, 2);
 
         expect(res.status)
             .toHaveBeenCalledWith(201);
@@ -54,33 +57,59 @@ describe('criarPedidoSindico', () => {
             });
     });
 
-    it('deve retornar erro 500 quando ocorrer um erro ao criar o pedido', async () => {
-    const req = {
-        usuario: {
-            id: 1
-        }
-    };
+    it('deve retornar 400 se condominioId não for fornecido', async () => {
+        const req = {
+            usuario: {
+                id: 1
+            },
+            body: {}
+        };
 
-    const res = {
-        status: jest.fn(),
-        json: jest.fn()
-    };
+        const res = {
+            status: jest.fn(),
+            json: jest.fn()
+        };
 
-    res.status.mockReturnValue(res);
+        res.status.mockReturnValue(res);
 
-    pedidoSindicoService.criarPedidoSindico
-        .mockRejectedValue(new Error('Erro de teste'));
+        await pedidoSindicoController.criarPedidoSindico(req, res);
 
-    await pedidoSindicoController.criarPedidoSindico(req, res);
-
-    expect(res.status)
-        .toHaveBeenCalledWith(500);
-
-    expect(res.json)
-        .toHaveBeenCalledWith({
-            erro: 'Erro ao criar pedido de síndico'
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+            erro: 'O ID do condomínio é obrigatório.'
         });
-});
+    });
+
+    it('deve retornar erro 500 quando ocorrer um erro ao criar o pedido', async () => {
+        const req = {
+            usuario: {
+                id: 1
+            },
+            body: {
+                condominioId: 2
+            }
+        };
+
+        const res = {
+            status: jest.fn(),
+            json: jest.fn()
+        };
+
+        res.status.mockReturnValue(res);
+
+        pedidoSindicoService.criarPedidoSindico
+            .mockRejectedValue(new Error('Erro de teste'));
+
+        await pedidoSindicoController.criarPedidoSindico(req, res);
+
+        expect(res.status)
+            .toHaveBeenCalledWith(500);
+
+        expect(res.json)
+            .toHaveBeenCalledWith({
+                erro: 'Erro ao criar pedido de síndico'
+            });
+    });
 });
 
 describe('aprovarPedidoSindico', () => {
@@ -168,8 +197,9 @@ describe('aprovarPedidoSindico', () => {
                 erro: 'Erro ao aprovar pedido de síndico'
             });
     });
+});
 
-    describe('reprovarPedidoSindico', () => {
+describe('reprovarPedidoSindico', () => {
     it('deve reprovar o pedido de cadastro de síndico', async () => {
         const req = {
             params: {
@@ -254,5 +284,4 @@ describe('aprovarPedidoSindico', () => {
                 erro: 'Erro ao reprovar pedido de síndico'
             });
     });
-});
 });

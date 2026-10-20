@@ -1,11 +1,11 @@
 const connection = require('./database');
 
 // Insere um novo usuário no banco com nome, email, senha já tratada e perfil.
-function criarUsuario(nome, email, senha, perfil) {
+function criarUsuario(nome, email, senha, perfil, id_condominio = null) {
     return new Promise((resolve, reject) => {
         connection.query(
-            'INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?, ?, ?, ?)',
-            [nome, email, senha, perfil],
+            'INSERT INTO usuarios (nome, email, senha, perfil, id_condominio) VALUES (?, ?, ?, ?, ?)',
+            [nome, email, senha, perfil, id_condominio],
             (error, results) => {
                 if (error) {
                     reject(error);
@@ -18,12 +18,12 @@ function criarUsuario(nome, email, senha, perfil) {
     });
 }
 
-// Insere um novo morador no banco com nome, email, senha já tratada, perfil e unidade.
-function criarMorador(nome, email, senha, perfil, unidade) {
+// Insere um novo morador no banco com nome, email, senha já tratada, perfil, unidade, condominio e bloco.
+function criarMorador(nome, email, senha, perfil, unidade, id_condominio = null, bloco = null, id_bloco = null) {
     return new Promise((resolve, reject) => {
         connection.query(
-            'INSERT INTO usuarios (nome, email, senha, perfil, unidade) VALUES (?, ?, ?, ?, ?)',
-            [nome, email, senha, perfil, unidade],
+            'INSERT INTO usuarios (nome, email, senha, perfil, unidade, id_condominio, bloco, id_bloco) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [nome, email, senha, perfil, unidade, id_condominio, bloco, id_bloco],
             (error, results) => {
                 if (error) {
                     reject(error);
@@ -37,7 +37,6 @@ function criarMorador(nome, email, senha, perfil, unidade) {
 }
 
 // Remove primeiro os pedidos de síndico ligados ao usuário e depois exclui o usuário.
-// Essa ordem evita dados órfãos no banco quando um usuário é apagado.
 function excluirUsuarioEPedido(usuarioId) {
     return new Promise((resolve, reject) => {
         connection.query(
@@ -143,20 +142,24 @@ function confirmarEmail(usuarioId) {
     });
 }
 
-// Lista os moradores que já validaram o e-mail e aguardam aprovação do síndico.
-function listarPendentes() {
+// Lista os moradores que já validaram o e-mail e aguardam aprovação do síndico (opcionalmente filtrado por condomínio).
+function listarPendentes(condominioId = null) {
     return new Promise((resolve, reject) => {
-        connection.query(
-            "SELECT id, nome, email, unidade, status_cadastro FROM usuarios WHERE status_cadastro = 'PENDENTE_APROVACAO'",
-            (error, results) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
+        let query = "SELECT id, nome, email, unidade, bloco, id_bloco, id_condominio, status_cadastro FROM usuarios WHERE status_cadastro = 'PENDENTE_APROVACAO'";
+        const params = [];
+        if (condominioId) {
+            query += " AND id_condominio = ?";
+            params.push(condominioId);
+        }
 
-                resolve(results);
+        connection.query(query, params, (error, results) => {
+            if (error) {
+                reject(error);
+                return;
             }
-        );
+
+            resolve(results);
+        });
     });
 }
 
