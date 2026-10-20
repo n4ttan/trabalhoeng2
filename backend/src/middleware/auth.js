@@ -1,11 +1,10 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
-function verificarToken(req, res, next){
-
+function verificarToken(req, res, next) {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader){
-        return res.status(401).json({mensagem: 'Token não fornecido'});
+    if (!authHeader) {
+        return res.status(401).json({ mensagem: 'Token não fornecido' });
     }
 
     const partes = authHeader.split(' ');
@@ -16,41 +15,38 @@ function verificarToken(req, res, next){
 
     const token = partes[1];
 
-    try{
+    try {
         const payLoad = jwt.verify(token, process.env.JWT_SECRET);
-
         req.usuario = payLoad;
-
         next();
-    }
-    catch(error){
-        return res.status(401).json({mensagem: 'Token inválido ou expirado'});
+    } catch (error) {
+        return res.status(401).json({ mensagem: 'Token inválido ou expirado' });
     }
 }
 
-function verificarSindico(req, res, next){
-
-    if (req.usuario.perfil !== 'SINDICO' || req.usuario.perfil !== 'ADMIN'){
+function verificarSindico(req, res, next) {
+    if (req.usuario.perfil !== 'SINDICO' && req.usuario.perfil !== 'ADMIN') {
         return res.status(403).json({ mensagem: 'Acesso negado. Apenas síndicos podem fazer isso.' });
     }
     next();
 }
 
-function verificarMorador(req, res, next){
-
-    if (req.usuario.perfil !== 'MORADOR'){
+function verificarMorador(req, res, next) {
+    if (req.usuario.perfil !== 'MORADOR') {
         return res.status(403).json({ mensagem: 'Acesso negado. Apenas moradores podem fazer isso.' });
     }
     next();
 }
 
 function verificarCondominioMorador(req, res, next) {
-    
     const idCondominioRota = Number(req.params.idCondominio);
 
+    if (req.usuario.perfil === 'ADMIN') {
+        return next();
+    }
+
     if (req.usuario.perfil === 'MORADOR' && req.usuario.id_condominio === idCondominioRota) {
-        
-        return next(); 
+        return next();
     }
 
     return res.status(403).json({ 
@@ -58,21 +54,20 @@ function verificarCondominioMorador(req, res, next) {
     });
 }
 
-function verificarCondominioSindico(req, res, next){
-
+function verificarCondominioSindico(req, res, next) {
     const idCondominioRota = Number(req.params.idCondominio);
 
-    if (req.usuario.perfil === 'ADMIN'){
+    if (req.usuario.perfil === 'ADMIN') {
         return next();
     }
 
-    if (req.usuario.perfil === 'SINDICO' && req.usuario.id_condominio === idCondominioRota){
+    if (req.usuario.perfil === 'SINDICO' && req.usuario.id_condominio === idCondominioRota) {
         return next();
     }
 
     return res.status(403).json({
         mensagem: 'Acesso negado. Somente o sindico desse condominio consegue realizar essa ação'
-    })
+    });
 }
 
 function verificarAdmin(req, res, next) {
@@ -83,7 +78,6 @@ function verificarAdmin(req, res, next) {
     }
     next();
 }
-
 
 module.exports = {
     verificarToken,

@@ -16,10 +16,11 @@ const INTERVALO_REENVIO_MS = 60 * 1000;
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Valida os dados do cadastro de morador e devolve os valores já normalizados.
-function validarDadosCadastro(nome, email, senha, unidade) {
+function validarDadosCadastro(nome, email, senha, unidade, id_condominio, bloco, id_bloco) {
     const nomeLimpo = typeof nome === 'string' ? nome.trim() : '';
     const emailLimpo = typeof email === 'string' ? email.trim() : '';
     const unidadeLimpa = typeof unidade === 'string' ? unidade.trim() : '';
+    const blocoLimpo = typeof bloco === 'string' ? bloco.trim() : undefined;
 
     if (!nomeLimpo || !emailLimpo || !unidadeLimpa || typeof senha !== 'string' || !senha) {
         throw erroNegocio(400, 'CAMPOS_OBRIGATORIOS', 'Preencha nome, e-mail, senha e unidade.');
@@ -49,12 +50,19 @@ function validarDadosCadastro(nome, email, senha, unidade) {
         throw erroNegocio(400, 'SENHA_LONGA', 'A senha deve possuir no máximo 72 caracteres.');
     }
 
-    return { nome: nomeLimpo, email: emailLimpo, unidade: unidadeLimpa };
+    return {
+        nome: nomeLimpo,
+        email: emailLimpo,
+        unidade: unidadeLimpa,
+        id_condominio: id_condominio !== undefined ? Number(id_condominio) : undefined,
+        bloco: blocoLimpo,
+        id_bloco: id_bloco !== undefined ? Number(id_bloco) : undefined
+    };
 }
 
 // Cadastro legado (fluxo de candidato a síndico): só aceita o perfil CANDIDATO.
 // Criptografa a senha antes de persistir o usuário para não salvar texto puro.
-async function criarUsuario(nome, email, senha, perfil) {
+async function criarUsuario(nome, email, senha, perfil, id_condominio = undefined) {
     if (perfil !== 'CANDIDATO') {
         throw erroNegocio(400, 'PERFIL_INVALIDO', 'Perfil inválido.');
     }
@@ -65,14 +73,29 @@ async function criarUsuario(nome, email, senha, perfil) {
         nome,
         email,
         senhaHash,
-        perfil
+        perfil,
+        id_condominio
     );
 }
 
 // Valida os dados, criptografa a senha e cadastra sempre como MORADOR.
-async function criarMorador(nome, email, senha, unidade) {
-    const dados = validarDadosCadastro(nome, email, senha, unidade);
+async function criarMorador(nome, email, senha, unidade, id_condominio = undefined, bloco = undefined, id_bloco = undefined) {
+    const dados = validarDadosCadastro(nome, email, senha, unidade, id_condominio, bloco, id_bloco);
     const senhaHash = await bcrypt.hash(senha, 10);
+
+    if (dados.id_condominio !== undefined || dados.bloco !== undefined || dados.id_bloco !== undefined) {
+        const usuarioId = await usuarioRepository.criarMorador(
+            dados.nome,
+            dados.email,
+            senhaHash,
+            'MORADOR',
+            dados.unidade,
+            dados.id_condominio,
+            dados.bloco,
+            dados.id_bloco
+        );
+        return { usuarioId, email: dados.email };
+    }
 
     const usuarioId = await usuarioRepository.criarMorador(
         dados.nome,
@@ -171,8 +194,7 @@ async function validarEmail(email, codigoInformado) {
     return true;
 }
 
-// Gera novo código para cadastros aguardando e-mail. Devolve null se não houver o que reenviar,
-// para o controller responder igual e não revelar quem está cadastrado.
+// Gera novo código para cadastros aguardando e-mail.
 async function reenviarCodigo(email) {
     const emailLimpo = typeof email === 'string' ? email.trim() : '';
 
@@ -186,8 +208,6 @@ async function reenviarCodigo(email) {
         return null;
     }
 
-    // Dentro do intervalo mínimo não gera nem envia outro código (evita zerar as tentativas
-    // em loop). A criação do código é deduzida da expiração; a resposta é a mesma de sempre.
     if (usuario.token_expira_em) {
         const criadoEm = new Date(usuario.token_expira_em).getTime() - VALIDADE_CODIGO_MS;
 
@@ -196,34 +216,36 @@ async function reenviarCodigo(email) {
         }
     }
 
-    // salvarTokenValidacao zera as tentativas junto com o novo código.
     const codigo = await gerarESalvarTokenValidacao(usuario.id);
 
     return { email: emailLimpo, codigo };
 }
 
-async function listarPendentes() {
-  return await usuarioRepository.listarPendentes();
+async function listarPendentes(condominioId = undefined) {
+    if (condominioId !== undefined) {
+        return await usuarioRepository.listarPendentes(condominioId);
+    }
+    return await usuarioRepository.listarPendentes();
 }
 
 async function aprovarMorador(usuarioId) {
-  const aprovado = await usuarioRepository.aprovarMorador(usuarioId);
-  if (!aprovado) {
-    const error = new Error("Usuário não encontrado ou não está pendente de aprovação");
-    error.status = 404;
-    throw error;
-  }
-  return { mensagem: "Morador aprovado com sucesso" };
+    const aprovado = await usuarioRepository.aprovarMorador(usuarioId);
+    if (!aprovado) {
+        const error = new Error("Usuário não encontrado ou não está pendente de aprovação");
+        error.status = 404;
+        throw error;
+    }
+    return { mensagem: "Morador aprovado com sucesso" };
 }
 
 async function rejeitarMorador(usuarioId) {
-  const rejeitado = await usuarioRepository.rejeitarMorador(usuarioId);
-  if (!rejeitado) {
-    const error = new Error("Usuário não encontrado ou não está pendente de aprovação");
-    error.status = 404;
-    throw error;
-  }
-  return { mensagem: "Morador rejeitado com sucesso" };
+    const rejeitado = await usuarioRepository.rejeitarMorador(usuarioId);
+    if (!rejeitado) {
+        const error = new Error("Usuário não encontrado ou não está pendente de aprovação");
+        error.status = 404;
+        throw error;
+    }
+    return { mensagem: "Morador rejeitado com sucesso" };
 }
 
 async function rebaixarUsuario(usuarioId) {
@@ -247,7 +269,7 @@ module.exports = {
     validarEmail,
     reenviarCodigo,
     listarPendentes,
-  aprovarMorador,
-  rejeitarMorador,
-  rebaixarUsuario
+    aprovarMorador,
+    rejeitarMorador,
+    rebaixarUsuario
 };

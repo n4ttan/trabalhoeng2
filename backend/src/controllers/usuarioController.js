@@ -14,14 +14,12 @@ function responderErro(res, error, mensagemGenerica) {
 // Controla o cadastro de usuário e devolve o ID gerado no banco.
 async function criarUsuario(req, res) {
     try {
-        const { nome, email, senha, perfil } = req.body;
+        const { nome, email, senha, perfil, id_condominio, condominioId } = req.body;
 
-        const usuarioId = await usuarioService.criarUsuario(
-            nome,
-            email,
-            senha,
-            perfil
-        );
+        const condId = id_condominio || condominioId;
+        const usuarioId = condId !== undefined
+            ? await usuarioService.criarUsuario(nome, email, senha, perfil, condId)
+            : await usuarioService.criarUsuario(nome, email, senha, perfil);
 
         res.status(201).json({
             mensagem: 'Usuário criado com sucesso. Verifique seu e-mail para validar o cadastro.',
@@ -50,9 +48,26 @@ async function criarUsuario(req, res) {
 // Controla o cadastro de morador com validação de e-mail e devolve o ID gerado no banco.
 async function criarMorador(req, res) {
     try {
-        const { nome, email, senha, unidade } = req.body;
+        const { nome, email, senha, unidade, id_condominio, condominioId, bloco, id_bloco, blocoId } = req.body;
 
-        const usuario = await usuarioService.criarMorador(nome, email, senha, unidade);
+        const condId = id_condominio || condominioId;
+        const blocoVal = bloco;
+        const blocoIdVal = id_bloco || blocoId;
+
+        let usuario;
+        if (condId !== undefined || blocoVal !== undefined || blocoIdVal !== undefined) {
+            usuario = await usuarioService.criarMorador(
+                nome,
+                email,
+                senha,
+                unidade,
+                condId,
+                blocoVal,
+                blocoIdVal
+            );
+        } else {
+            usuario = await usuarioService.criarMorador(nome, email, senha, unidade);
+        }
 
         const codigoValidacao = await usuarioService.gerarESalvarTokenValidacao(usuario.usuarioId);
 
@@ -106,7 +121,6 @@ async function excluirUsuarioEPedido(req, res) {
     }
 }
 
-
 // Recebe o e-mail e o código digitado pelo morador e confirma a validação.
 async function validarEmail(req, res) {
     try {
@@ -149,7 +163,8 @@ async function reenviarCodigo(req, res) {
 
 async function listarPendentes(req, res) {
   try {
-    const moradores = await usuarioService.listarPendentes();
+    const condominioId = req?.query?.condominioId || (req?.usuario && req.usuario.id_condominio) || undefined;
+    const moradores = await usuarioService.listarPendentes(condominioId);
     return res.status(200).json(moradores);
   } catch (error) {
     return res.status(error.status || 500).json({ mensagem: error.message });
@@ -199,7 +214,7 @@ module.exports = {
     validarEmail,
     reenviarCodigo,
     listarPendentes,
-  aprovarMorador,
-  rejeitarMorador,
-  rebaixarUsuario
+    aprovarMorador,
+    rejeitarMorador,
+    rebaixarUsuario
 };

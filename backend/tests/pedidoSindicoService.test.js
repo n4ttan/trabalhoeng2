@@ -1,6 +1,7 @@
 jest.mock('../src/repositories/pedidoSindicoRepository', () => ({
     criarPedidoSindico: jest.fn(),
     aprovarPedidoSindico: jest.fn(),
+    reprovarPedidoSindico: jest.fn()
 }));
 
 const pedidoSindicoRepository = require('../src/repositories/pedidoSindicoRepository');
@@ -11,15 +12,15 @@ beforeEach(() => {
 });
 
 describe('criarPedidoSindico', () => {
-    it('deve criar um pedido de cadastro de síndico', async () => {
+    it('deve criar um pedido de cadastro de síndico com usuario e condominio', async () => {
         pedidoSindicoRepository.criarPedidoSindico.mockResolvedValue(1);
 
         const resultado =
-            await pedidoSindicoService.criarPedidoSindico(1);
+            await pedidoSindicoService.criarPedidoSindico(1, 2);
 
         expect(
             pedidoSindicoRepository.criarPedidoSindico
-        ).toHaveBeenCalledWith(1);
+        ).toHaveBeenCalledWith(1, 2);
 
         expect(resultado).toBe(1);
     });
