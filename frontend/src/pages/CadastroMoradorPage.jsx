@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { criarUsuario } from '../services/usuarioApi';
+import { criarMorador } from '../services/moradorApi';
 
 import './CadastroMoradorPage.css';
 
@@ -40,11 +40,7 @@ function CadastroMoradorPage() {
         try {
             setCarregando(true);
 
-            const resultado = await criarUsuario(
-                nome,
-                email,
-                senha
-            );
+            const resultado = await criarMorador({ nome, email, senha });
 
             setMensagem(
                 resultado.mensagem ||

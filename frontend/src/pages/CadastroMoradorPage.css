@@ -153,3 +153,31 @@
 .voltar-home a:hover {
     text-decoration: underline;
 }
+
+/* Tela de cadastro com a imagem oficial do condomínio enviada pelo usuário */
+.cadastro-morador-container {
+    min-height: 100vh;
+    padding: clamp(18px, 4vh, 42px) 18px;
+    background-image: linear-gradient(90deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,.38) 8%, rgba(255,255,255,.14) 20%, rgba(255,255,255,0) 36%, rgba(255,255,255,0) 64%, rgba(255,255,255,.14) 80%, rgba(255,255,255,.38) 92%, rgba(255,255,255,.62) 100%), linear-gradient(rgba(255,255,255,.10), rgba(255,255,255,.10)), url('/morada-condominio.png');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+.cadastro-morador-card {
+    max-width: 532px;
+    padding: 32px 36px;
+    border: 1px solid rgba(255,255,255,.8);
+    border-radius: 14px;
+    box-shadow: 0 18px 55px rgba(20, 39, 77, .22);
+    background: rgba(255,255,255,.97);
+}
+.cabecalho-cadastro h1 { color: #203657; }
+.formulario-cadastro button {
+    background: linear-gradient(100deg, #2864ed, #2563eb);
+    border-radius: 7px;
+}
+@media (max-width: 520px) {
+    .cadastro-morador-container { padding: 16px 12px; background-attachment: scroll; }
+    .cadastro-morador-card { padding: 25px 20px; }
+}

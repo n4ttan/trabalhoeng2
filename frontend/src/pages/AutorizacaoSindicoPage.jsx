@@ -1,124 +1,320 @@
-import { useState } from 'react';
+import {
+    useState
+} from 'react';
 
-import { aprovarPedidoSindico }
-    from '../services/autorizacaoSindicoApi';
+import {
+    useNavigate
+} from 'react-router-dom';
 
-import './PedidoSindicoPage.css';
+import {
+    aprovarPedidoSindico
+} from '../services/pedidoSindicoApi';
+
+import './AutorizacaoSindicoPage.css';
+
 
 function AutorizacaoSindicoPage() {
 
-    const [pedidoId, setPedidoId] = useState('');
-    const [mensagem, setMensagem] = useState('');
-    const [aprovando, setAprovando] = useState(false);
+    const navigate = useNavigate();
+
+
+    const [
+        pedidoId,
+        setPedidoId
+    ] = useState('');
+
+
+    const [
+        carregando,
+        setCarregando
+    ] = useState(false);
+
+
+    const [
+        mensagem,
+        setMensagem
+    ] = useState('');
+
+
+    const [
+        erro,
+        setErro
+    ] = useState('');
+
 
     async function autorizarPedido(event) {
 
         event.preventDefault();
 
+        setMensagem('');
+        setErro('');
+
+
         if (!pedidoId) {
-            setMensagem('Digite o ID do pedido.');
+
+            setErro(
+                'Informe o ID do pedido.'
+            );
+
             return;
+
         }
+
+
+        if (
+            Number.isNaN(
+                Number(pedidoId)
+            ) ||
+            Number(pedidoId) <= 0
+        ) {
+
+            setErro(
+                'Informe um ID de pedido válido.'
+            );
+
+            return;
+
+        }
+
 
         try {
 
-            setAprovando(true);
-            setMensagem('');
+            setCarregando(true);
 
-            const resultado =
-                await aprovarPedidoSindico(pedidoId);
+
+            const data =
+                await aprovarPedidoSindico(
+                    pedidoId
+                );
+
 
             setMensagem(
-                resultado.mensagem ||
-                'Pedido autorizado com sucesso!'
+                data.mensagem ||
+                'Pedido de síndico aprovado com sucesso!'
             );
+
 
             setPedidoId('');
 
         } catch (error) {
 
-            setMensagem(error.message);
+            setErro(
+                error.message ||
+                'Não foi possível aprovar o pedido.'
+            );
 
         } finally {
 
-            setAprovando(false);
+            setCarregando(false);
+
         }
+
     }
+
+
+    function voltar() {
+
+        navigate('/');
+
+    }
+
 
     return (
 
-        <div className="pedido-sindico-container">
+        <main className="autorizacao-page">
 
-            <div className="pedido-sindico-card">
+            <div className="autorizacao-container">
+                <button type="button" className="autorizacao-voltar" onClick={voltar}>&#8592; Voltar</button>
 
-                <div className="titulo-pagina">
+<section className="autorizacao-card">
+
+
+                    <div className="autorizacao-icone">
+                        ✓
+                    </div>
+
+
+                    <span className="autorizacao-etiqueta">
+                        ADMINISTRAÇÃO
+                    </span>
+
 
                     <h1>
-                        Autorização do Síndico
+                        Autorizar síndico
                     </h1>
 
-                    <p>
-                        Autorize uma solicitação para
-                        se tornar síndico.
+
+                    <p className="autorizacao-descricao">
+
+                        Informe o ID do pedido de síndico
+                        para aprovar a solicitação.
+
                     </p>
 
-                </div>
 
-                <section className="secao-sindico">
 
-                    <h2>
-                        Autorizar solicitação
-                    </h2>
+                    {erro && (
+
+                        <div className="autorizacao-alerta erro">
+
+                            ⚠ {erro}
+
+                        </div>
+
+                    )}
+
+
+
+                    {mensagem && (
+
+                        <div className="autorizacao-alerta sucesso">
+
+                            ✓ {mensagem}
+
+                        </div>
+
+                    )}
+
+
 
                     <form
-                        className="formulario-sindico"
+                        className="autorizacao-form"
                         onSubmit={autorizarPedido}
                     >
 
-                        <label htmlFor="pedidoId">
-                            ID do pedido
-                        </label>
+                        <div className="autorizacao-campo">
 
-                        <input
-                            id="pedidoId"
-                            type="number"
-                            min="1"
-                            value={pedidoId}
-                            onChange={(event) =>
-                                setPedidoId(event.target.value)
-                            }
-                            placeholder="Digite o ID do pedido"
-                        />
+                            <label htmlFor="pedidoId">
+
+                                ID do pedido
+
+                            </label>
+
+
+                            <input
+                                id="pedidoId"
+                                type="number"
+                                min="1"
+                                value={pedidoId}
+                                onChange={(event) =>
+                                    setPedidoId(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Digite o ID do pedido"
+                            />
+
+                        </div>
+
+
 
                         <button
                             type="submit"
-                            className="botao-aprovar"
-                            disabled={aprovando}
+                            className="autorizacao-botao"
+                            disabled={carregando}
                         >
 
-                            {aprovando
-                                ? 'Autorizando...'
-                                : 'Autorizar pedido'
-                            }
+                            {carregando
+                                ? 'Aprovando...'
+                                : 'Aprovar pedido'}
 
                         </button>
 
                     </form>
 
-                    {mensagem && (
 
-                        <div className="mensagem">
-                            {mensagem}
+
+                    <div className="autorizacao-info">
+
+                        <div className="autorizacao-info-item">
+
+                            <strong>
+                                1
+                            </strong>
+
+                            <div>
+
+                                <b>
+                                    Localize o pedido
+                                </b>
+
+                                <span>
+                                    Utilize o ID da solicitação
+                                    que precisa ser analisada.
+                                </span>
+
+                            </div>
+
                         </div>
 
-                    )}
+
+
+                        <div className="autorizacao-info-item">
+
+                            <strong>
+                                2
+                            </strong>
+
+                            <div>
+
+                                <b>
+                                    Confirme a autorização
+                                </b>
+
+                                <span>
+                                    O sistema processará a
+                                    aprovação do pedido.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div className="autorizacao-info-item">
+
+                            <strong>
+                                3
+                            </strong>
+
+                            <div>
+
+                                <b>
+                                    Permissão concedida
+                                </b>
+
+                                <span>
+                                    O usuário poderá receber
+                                    as permissões correspondentes.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
 
                 </section>
 
+
+
+                <footer className="autorizacao-footer">
+
+                    Morada Residências · Gestão
+                    condominial simplificada
+
+                </footer>
+
+
             </div>
 
-        </div>
+        </main>
+
     );
+
 }
+
 
 export default AutorizacaoSindicoPage;

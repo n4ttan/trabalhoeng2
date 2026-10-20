@@ -84,12 +84,12 @@ function CadastroMoradorValidacaoPage() {
         try {
             setCarregando(true);
 
-            const data = await cadastrarMorador(
-                form.nome.trim(),
-                form.email.trim(),
-                form.senha,
-                form.unidade.trim()
-            );
+            const data = await cadastrarMorador({
+                nome: form.nome.trim(),
+                email: form.email.trim(),
+                senha: form.senha,
+                unidade: form.unidade.trim()
+            });
 
             setMensagem(
                 data.mensagem ||

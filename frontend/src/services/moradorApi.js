@@ -1,65 +1,130 @@
 const API_URL = 'http://localhost:3000';
 
-// Envia um POST em JSON e devolve o corpo; lança Error com a mensagem do backend quando falha.
-async function post(caminho, corpo, mensagemPadrao) {
+
+async function requisicao(
+    url,
+    options = {}
+) {
+
+    const token =
+        localStorage.getItem(
+            'morada_token'
+        );
+
 
     const response = await fetch(
-        `${API_URL}${caminho}`,
+        `${API_URL}${url}`,
         {
-            method: 'POST',
+            ...options,
 
             headers: {
-                'Content-Type': 'application/json'
-            },
+                'Content-Type':
+                    'application/json',
 
-            body: JSON.stringify(corpo)
+                ...(options.headers || {}),
+
+                ...(token
+                    ? {
+                        Authorization:
+                            `Bearer ${token}`
+                    }
+                    : {})
+            }
         }
     );
 
-    let data;
+
+    let data = {};
 
     try {
+
         data = await response.json();
+
     } catch {
+
         data = {};
+
     }
+
 
     if (!response.ok) {
-        const erro = new Error(
+
+        const error = new Error(
             data.erro ||
             data.mensagem ||
-            mensagemPadrao
+            'Não foi possível realizar a operação.'
         );
+        error.codigo = data.codigo;
+        throw error;
 
-        erro.status = response.status;
-        erro.codigo = data.codigo;
-
-        throw erro;
     }
 
+
     return data;
+
 }
 
-export function cadastrarMorador(nome, email, senha, unidade) {
-    return post(
+
+
+/*
+ * Criar morador
+ */
+export async function criarMorador(
+    dados
+) {
+
+    return await requisicao(
+        '/usuarios',
+        {
+            method: 'POST',
+
+            body: JSON.stringify(
+                dados
+            )
+        }
+    );
+
+}
+
+export async function cadastrarMorador(dados) {
+    return await requisicao(
         '/usuarios/moradores',
-        { nome, email, senha, unidade },
-        'Não foi possível realizar o cadastro.'
+        {
+            method: 'POST',
+            body: JSON.stringify(dados)
+        }
     );
 }
 
-export function validarEmail(email, codigo) {
-    return post(
+export async function validarEmail(email, codigo) {
+    return await requisicao(
         '/usuarios/validar-email',
-        { email, codigo },
-        'Não foi possível validar o e-mail.'
+        {
+            method: 'POST',
+            body: JSON.stringify({ email, codigo })
+        }
     );
 }
 
-export function reenviarCodigo(email) {
-    return post(
+export async function reenviarCodigo(email) {
+    return await requisicao(
         '/usuarios/reenviar-codigo',
-        { email },
-        'Não foi possível reenviar o código.'
+        {
+            method: 'POST',
+            body: JSON.stringify({ email })
+        }
     );
+}
+
+
+
+/*
+ * Buscar/validar cadastro
+ */
+export async function buscarMensagem() {
+
+    return await requisicao(
+        '/mensagem'
+    );
+
 }
