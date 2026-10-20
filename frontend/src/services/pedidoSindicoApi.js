@@ -1,46 +1,113 @@
 const API_URL = 'http://localhost:3000';
 
-export async function criarPedidoSindico(usuario_id) {
-    const response = await fetch(
-        `${API_URL}/pedidos-sindico`,
+
+function obterToken() {
+
+    return localStorage.getItem(
+        'morada_token'
+    );
+
+}
+
+
+async function requisicao(
+    url,
+    options = {}
+) {
+
+    const token =
+        obterToken();
+
+
+    const response =
+        await fetch(
+            `${API_URL}${url}`,
+            {
+                ...options,
+
+                headers: {
+                    'Content-Type':
+                        'application/json',
+
+                    ...(options.headers || {}),
+
+                    ...(token
+                        ? {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                        : {})
+                }
+            }
+        );
+
+
+    let data;
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch {
+
+        data = {};
+
+    }
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.erro ||
+            data.mensagem ||
+            'Não foi possível realizar a operação.'
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/*
+ * CRIAR PEDIDO DE SÍNDICO
+ */
+export async function criarPedidoSindico(
+    usuario_id
+) {
+
+    return await requisicao(
+        '/pedidos-sindico',
         {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+
             body: JSON.stringify({
-                usuario_id: Number(usuario_id),
+                usuario_id:
+                    Number(usuario_id),
+
                 deferido: false
             })
         }
     );
 
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(
-            data.erro || 'Erro ao criar pedido de síndico'
-        );
-    }
-
-    return data;
 }
 
-export async function aprovarPedidoSindico(pedidoId) {
-    const response = await fetch(
-        `${API_URL}/pedidos-sindico/${pedidoId}/aprovar`,
+
+/*
+ * APROVAR PEDIDO DE SÍNDICO
+ */
+export async function aprovarPedidoSindico(
+    pedidoId
+) {
+
+    return await requisicao(
+        `/pedidos-sindico/${pedidoId}/aprovar`,
         {
             method: 'PATCH'
         }
     );
 
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(
-            data.erro || 'Erro ao aprovar pedido de síndico'
-        );
-    }
-
-    return data;
 }
