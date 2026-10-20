@@ -30,7 +30,7 @@ function verificarToken(req, res, next){
 
 function verificarSindico(req, res, next){
 
-    if (!req.usuario.perfil === 'SINDICO' || !req.usuario.perfil === 'ADMIN'){
+    if (req.usuario.perfil !== 'SINDICO' || req.usuario.perfil !== 'ADMIN'){
         return res.status(403).json({ mensagem: 'Acesso negado. Apenas síndicos podem fazer isso.' });
     }
     next();
@@ -44,6 +44,37 @@ function verificarMorador(req, res, next){
     next();
 }
 
+function verificarCondominioMorador(req, res, next) {
+    
+    const idCondominioRota = Number(req.params.idCondominio);
+
+    if (req.usuario.perfil === 'MORADOR' && req.usuario.id_condominio === idCondominioRota) {
+        
+        return next(); 
+    }
+
+    return res.status(403).json({ 
+        mensagem: 'Acesso negado. Você só pode acessar o seu próprio condomínio.' 
+    });
+}
+
+function verificarCondominioSindico(req, res, next){
+
+    const idCondominioRota = Number(req.params.idCondominio);
+
+    if (req.usuario.perfil === 'ADMIN'){
+        return next();
+    }
+
+    if (req.usuario.perfil === 'SINDICO' && req.usuario.id_condominio === idCondominioRota){
+        return next();
+    }
+
+    return res.status(403).json({
+        mensagem: 'Acesso negado. Somente o sindico desse condominio consegue realizar essa ação'
+    })
+}
+
 function verificarAdmin(req, res, next) {
     if (req.usuario.perfil !== 'ADMIN') {
         return res.status(403).json({ 
@@ -54,4 +85,11 @@ function verificarAdmin(req, res, next) {
 }
 
 
-module.exports = {verificarToken, verificarSindico, verificarMorador, verificarAdmin};
+module.exports = {
+    verificarToken,
+    verificarSindico,
+    verificarMorador, 
+    verificarAdmin, 
+    verificarCondominioMorador, 
+    verificarCondominioSindico
+};

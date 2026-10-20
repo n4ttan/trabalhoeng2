@@ -1,7 +1,7 @@
 const connection = require('./database');
 
 // Cria um registro de pedido de síndico para o usuário informado.
-function criarPedidoSindico(usuarioId) {
+function criarPedidoSindico(usuarioId, condominioId) {
     return new Promise((resolve, reject) => {
         const query = `
             INSERT INTO pedidos_sindico (usuario_id, deferido) 
@@ -9,7 +9,7 @@ function criarPedidoSindico(usuarioId) {
         `;
 
         // Passamos apenas o usuarioId na lista de parâmetros (o array)
-        connection.query(query, [usuarioId], (error, results) => {
+        connection.query(query, [usuarioId, condominioId], (error, results) => {
             if (error) {
                 reject(error);
                 return;

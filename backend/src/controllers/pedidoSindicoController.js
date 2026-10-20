@@ -4,8 +4,15 @@ const pedidoSindicoService = require('../services/pedidoSindicoService');
 async function criarPedidoSindico(req, res) {
     try {
        const usuarioId = req.usuario.id;
+       const condominioId = req.body.condominioId;
+
+       if (!condominioId) {
+            return res.status(400).json({
+                erro: 'O ID do condomínio é obrigatório.'
+            });
+        }
         
-        const pedidoId = await pedidoSindicoService.criarPedidoSindico(usuarioId);
+        const pedidoId = await pedidoSindicoService.criarPedidoSindico(usuarioId, condominioId);
         res.status(201).json({
             mensagem: 'Pedido de cadastro de síndico criado com sucesso',
             pedidoId: pedidoId
