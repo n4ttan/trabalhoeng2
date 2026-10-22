@@ -40,6 +40,7 @@ async function login(req, res){
         });
     }
     catch(error){
+        console.error('Erro no login:', error);
         return res.status(500).json({ mensagem: 'Erro interno no servidor' });
     }
 }
