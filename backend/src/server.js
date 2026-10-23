@@ -1,11 +1,16 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const cors = require('cors');
 const mensagemController = require('./controllers/mensagemController');
+const { setIO } = require('./socket');
 const pedidoSindicoController = require('./controllers/pedidoSindicoController');
 const usuarioController = require('./controllers/usuarioController');
 const condominioController = require('./controllers/condominioController');
 const authController = require('./controllers/authController');
+const notificacaoController = require('./controllers/notificacaoController');
 const {
     verificarToken,
     verificarSindico,
@@ -17,6 +22,48 @@ const {
 
 // Inicializa a API Express.
 const app = express();
+
+// Cria um servidor HTTP para a API e os WebSockets.
+const httpServer = http.createServer(app);
+
+// Inicializa o Socket.IO associado ao servidor HTTP.
+const io = new Server(httpServer, {
+    cors: {
+        origin: 'http://localhost:5173'
+    }
+});
+setIO(io);
+
+io.use((socket, next) => {
+    const token = socket.handshake.auth?.token;
+
+    if (!token) {
+        return next(new Error('Token não fornecido'));
+    }
+
+    try {
+        const usuario = jwt.verify(token, process.env.JWT_SECRET);
+        socket.data.usuario = usuario;
+        next();
+    } catch (error) {
+        next(new Error('Token inválido ou expirado'));
+    }
+});
+
+io.on('connection', (socket) => {
+    const usuario = socket.data.usuario;
+
+    socket.join(`usuario:${usuario.id}`);
+
+    console.log(
+        `Usuário ${usuario.id} conectado via WebSocket:`,
+        socket.id
+    );
+
+    socket.on('disconnect', () => {
+        console.log('Cliente desconectado:', socket.id);
+    });
+});
 
 // Permite que o frontend consuma a API e decodifica requisições em JSON.
 app.use(cors());
@@ -238,9 +285,30 @@ app.patch(
     usuarioController.rejeitarMorador
 );
 
+// ======================== NOTIFICAÇÕES ========================
+
+// Listar notificações do usuário autenticado
+app.get(
+    '/notificacoes',
+    verificarToken,
+    notificacaoController.listar
+);
+// Marca uma notificação como lida para o usuário autenticado
+app.patch(
+    '/notificacoes/:id/lida',
+    verificarToken,
+    notificacaoController.marcarComoLida
+);
+// Publica uma nova notificação (Admin ou Síndico)
+app.post(
+    '/notificacoes',
+    verificarToken,
+    notificacaoController.publicar
+);
+
 // Inicia o servidor na porta 3000 se executado diretamente.
 if (require.main === module) {
-    app.listen(3000, () => {
+    httpServer.listen(3000, () => {
         console.log('Servidor rodando na porta 3000');
     });
 }
