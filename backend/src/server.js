@@ -186,7 +186,6 @@ app.get(
 // Puxa todos os condomínios
 app.get(
     '/condominios',
-    verificarToken,
     condominioController.listarCondominios
 );
 

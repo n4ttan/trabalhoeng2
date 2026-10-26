@@ -25,10 +25,15 @@ async function login(req, res){
             return res.status(401).json({ mensagem: 'Senha incorreta' });
         }
 
+        if(usuario.status_cadastro != 'APROVADO'){
+            return res.status(401).json({mensagem: 'A validação do email ainda não foi aprovada.'})
+        }
+
         const token = jwt.sign(
             {
                 id: usuario.id,
-                perfil: usuario.perfil
+                perfil: usuario.perfil,
+                condominio: usuario.id_condominio
             },
             process.env.JWT_SECRET,
             {expiresIn: '1d'}
