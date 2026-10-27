@@ -161,9 +161,26 @@ async function reenviarCodigo(req, res) {
     }
 }
 
+// Síndico só age no condomínio do próprio token; o admin não tem restrição (undefined).
+function condominioDoEscopo(req) {
+  if (req?.usuario?.perfil !== 'SINDICO') {
+    return undefined;
+  }
+
+  const condominioId = Number(req.usuario.id_condominio);
+
+  if (!condominioId) {
+    const error = new Error('Síndico sem condomínio vinculado.');
+    error.status = 403;
+    throw error;
+  }
+
+  return condominioId;
+}
+
 async function listarPendentes(req, res) {
   try {
-    const condominioId = req?.query?.condominioId || (req?.usuario && req.usuario.id_condominio) || undefined;
+    const condominioId = condominioDoEscopo(req) ?? req?.query?.condominioId;
     const moradores = await usuarioService.listarPendentes(condominioId);
     return res.status(200).json(moradores);
   } catch (error) {
@@ -174,7 +191,7 @@ async function listarPendentes(req, res) {
 async function aprovarMorador(req, res) {
   try {
     const { usuarioId } = req.params;
-    const resultado = await usuarioService.aprovarMorador(usuarioId);
+    const resultado = await usuarioService.aprovarMorador(usuarioId, condominioDoEscopo(req));
     return res.status(200).json(resultado);
   } catch (error) {
     return res.status(error.status || 500).json({ mensagem: error.message });
@@ -184,7 +201,7 @@ async function aprovarMorador(req, res) {
 async function rejeitarMorador(req, res) {
   try {
     const { usuarioId } = req.params;
-    const resultado = await usuarioService.rejeitarMorador(usuarioId);
+    const resultado = await usuarioService.rejeitarMorador(usuarioId, condominioDoEscopo(req));
     return res.status(200).json(resultado);
   } catch (error) {
     return res.status(error.status || 500).json({ mensagem: error.message });

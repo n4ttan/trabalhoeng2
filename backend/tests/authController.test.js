@@ -56,6 +56,29 @@ describe('authController - login', () => {
         });
     });
 
+    it('grava id_condominio no token, o mesmo campo lido pelos middlewares', async () => {
+        connection.query.mockResolvedValue([
+            [{
+                id: 7,
+                perfil: 'SINDICO',
+                id_condominio: 3,
+                senha: 'hash-do-banco',
+                status_cadastro: 'APROVADO'
+            }]
+        ]);
+
+        bcrypt.compare.mockResolvedValue(true);
+        jwt.sign.mockReturnValue('token-fake-123');
+
+        await authController.login(req, res);
+
+        expect(jwt.sign).toHaveBeenCalledWith(
+            { id: 7, perfil: 'SINDICO', id_condominio: 3 },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+    });
+
     it('deve retornar erro 401 se o usuário não for encontrado no banco', async () => {
         connection.query.mockResolvedValue([[]]);
 

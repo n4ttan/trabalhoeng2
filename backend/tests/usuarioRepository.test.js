@@ -238,6 +238,29 @@ describe('listarPendentes', () => {
 });
 
 describe.each([
+    ['aprovarMorador', 'APROVADO'],
+    ['rejeitarMorador', 'REJEITADO']
+])('%s com escopo de condomínio', (metodo, status) => {
+    it('não filtra por condomínio quando ele não é informado', async () => {
+        responderQuery(null, { affectedRows: 1 });
+
+        await repository[metodo](2);
+
+        expect(connection.query.mock.calls[0][0]).not.toContain('id_condominio');
+        expect(connection.query.mock.calls[0][1]).toEqual([status, 2]);
+    });
+
+    it('restringe ao condomínio informado', async () => {
+        responderQuery(null, { affectedRows: 0 });
+
+        await expect(repository[metodo](2, 8)).resolves.toBe(false);
+
+        expect(connection.query.mock.calls[0][0]).toContain('AND id_condominio = ?');
+        expect(connection.query.mock.calls[0][1]).toEqual([status, 2, 8]);
+    });
+});
+
+describe.each([
     ['aprovarMorador', 'Falha ao aprovar morador'],
     ['rejeitarMorador', 'Falha ao rejeitar morador']
 ])('%s', (metodo, mensagemErro) => {

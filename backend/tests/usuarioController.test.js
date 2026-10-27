@@ -774,7 +774,7 @@ describe('aprovarMorador', () => {
         await usuarioController.aprovarMorador(req, res);
 
         expect(usuarioService.aprovarMorador)
-            .toHaveBeenCalledWith(1);
+            .toHaveBeenCalledWith(1, undefined);
 
         expect(res.status).toHaveBeenCalledWith(200);
 
@@ -861,7 +861,7 @@ describe('rejeitarMorador', () => {
         await usuarioController.rejeitarMorador(req, res);
 
         expect(usuarioService.rejeitarMorador)
-            .toHaveBeenCalledWith(1);
+            .toHaveBeenCalledWith(1, undefined);
 
         expect(res.status).toHaveBeenCalledWith(200);
 
@@ -921,5 +921,96 @@ describe('rejeitarMorador', () => {
         expect(res.json).toHaveBeenCalledWith({
             mensagem: 'Usuário não encontrado'
         });
+    });
+});
+
+describe('escopo por condomínio (síndico x admin)', () => {
+    const novoRes = () => {
+        const res = { status: jest.fn(), json: jest.fn() };
+        res.status.mockReturnValue(res);
+        return res;
+    };
+
+    it('listarPendentes ignora ?condominioId e usa o condomínio do síndico', async () => {
+        const req = {
+            usuario: { perfil: 'SINDICO', id_condominio: 1 },
+            query: { condominioId: '2' }
+        };
+        const res = novoRes();
+        usuarioService.listarPendentes.mockResolvedValue([]);
+
+        await usuarioController.listarPendentes(req, res);
+
+        expect(usuarioService.listarPendentes).toHaveBeenCalledWith(1);
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('listarPendentes do admin usa o filtro opcional ?condominioId', async () => {
+        const req = { usuario: { perfil: 'ADMIN' }, query: { condominioId: '2' } };
+        usuarioService.listarPendentes.mockResolvedValue([]);
+
+        await usuarioController.listarPendentes(req, novoRes());
+
+        expect(usuarioService.listarPendentes).toHaveBeenCalledWith('2');
+    });
+
+    it('listarPendentes do admin sem filtro lista todos os condomínios', async () => {
+        const req = { usuario: { perfil: 'ADMIN', id_condominio: null }, query: {} };
+        usuarioService.listarPendentes.mockResolvedValue([]);
+
+        await usuarioController.listarPendentes(req, novoRes());
+
+        expect(usuarioService.listarPendentes).toHaveBeenCalledWith(undefined);
+    });
+
+    it('síndico sem condomínio vinculado recebe 403 em vez de ver tudo', async () => {
+        const req = { usuario: { perfil: 'SINDICO', id_condominio: null }, query: {} };
+        const res = novoRes();
+
+        await usuarioController.listarPendentes(req, res);
+
+        expect(usuarioService.listarPendentes).not.toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(403);
+        expect(res.json).toHaveBeenCalledWith({ mensagem: 'Síndico sem condomínio vinculado.' });
+    });
+
+    it.each([
+        ['aprovarMorador'],
+        ['rejeitarMorador']
+    ])('%s repassa o condomínio do síndico para o serviço', async (metodo) => {
+        const req = {
+            params: { usuarioId: 15 },
+            usuario: { perfil: 'SINDICO', id_condominio: 1 }
+        };
+        usuarioService[metodo].mockResolvedValue({ mensagem: 'ok' });
+
+        await usuarioController[metodo](req, novoRes());
+
+        expect(usuarioService[metodo]).toHaveBeenCalledWith(15, 1);
+    });
+
+    it.each([
+        ['aprovarMorador'],
+        ['rejeitarMorador']
+    ])('%s do admin não restringe por condomínio', async (metodo) => {
+        const req = { params: { usuarioId: 15 }, usuario: { perfil: 'ADMIN' } };
+        usuarioService[metodo].mockResolvedValue({ mensagem: 'ok' });
+
+        await usuarioController[metodo](req, novoRes());
+
+        expect(usuarioService[metodo]).toHaveBeenCalledWith(15, undefined);
+    });
+
+    it.each([
+        ['aprovarMorador'],
+        ['rejeitarMorador']
+    ])('%s de síndico sem condomínio devolve 403 sem chamar o serviço', async (metodo) => {
+        const req = { params: { usuarioId: 15 }, usuario: { perfil: 'SINDICO' } };
+        const res = novoRes();
+
+        await usuarioController[metodo](req, res);
+
+        expect(usuarioService[metodo]).not.toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(403);
     });
 });

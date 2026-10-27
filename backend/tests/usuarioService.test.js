@@ -71,7 +71,7 @@ describe('aprovarMorador', () => {
 
         const resultado = await usuarioService.aprovarMorador(1);
 
-        expect(usuarioRepository.aprovarMorador).toHaveBeenCalledWith(1);
+        expect(usuarioRepository.aprovarMorador).toHaveBeenCalledWith(1, undefined);
         expect(resultado).toEqual({
             mensagem: 'Morador aprovado com sucesso'
         });
@@ -86,7 +86,21 @@ describe('aprovarMorador', () => {
             status: 404
         });
 
-        expect(usuarioRepository.aprovarMorador).toHaveBeenCalledWith(1);
+        expect(usuarioRepository.aprovarMorador).toHaveBeenCalledWith(1, undefined);
+    });
+
+    it('repassa o condomínio ao repositório para limitar a aprovação', async () => {
+        usuarioRepository.aprovarMorador.mockResolvedValue(true);
+
+        await usuarioService.aprovarMorador(1, 4);
+
+        expect(usuarioRepository.aprovarMorador).toHaveBeenCalledWith(1, 4);
+    });
+
+    it('devolve 404 quando o morador pendente é de outro condomínio', async () => {
+        usuarioRepository.aprovarMorador.mockResolvedValue(false);
+
+        await expect(usuarioService.aprovarMorador(1, 4)).rejects.toMatchObject({ status: 404 });
     });
 });
 
@@ -96,7 +110,7 @@ describe('rejeitarMorador', () => {
 
         const resultado = await usuarioService.rejeitarMorador(1);
 
-        expect(usuarioRepository.rejeitarMorador).toHaveBeenCalledWith(1);
+        expect(usuarioRepository.rejeitarMorador).toHaveBeenCalledWith(1, undefined);
         expect(resultado).toEqual({
             mensagem: 'Morador rejeitado com sucesso'
         });
@@ -111,7 +125,21 @@ describe('rejeitarMorador', () => {
             status: 404
         });
 
-        expect(usuarioRepository.rejeitarMorador).toHaveBeenCalledWith(1);
+        expect(usuarioRepository.rejeitarMorador).toHaveBeenCalledWith(1, undefined);
+    });
+
+    it('repassa o condomínio ao repositório para limitar a rejeição', async () => {
+        usuarioRepository.rejeitarMorador.mockResolvedValue(true);
+
+        await usuarioService.rejeitarMorador(1, 4);
+
+        expect(usuarioRepository.rejeitarMorador).toHaveBeenCalledWith(1, 4);
+    });
+
+    it('devolve 404 quando o morador pendente é de outro condomínio', async () => {
+        usuarioRepository.rejeitarMorador.mockResolvedValue(false);
+
+        await expect(usuarioService.rejeitarMorador(1, 4)).rejects.toMatchObject({ status: 404 });
     });
 });
 

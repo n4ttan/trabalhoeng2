@@ -163,40 +163,37 @@ function listarPendentes(condominioId = null) {
     });
 }
 
-// Aprova um morador pendente; devolve true se alguma linha foi alterada.
-function aprovarMorador(usuarioId) {
+// Muda o status de um morador pendente (opcionalmente só se ele for do condomínio informado);
+// devolve true se alguma linha foi alterada.
+function alterarStatusPendente(novoStatus, usuarioId, condominioId) {
     return new Promise((resolve, reject) => {
-        connection.query(
-            "UPDATE usuarios SET status_cadastro = 'APROVADO' WHERE id = ? AND status_cadastro = 'PENDENTE_APROVACAO'",
-            [usuarioId],
-            (error, results) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
+        let query = "UPDATE usuarios SET status_cadastro = ? WHERE id = ? AND status_cadastro = 'PENDENTE_APROVACAO'";
+        const params = [novoStatus, usuarioId];
 
-                resolve(results.affectedRows > 0);
+        if (condominioId) {
+            query += " AND id_condominio = ?";
+            params.push(condominioId);
+        }
+
+        connection.query(query, params, (error, results) => {
+            if (error) {
+                reject(error);
+                return;
             }
-        );
+
+            resolve(results.affectedRows > 0);
+        });
     });
 }
 
-// Rejeita um morador pendente; devolve true se alguma linha foi alterada.
-function rejeitarMorador(usuarioId) {
-    return new Promise((resolve, reject) => {
-        connection.query(
-            "UPDATE usuarios SET status_cadastro = 'REJEITADO' WHERE id = ? AND status_cadastro = 'PENDENTE_APROVACAO'",
-            [usuarioId],
-            (error, results) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
+// Aprova um morador pendente; devolve true se alguma linha foi alterada.
+function aprovarMorador(usuarioId, condominioId = null) {
+    return alterarStatusPendente('APROVADO', usuarioId, condominioId);
+}
 
-                resolve(results.affectedRows > 0);
-            }
-        );
-    });
+// Rejeita um morador pendente; devolve true se alguma linha foi alterada.
+function rejeitarMorador(usuarioId, condominioId = null) {
+    return alterarStatusPendente('REJEITADO', usuarioId, condominioId);
 }
 
 function rebaixarUsuario(usuarioId) {
