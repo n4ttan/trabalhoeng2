@@ -1,4 +1,5 @@
 const condominioRepository = require('../repositories/condominioRepository');
+const usuarioRepository = require('../repositories/usuarioRepository');
 
 function erroNegocio(status, codigo, mensagem) {
     const erro = new Error(mensagem);
@@ -112,23 +113,84 @@ async function listarBlocos(condominioId) {
     return condominioRepository.listarBlocos(condId);
 }
 
+const PERFIS_GESTORES = ['SINDICO', 'ADMIN'];
+
+// Aceita um ID de condomínio ou um objeto { condominioId, blocoId } e devolve os IDs como números.
+function normalizarAtribuicao(item) {
+    const objeto = item !== null && typeof item === 'object';
+    const condominioId = Number(objeto ? item.condominioId : item);
+    const blocoId = objeto && item.blocoId ? Number(item.blocoId) : null;
+
+    const condominioValido = Number.isInteger(condominioId) && condominioId > 0;
+    const blocoValido = blocoId === null || (Number.isInteger(blocoId) && blocoId > 0);
+
+    if (!condominioValido || !blocoValido) {
+        throw erroNegocio(400, 'DADOS_INVALIDOS', 'Cada atribuição precisa de um condomínio (e, opcionalmente, um bloco) válido.');
+    }
+
+    return { condominioId, blocoId };
+}
+
 async function atribuirGestao(usuarioId, condominios = []) {
     const userId = Number(usuarioId);
     if (!userId || !Array.isArray(condominios) || condominios.length === 0) {
         throw erroNegocio(400, 'DADOS_INVALIDOS', 'Informe o usuário e a lista de condomínios/blocos para gerenciamento.');
     }
 
-    const resultados = [];
+    // Remove repetições do próprio pedido antes de validar.
+    const itens = new Map();
     for (const item of condominios) {
-        const condId = typeof item === 'object' ? item.condominioId : item;
-        const blocoId = typeof item === 'object' ? item.blocoId || null : null;
-        if (condId) {
-            const id = await condominioRepository.atribuirGestor(userId, condId, blocoId);
-            resultados.push({ id, condominioId: condId, blocoId });
+        const atribuicao = normalizarAtribuicao(item);
+        itens.set(`${atribuicao.condominioId}:${atribuicao.blocoId}`, atribuicao);
+    }
+
+    const usuario = await usuarioRepository.buscarPorId(userId);
+    if (!usuario) {
+        throw erroNegocio(404, 'USUARIO_NAO_ENCONTRADO', 'Usuário não encontrado.');
+    }
+    if (!PERFIS_GESTORES.includes(usuario.perfil)) {
+        throw erroNegocio(400, 'PERFIL_INVALIDO', 'Apenas síndicos ou administradores podem receber gerenciamento.');
+    }
+
+    const condominiosVerificados = new Set();
+    for (const { condominioId, blocoId } of itens.values()) {
+        if (!condominiosVerificados.has(condominioId)) {
+            const condominio = await condominioRepository.buscarPorId(condominioId);
+            if (!condominio) {
+                throw erroNegocio(404, 'CONDOMINIO_NAO_ENCONTRADO', `Condomínio ${condominioId} não encontrado.`);
+            }
+            condominiosVerificados.add(condominioId);
+        }
+
+        if (blocoId !== null) {
+            const bloco = await condominioRepository.buscarBlocoPorId(blocoId);
+            if (!bloco) {
+                throw erroNegocio(404, 'BLOCO_NAO_ENCONTRADO', `Bloco ${blocoId} não encontrado.`);
+            }
+            if (bloco.id_condominio !== condominioId) {
+                throw erroNegocio(400, 'BLOCO_INVALIDO', `O bloco ${blocoId} não pertence ao condomínio ${condominioId}.`);
+            }
         }
     }
 
-    return { mensagem: 'Gerenciamento atribuído com sucesso.', atribuicoes: resultados };
+    const atribuicoes = await condominioRepository.atribuirGestores(userId, [...itens.values()]);
+
+    return { mensagem: 'Gerenciamento atribuído com sucesso.', atribuicoes };
+}
+
+async function removerGestao(usuarioId, gerenciamentoId) {
+    const userId = Number(usuarioId);
+    const gestaoId = Number(gerenciamentoId);
+    if (!userId || !gestaoId) {
+        throw erroNegocio(400, 'ID_INVALIDO', 'ID do usuário ou do gerenciamento inválido.');
+    }
+
+    const removido = await condominioRepository.removerGestao(userId, gestaoId);
+    if (!removido) {
+        throw erroNegocio(404, 'GERENCIAMENTO_NAO_ENCONTRADO', 'Gerenciamento não encontrado para este usuário.');
+    }
+
+    return { mensagem: 'Gerenciamento removido com sucesso.' };
 }
 
 async function listarGerenciamentosUsuario(usuarioId) {
@@ -150,5 +212,6 @@ module.exports = {
     criarBloco,
     listarBlocos,
     atribuirGestao,
+    removerGestao,
     listarGerenciamentosUsuario
 };

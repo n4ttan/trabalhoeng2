@@ -196,6 +196,24 @@ function rejeitarMorador(usuarioId, condominioId = null) {
     return alterarStatusPendente('REJEITADO', usuarioId, condominioId);
 }
 
+// Busca um usuário pelo ID (sem a senha); devolve null se não existir.
+function buscarPorId(id) {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            'SELECT id, nome, email, perfil, id_condominio FROM usuarios WHERE id = ?',
+            [id],
+            (error, results) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                resolve(results[0] || null);
+            }
+        );
+    });
+}
+
 function rebaixarUsuario(usuarioId) {
     return new Promise((resolve, reject) => {
         const query = `
@@ -220,6 +238,7 @@ module.exports = {
     excluirUsuarioEPedido,
     salvarTokenValidacao,
     buscarPorEmail,
+    buscarPorId,
     reservarTentativaValidacao,
     confirmarEmail,
     listarPendentes,

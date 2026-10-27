@@ -176,15 +176,72 @@ function listarBlocos(condominioId) {
     });
 }
 
-// Atribui gestão de condomínio/bloco (suporta múltiplos condomínios e blocos para gerenciamento)
-function atribuirGestor(usuarioId, condominioId, blocoId = null) {
+// Busca um bloco pelo ID
+function buscarBlocoPorId(id) {
     return new Promise((resolve, reject) => {
         connection.query(
-            'INSERT INTO gestores_condominios (usuario_id, condominio_id, bloco_id) VALUES (?, ?, ?)',
-            [usuarioId, condominioId, blocoId],
+            'SELECT * FROM blocos WHERE id = ?',
+            [id],
             (error, results) => {
                 if (error) return reject(error);
-                resolve(results.insertId);
+                resolve(results[0] || null);
+            }
+        );
+    });
+}
+
+// Atribui vários condomínios/blocos a um gestor numa transação (tudo ou nada).
+// O que o usuário já gerencia é ignorado, evitando linhas duplicadas.
+function atribuirGestores(usuarioId, itens) {
+    return new Promise((resolve, reject) => {
+        connection.beginTransaction((error) => {
+            if (error) return reject(error);
+
+            const atribuicoes = [];
+
+            const inserir = (indice) => {
+                if (indice === itens.length) {
+                    return connection.commit((erroCommit) => {
+                        if (erroCommit) return connection.rollback(() => reject(erroCommit));
+                        resolve(atribuicoes);
+                    });
+                }
+
+                const { condominioId, blocoId } = itens[indice];
+                const query = `
+                    INSERT INTO gestores_condominios (usuario_id, condominio_id, bloco_id)
+                    SELECT ?, ?, ?
+                    FROM DUAL
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM gestores_condominios
+                        WHERE usuario_id = ? AND condominio_id = ? AND bloco_id <=> ?
+                    )
+                `;
+                const params = [usuarioId, condominioId, blocoId, usuarioId, condominioId, blocoId];
+
+                connection.query(query, params, (erroQuery, results) => {
+                    if (erroQuery) return connection.rollback(() => reject(erroQuery));
+
+                    const nova = results.affectedRows > 0;
+                    atribuicoes.push({ id: nova ? results.insertId : null, condominioId, blocoId, nova });
+                    inserir(indice + 1);
+                });
+            };
+
+            inserir(0);
+        });
+    });
+}
+
+// Remove uma atribuição de gestão do usuário; devolve true se alguma linha foi removida
+function removerGestao(usuarioId, gerenciamentoId) {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            'DELETE FROM gestores_condominios WHERE id = ? AND usuario_id = ?',
+            [gerenciamentoId, usuarioId],
+            (error, results) => {
+                if (error) return reject(error);
+                resolve(results.affectedRows > 0);
             }
         );
     });
@@ -219,6 +276,8 @@ module.exports = {
     atribuirSindicoCondominio,
     criarBloco,
     listarBlocos,
-    atribuirGestor,
+    buscarBlocoPorId,
+    atribuirGestores,
+    removerGestao,
     listarGerenciamentosUsuario
 };

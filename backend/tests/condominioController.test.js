@@ -10,6 +10,7 @@ jest.mock('../src/services/condominioService', () => ({
     criarBloco: jest.fn(),
     listarBlocos: jest.fn(),
     atribuirGestao: jest.fn(),
+    removerGestao: jest.fn(),
     listarGerenciamentosUsuario: jest.fn()
 }));
 
@@ -484,7 +485,7 @@ describe('condominioController', () => {
 
     describe('listarGerenciamentos', () => {
         it('deve listar gerenciamentos usando usuarioId dos parâmetros', async () => {
-            const req = { params: { usuarioId: '5' }, usuario: { id: 10 } };
+            const req = { params: { usuarioId: '5' }, usuario: { id: 10, perfil: 'ADMIN' } };
             const res = criarResposta();
 
             condominioService.listarGerenciamentosUsuario.mockResolvedValue([]);
@@ -494,6 +495,32 @@ describe('condominioController', () => {
             expect(condominioService.listarGerenciamentosUsuario).toHaveBeenCalledWith('5');
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith([]);
+        });
+
+        it('deve permitir que o usuário veja os próprios gerenciamentos', async () => {
+            const req = { params: { usuarioId: '10' }, usuario: { id: 10, perfil: 'SINDICO' } };
+            const res = criarResposta();
+
+            condominioService.listarGerenciamentosUsuario.mockResolvedValue([]);
+
+            await condominioController.listarGerenciamentos(req, res);
+
+            expect(condominioService.listarGerenciamentosUsuario).toHaveBeenCalledWith('10');
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        it('deve negar a um não admin ver os gerenciamentos de outro usuário', async () => {
+            const req = { params: { usuarioId: '5' }, usuario: { id: 10, perfil: 'SINDICO' } };
+            const res = criarResposta();
+
+            await condominioController.listarGerenciamentos(req, res);
+
+            expect(condominioService.listarGerenciamentosUsuario).not.toHaveBeenCalled();
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.json).toHaveBeenCalledWith({
+                erro: 'Acesso negado. Você só pode ver os seus próprios gerenciamentos.',
+                codigo: 'ACESSO_NEGADO'
+            });
         });
 
         it('deve usar o id do usuário autenticado como alternativa', async () => {
@@ -519,6 +546,52 @@ describe('condominioController', () => {
             expect(res.json).toHaveBeenCalledWith({
                 erro: 'Erro ao listar condomínios gerenciados.'
             });
+        });
+    });
+
+    describe('removerGerenciamento', () => {
+        it('deve remover uma atribuição de gerenciamento', async () => {
+            const req = { params: { usuarioId: '5', gerenciamentoId: '9' } };
+            const res = criarResposta();
+
+            condominioService.removerGestao.mockResolvedValue({
+                mensagem: 'Gerenciamento removido com sucesso.'
+            });
+
+            await condominioController.removerGerenciamento(req, res);
+
+            expect(condominioService.removerGestao).toHaveBeenCalledWith('5', '9');
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        it('deve repassar o status do erro de negócio', async () => {
+            const req = { params: { usuarioId: '5', gerenciamentoId: '9' } };
+            const res = criarResposta();
+            const erro = new Error('Gerenciamento não encontrado para este usuário.');
+            erro.status = 404;
+            erro.codigo = 'GERENCIAMENTO_NAO_ENCONTRADO';
+
+            condominioService.removerGestao.mockRejectedValue(erro);
+
+            await condominioController.removerGerenciamento(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({
+                erro: 'Gerenciamento não encontrado para este usuário.',
+                codigo: 'GERENCIAMENTO_NAO_ENCONTRADO'
+            });
+        });
+
+        it('deve tratar erros inesperados', async () => {
+            const req = { params: { usuarioId: '5', gerenciamentoId: '9' } };
+            const res = criarResposta();
+
+            condominioService.removerGestao.mockRejectedValue(new Error('Falha'));
+
+            await condominioController.removerGerenciamento(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.json).toHaveBeenCalledWith({ erro: 'Erro ao remover gerenciamento.' });
         });
     });
 
