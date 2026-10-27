@@ -12,6 +12,7 @@ import AutorizacaoSindicoPage from './pages/AutorizacaoSindicoPage';
 import PainelSindicoPage from './pages/PainelSindicoPage';
 import PerfilMoradorPage from './pages/PerfilMoradorPage';
 import NotificacoesPage from './pages/NotificacoesPage';
+import CondominiosPage from './pages/CondominiosPage';
 
 function App() {
     return (
@@ -23,10 +24,13 @@ function App() {
                 {/* Login */}
                 <Route path="/login" element={<LoginPage />} />
 
-                {/* Cadastro do morador (Mapeado em múltiplos caminhos para evitar tela em branco) */}
+                {/* Cadastro do morador */}
                 <Route path="/cadastro" element={<CadastroMoradorValidacaoPage />} />
                 <Route path="/cadastro-morador" element={<CadastroMoradorValidacaoPage />} />
                 <Route path="/morador/cadastro" element={<CadastroMoradorValidacaoPage />} />
+
+                {/* Múltiplos Condomínios */}
+                <Route path="/condominios" element={<CondominiosPage />} />
 
                 {/* Solicitação para ser síndico */}
                 <Route path="/permissao-sindico" element={<PermissaoSindicoPage />} />
