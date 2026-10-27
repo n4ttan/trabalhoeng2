@@ -33,6 +33,12 @@ export default function CondominiosPage() {
 
   return (
     <div className="condominios-container">
+      <div className="acoes-topo">
+        <button className="btn-voltar-home" onClick={() => navigate('/')}>
+          ← Voltar para a Home
+        </button>
+      </div>
+
       <div className="condominios-header">
         <h2>Selecione o Condomínio</h2>
         <p>Escolha um condomínio para visualizar os avisos e informações.</p>
@@ -42,7 +48,7 @@ export default function CondominiosPage() {
 
       <div className="grid-condominios">
         {condominios.length === 0 ? (
-          <p>Nenhum condomínio registado no sistema.</p>
+          <p className="sem-registos">Nenhum condomínio registado no sistema.</p>
         ) : (
           condominios.map((condo) => (
             <div key={condo.id} className="card-condominio">

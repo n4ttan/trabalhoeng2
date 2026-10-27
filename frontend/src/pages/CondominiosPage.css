@@ -1,51 +1,82 @@
 .condominios-container {
-  min-height: 100vh;
-  background-color: #f4f7fc;
-  padding: 40px 20px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.acoes-topo {
+  margin-bottom: 24px;
+}
+
+.btn-voltar-home {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-voltar-home:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
 }
 
 .condominios-header {
-  max-width: 900px;
-  margin: 0 auto 32px auto;
   text-align: center;
+  margin-bottom: 36px;
 }
 
 .condominios-header h2 {
-  color: #0f172a;
   font-size: 28px;
   font-weight: 800;
+  color: #0f172a;
   margin-bottom: 8px;
 }
 
 .condominios-header p {
+  font-size: 16px;
   color: #64748b;
-  font-size: 15px;
+  margin: 0;
+}
+
+.alerta-erro {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #ef4444;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .grid-condominios {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
-  max-width: 900px;
-  margin: 0 auto;
 }
 
 .card-condominio {
-  background: #ffffff;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .card-condominio:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .card-condo-header {
@@ -57,27 +88,22 @@
 
 .card-icon {
   font-size: 24px;
-  background: #eff6ff;
-  padding: 8px;
-  border-radius: 8px;
+  background-color: #f1f5f9;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .card-condo-header h3 {
-  margin: 0;
-  color: #0f172a;
   font-size: 18px;
   font-weight: 700;
+  color: #1e293b;
+  margin: 0;
 }
 
 .card-condo-body {
-  color: #475569;
+  margin-bottom: 24px;
   font-size: 14px;
-  line-height: 1.5;
-  margin-bottom: 20px;
-}
-
-.card-condo-body p {
-  margin: 4px 0;
+  color: #475569;
 }
 
 .btn-acessar-condo {
@@ -85,25 +111,21 @@
   background-color: #2563eb;
   color: #ffffff;
   border: none;
-  padding: 10px 16px;
+  padding: 12px 16px;
   border-radius: 8px;
-  font-weight: 600;
   font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s;
 }
 
 .btn-acessar-condo:hover {
   background-color: #1d4ed8;
 }
 
-.alerta-erro {
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  padding: 12px;
-  border-radius: 8px;
-  max-width: 900px;
-  margin: 0 auto 20px auto;
+.sem-registos {
+  grid-column: 1 / -1;
   text-align: center;
+  color: #64748b;
+  font-size: 16px;
 }

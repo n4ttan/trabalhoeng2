@@ -1,9 +1,11 @@
+import React from 'react';
 import {
     BrowserRouter,
     Routes,
     Route
 } from 'react-router-dom';
 
+import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import CadastroMoradorValidacaoPage from './pages/CadastroMoradorValidacaoPage';
@@ -17,6 +19,7 @@ import CondominiosPage from './pages/CondominiosPage';
 function App() {
     return (
         <BrowserRouter>
+            <Navbar />
             <Routes>
                 {/* Página inicial */}
                 <Route path="/" element={<HomePage />} />
