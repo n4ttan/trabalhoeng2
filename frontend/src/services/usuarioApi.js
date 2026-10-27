@@ -87,3 +87,13 @@ export async function excluirUsuario(
     );
 
 }
+
+
+/*
+ * BUSCAR PERFIL DO USUÁRIO LOGADO
+ */
+export async function buscarPerfilUsuario() {
+
+    return await requisicao('/usuarios/me');
+
+}
