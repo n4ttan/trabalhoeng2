@@ -74,9 +74,14 @@ export default function Navbar() {
           className={`nav-item ${location.pathname === '/reunioes' ? 'active' : ''}`}
           onClick={() => navigate('/reunioes')}
         >
-         Reuniões
+          Reuniões
         </button>
-
+        <button
+          className={`nav-item ${location.pathname === '/reservas-churrasqueira' ? 'active' : ''}`}
+          onClick={() => navigate('/reservas-churrasqueira')}
+        >
+          Churrasqueira
+        </button>
       </nav>
     </header>
   );

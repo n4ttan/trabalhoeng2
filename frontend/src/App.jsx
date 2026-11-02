@@ -16,6 +16,7 @@ import PerfilMoradorPage from './pages/PerfilMoradorPage';
 import NotificacoesPage from './pages/NotificacoesPage';
 import CondominiosPage from './pages/CondominiosPage';
 import ReunioesPage from './pages/ReunioesPage';
+import ReservasChurrasqueiraPage from './pages/ReservasChurrasqueiraPage';
 
 function App() {
     return (
@@ -53,6 +54,9 @@ function App() {
 
                 {/* Reuniões */}
                 <Route path="/reunioes" element={<ReunioesPage />} />
+
+                {/* Reservas de Churrasqueira */}
+                <Route path="/reservas-churrasqueira" element={<ReservasChurrasqueiraPage />} />
             </Routes>
         </BrowserRouter>
     );
