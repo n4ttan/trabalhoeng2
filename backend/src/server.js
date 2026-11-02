@@ -11,6 +11,7 @@ const usuarioController = require('./controllers/usuarioController');
 const condominioController = require('./controllers/condominioController');
 const authController = require('./controllers/authController');
 const notificacaoController = require('./controllers/notificacaoController');
+const reuniaoController = require('./controllers/reuniaoController');
 const {
     verificarToken,
     verificarSindico,
@@ -237,6 +238,31 @@ app.get(
     '/usuarios/:usuarioId/gerenciamentos',
     verificarToken,
     condominioController.listarGerenciamentos
+);
+
+// ======================== REUNIÕES MARCADAS ========================
+
+// Listar reuniões marcadas de um condomínio
+app.get(
+    '/condominios/:idCondominio/reunioes',
+    verificarToken,
+    reuniaoController.listarReunioes
+);
+
+// Agendar nova reunião (Apenas Síndico ou Admin)
+app.post(
+    '/condominios/:idCondominio/reunioes',
+    verificarToken,
+    verificarSindico,
+    reuniaoController.criarReuniao
+);
+
+// Cancelar / Excluir reunião (Apenas Síndico ou Admin)
+app.delete(
+    '/condominios/:idCondominio/reunioes/:reuniaoId',
+    verificarToken,
+    verificarSindico,
+    reuniaoController.deletarReuniao
 );
 
 // ======================== ADMIN E GERÊNCIA DE USUÁRIOS ========================
