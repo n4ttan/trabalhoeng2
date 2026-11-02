@@ -12,6 +12,7 @@ const condominioController = require('./controllers/condominioController');
 const authController = require('./controllers/authController');
 const notificacaoController = require('./controllers/notificacaoController');
 const reuniaoController = require('./controllers/reuniaoController');
+const reservaController = require('./controllers/reservaController'); // Importado para KAN-14
 const {
     verificarToken,
     verificarSindico,
@@ -263,6 +264,22 @@ app.delete(
     verificarToken,
     verificarSindico,
     reuniaoController.deletarReuniao
+);
+
+// ======================== RESERVAS DE CHURRASQUEIRA (KAN-14) ========================
+
+// Listar reservas de um condomínio
+app.get(
+    '/condominios/:idCondominio/reservas-churrasqueira',
+    verificarToken,
+    reservaController.listar
+);
+
+// Criar nova reserva (Morador ou Síndico)
+app.post(
+    '/condominios/:idCondominio/reservas-churrasqueira',
+    verificarToken,
+    reservaController.criar
 );
 
 // ======================== ADMIN E GERÊNCIA DE USUÁRIOS ========================
