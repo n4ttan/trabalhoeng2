@@ -13,10 +13,83 @@
   margin-bottom: 20px;
 }
 
+/* Layout flex em linha para manter avatar e informações lado a lado */
 .perfil-card {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 30px;
+}
+
+/* Seção da Foto de Perfil */
+.perfil-avatar-section {
+  display: flex;
   flex-direction: column;
-  gap: 15px;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Container trava o tamanho em 110px e corta o excesso */
+.avatar-wrapper {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  min-width: 110px;
+  min-height: 110px;
+  max-width: 110px;
+  max-height: 110px;
+  border-radius: 50%;
+  border: 3px solid #3b82f6;
+  overflow: hidden;
+  background-color: #f1f5f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Trava rígida nas dimensões da imagem */
+.avatar-img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+}
+
+.avatar-placeholder {
+  font-size: 3.5rem;
+  color: #94a3b8;
+}
+
+.btn-alterar-foto {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: #ffffff;
+  border-radius: 50%;
+  padding: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.btn-alterar-foto:hover {
+  transform: scale(1.1);
+}
+
+.avatar-tip {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* Container de Informações */
+.perfil-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .info-group {
@@ -60,4 +133,28 @@
   color: #0c5460;
   font-size: 0.95rem;
   line-height: 1.4;
+}
+
+@media (max-width: 500px) {
+  .perfil-card {
+    flex-direction: column;
+  }
+}
+
+.btn-alterar-foto-texto {
+  background: transparent;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
+  margin-top: 4px;
+}
+
+.btn-alterar-foto-texto:hover {
+  background-color: #eff6ff;
+  color: #1d4ed8;
 }
