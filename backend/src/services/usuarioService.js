@@ -228,8 +228,8 @@ async function listarPendentes(condominioId = undefined) {
     return await usuarioRepository.listarPendentes();
 }
 
-async function aprovarMorador(usuarioId) {
-    const aprovado = await usuarioRepository.aprovarMorador(usuarioId);
+async function aprovarMorador(usuarioId, condominioId = undefined) {
+    const aprovado = await usuarioRepository.aprovarMorador(usuarioId, condominioId);
     if (!aprovado) {
         const error = new Error("Usuário não encontrado ou não está pendente de aprovação");
         error.status = 404;
@@ -238,8 +238,8 @@ async function aprovarMorador(usuarioId) {
     return { mensagem: "Morador aprovado com sucesso" };
 }
 
-async function rejeitarMorador(usuarioId) {
-    const rejeitado = await usuarioRepository.rejeitarMorador(usuarioId);
+async function rejeitarMorador(usuarioId, condominioId = undefined) {
+    const rejeitado = await usuarioRepository.rejeitarMorador(usuarioId, condominioId);
     if (!rejeitado) {
         const error = new Error("Usuário não encontrado ou não está pendente de aprovação");
         error.status = 404;

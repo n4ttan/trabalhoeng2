@@ -225,6 +225,14 @@ app.post(
     condominioController.atribuirGerenciamento
 );
 
+// Remover uma atribuição de gerenciamento (Admin)
+app.delete(
+    '/usuarios/:usuarioId/gerenciamentos/:gerenciamentoId',
+    verificarToken,
+    verificarAdmin,
+    condominioController.removerGerenciamento
+);
+
 app.get(
     '/usuarios/:usuarioId/gerenciamentos',
     verificarToken,

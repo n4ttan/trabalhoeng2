@@ -33,7 +33,7 @@ async function login(req, res){
             {
                 id: usuario.id,
                 perfil: usuario.perfil,
-                condominio: usuario.id_condominio
+                id_condominio: usuario.id_condominio
             },
             process.env.JWT_SECRET,
             {expiresIn: '1d'}

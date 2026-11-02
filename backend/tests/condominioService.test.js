@@ -11,11 +11,18 @@ jest.mock('../src/repositories/condominioRepository', () => ({
     atribuirSindicoCondominio: jest.fn(),
     criarBloco: jest.fn(),
     listarBlocos: jest.fn(),
-    atribuirGestor: jest.fn(),
+    buscarBlocoPorId: jest.fn(),
+    atribuirGestores: jest.fn(),
+    removerGestao: jest.fn(),
     listarGerenciamentosUsuario: jest.fn()
 }));
 
+jest.mock('../src/repositories/usuarioRepository', () => ({
+    buscarPorId: jest.fn()
+}));
+
 const repository = require('../src/repositories/condominioRepository');
+const usuarioRepository = require('../src/repositories/usuarioRepository');
 const service = require('../src/services/condominioService');
 
 describe('condominioService', () => {
@@ -296,29 +303,151 @@ describe('condominioService', () => {
             });
         });
 
-        test('atribui condomínios e blocos', async () => {
-            repository.atribuirGestor
-                .mockResolvedValueOnce(100)
-                .mockResolvedValueOnce(101);
-
-            await expect(
-                service.atribuirGestao(20, [
-                    1,
-                    { condominioId: 2, blocoId: 5 },
-                    {}
-                ])
-            ).resolves.toEqual({
-                mensagem: 'Gerenciamento atribuído com sucesso.',
-                atribuicoes: [
-                    { id: 100, condominioId: 1, blocoId: null },
-                    { id: 101, condominioId: 2, blocoId: 5 }
-                ]
+        describe('com usuário gestor', () => {
+            beforeEach(() => {
+                usuarioRepository.buscarPorId.mockResolvedValue({ id: 20, perfil: 'SINDICO' });
+                repository.buscarPorId.mockResolvedValue({ id: 1 });
+                repository.buscarBlocoPorId.mockResolvedValue({ id: 5, id_condominio: 2 });
+                repository.atribuirGestores.mockImplementation(async (id, itens) =>
+                    itens.map((item, indice) => ({ id: 100 + indice, ...item, nova: true }))
+                );
             });
 
-            expect(repository.atribuirGestor)
-                .toHaveBeenNthCalledWith(1, 20, 1, null);
-            expect(repository.atribuirGestor)
-                .toHaveBeenNthCalledWith(2, 20, 2, 5);
+            test('atribui condomínios e blocos', async () => {
+                await expect(
+                    service.atribuirGestao('20', [1, { condominioId: 2, blocoId: 5 }])
+                ).resolves.toEqual({
+                    mensagem: 'Gerenciamento atribuído com sucesso.',
+                    atribuicoes: [
+                        { id: 100, condominioId: 1, blocoId: null, nova: true },
+                        { id: 101, condominioId: 2, blocoId: 5, nova: true }
+                    ]
+                });
+
+                expect(repository.atribuirGestores).toHaveBeenCalledWith(20, [
+                    { condominioId: 1, blocoId: null },
+                    { condominioId: 2, blocoId: 5 }
+                ]);
+            });
+
+            test('descarta repetições do próprio pedido', async () => {
+                await service.atribuirGestao(20, [1, { condominioId: 1 }, '1']);
+
+                expect(repository.atribuirGestores).toHaveBeenCalledWith(20, [
+                    { condominioId: 1, blocoId: null }
+                ]);
+                expect(repository.buscarPorId).toHaveBeenCalledTimes(1);
+            });
+
+            test.each([
+                [{}],
+                [{ condominioId: 'abc' }],
+                [{ condominioId: 1, blocoId: 'x' }],
+                [-3],
+                [null]
+            ])('rejeita atribuição malformada %j', async (item) => {
+                await expect(
+                    service.atribuirGestao(20, [item])
+                ).rejects.toMatchObject({ status: 400, codigo: 'DADOS_INVALIDOS' });
+
+                expect(repository.atribuirGestores).not.toHaveBeenCalled();
+            });
+
+            test('rejeita condomínio inexistente sem gravar nada', async () => {
+                repository.buscarPorId.mockResolvedValue(null);
+
+                await expect(
+                    service.atribuirGestao(20, [999])
+                ).rejects.toMatchObject({ status: 404, codigo: 'CONDOMINIO_NAO_ENCONTRADO' });
+
+                expect(repository.atribuirGestores).not.toHaveBeenCalled();
+            });
+
+            test('rejeita bloco inexistente', async () => {
+                repository.buscarBlocoPorId.mockResolvedValue(null);
+
+                await expect(
+                    service.atribuirGestao(20, [{ condominioId: 2, blocoId: 77 }])
+                ).rejects.toMatchObject({ status: 404, codigo: 'BLOCO_NAO_ENCONTRADO' });
+
+                expect(repository.atribuirGestores).not.toHaveBeenCalled();
+            });
+
+            test('rejeita bloco que pertence a outro condomínio', async () => {
+                await expect(
+                    service.atribuirGestao(20, [{ condominioId: 1, blocoId: 5 }])
+                ).rejects.toMatchObject({ status: 400, codigo: 'BLOCO_INVALIDO' });
+
+                expect(repository.atribuirGestores).not.toHaveBeenCalled();
+            });
+
+            test('valida o pedido inteiro antes de gravar qualquer item', async () => {
+                repository.buscarPorId
+                    .mockResolvedValueOnce({ id: 1 })
+                    .mockResolvedValueOnce(null);
+
+                await expect(
+                    service.atribuirGestao(20, [1, 999])
+                ).rejects.toMatchObject({ status: 404 });
+
+                expect(repository.atribuirGestores).not.toHaveBeenCalled();
+            });
+        });
+
+        test('rejeita usuário inexistente', async () => {
+            usuarioRepository.buscarPorId.mockResolvedValue(null);
+
+            await expect(
+                service.atribuirGestao(20, [1])
+            ).rejects.toMatchObject({ status: 404, codigo: 'USUARIO_NAO_ENCONTRADO' });
+
+            expect(repository.atribuirGestores).not.toHaveBeenCalled();
+        });
+
+        test('rejeita usuário que não é síndico nem admin', async () => {
+            usuarioRepository.buscarPorId.mockResolvedValue({ id: 20, perfil: 'MORADOR' });
+
+            await expect(
+                service.atribuirGestao(20, [1])
+            ).rejects.toMatchObject({ status: 400, codigo: 'PERFIL_INVALIDO' });
+
+            expect(repository.atribuirGestores).not.toHaveBeenCalled();
+        });
+
+        test('aceita administrador como gestor', async () => {
+            usuarioRepository.buscarPorId.mockResolvedValue({ id: 20, perfil: 'ADMIN' });
+            repository.buscarPorId.mockResolvedValue({ id: 1 });
+            repository.atribuirGestores.mockResolvedValue([]);
+
+            await expect(service.atribuirGestao(20, [1])).resolves.toMatchObject({
+                mensagem: 'Gerenciamento atribuído com sucesso.'
+            });
+        });
+    });
+
+    describe('removerGestao', () => {
+        test('rejeita IDs inválidos', async () => {
+            await expect(service.removerGestao(0, 3)).rejects.toMatchObject({ status: 400, codigo: 'ID_INVALIDO' });
+            await expect(service.removerGestao(20, 'abc')).rejects.toMatchObject({ status: 400, codigo: 'ID_INVALIDO' });
+            expect(repository.removerGestao).not.toHaveBeenCalled();
+        });
+
+        test('remove a atribuição do usuário', async () => {
+            repository.removerGestao.mockResolvedValue(true);
+
+            await expect(service.removerGestao('20', '3')).resolves.toEqual({
+                mensagem: 'Gerenciamento removido com sucesso.'
+            });
+            expect(repository.removerGestao).toHaveBeenCalledWith(20, 3);
+        });
+
+        test('devolve 404 quando a atribuição não existe para o usuário', async () => {
+            repository.removerGestao.mockResolvedValue(false);
+
+            await expect(service.removerGestao(20, 3)).rejects.toMatchObject({
+                status: 404,
+                codigo: 'GERENCIAMENTO_NAO_ENCONTRADO'
+            });
         });
     });
 

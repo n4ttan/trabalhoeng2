@@ -143,10 +143,30 @@ async function atribuirGerenciamento(req, res) {
     }
 }
 
+// DELETE /usuarios/:usuarioId/gerenciamentos/:gerenciamentoId
+// Remove uma atribuição de condomínio/bloco de um síndico/administrador
+async function removerGerenciamento(req, res) {
+    try {
+        const { usuarioId, gerenciamentoId } = req.params;
+        const resultado = await condominioService.removerGestao(usuarioId, gerenciamentoId);
+        return res.status(200).json(resultado);
+    } catch (error) {
+        return responderErro(res, error, 'Erro ao remover gerenciamento.');
+    }
+}
+
 // GET /usuarios/:usuarioId/gerenciamentos
+// O admin consulta qualquer usuário; os demais só enxergam os próprios gerenciamentos
 async function listarGerenciamentos(req, res) {
     try {
         const usuarioId = req.params.usuarioId || req.usuario.id;
+        if (req.usuario.perfil !== 'ADMIN' && Number(usuarioId) !== Number(req.usuario.id)) {
+            return res.status(403).json({
+                erro: 'Acesso negado. Você só pode ver os seus próprios gerenciamentos.',
+                codigo: 'ACESSO_NEGADO'
+            });
+        }
+
         const gerenciamentos = await condominioService.listarGerenciamentosUsuario(usuarioId);
         return res.status(200).json(gerenciamentos);
     } catch (error) {
@@ -179,6 +199,7 @@ module.exports = {
     criarBloco,
     listarBlocos,
     atribuirGerenciamento,
+    removerGerenciamento,
     listarGerenciamentos,
     acessarCondominio
 };

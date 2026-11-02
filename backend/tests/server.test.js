@@ -70,6 +70,7 @@ jest.mock('../src/controllers/condominioController', () => ({
     criarBloco: jest.fn(),
     listarBlocos: jest.fn(),
     atribuirGerenciamento: jest.fn(),
+    removerGerenciamento: jest.fn(),
     listarGerenciamentos: jest.fn()
 }));
 
