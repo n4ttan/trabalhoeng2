@@ -70,6 +70,13 @@ export default function Navbar() {
         >
           Meu Perfil
         </button>
+        <button
+          className={`nav-item ${location.pathname === '/reunioes' ? 'active' : ''}`}
+          onClick={() => navigate('/reunioes')}
+        >
+         Reuniões
+        </button>
+
       </nav>
     </header>
   );

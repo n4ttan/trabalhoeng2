@@ -15,6 +15,7 @@ import PainelSindicoPage from './pages/PainelSindicoPage';
 import PerfilMoradorPage from './pages/PerfilMoradorPage';
 import NotificacoesPage from './pages/NotificacoesPage';
 import CondominiosPage from './pages/CondominiosPage';
+import ReunioesPage from './pages/ReunioesPage';
 
 function App() {
     return (
@@ -49,6 +50,9 @@ function App() {
 
                 {/* Notificações / Mural */}
                 <Route path="/notificacoes" element={<NotificacoesPage />} />
+
+                {/* Reuniões */}
+                <Route path="/reunioes" element={<ReunioesPage />} />
             </Routes>
         </BrowserRouter>
     );
