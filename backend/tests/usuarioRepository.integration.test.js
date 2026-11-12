@@ -4,6 +4,12 @@ const usuarioRepository = require('../src/repositories/usuarioRepository');
 describe('usuarioRepository - integração', () => {
     let usuarioId;
 
+    beforeAll(async () => {
+        await connection.promise().query(
+            'INSERT INTO condominios (id, nome, numero_moradores) VALUES (1, "Condomínio Teste", 0) ON DUPLICATE KEY UPDATE id=id'
+        );
+    });
+
     afterAll((done) => {
         if (!usuarioId) {
             connection.end(done);

@@ -37,6 +37,22 @@ async function retirarCondominio(req, res) {
 async function listarCondominios(req, res) {
     try {
         const condominios = await condominioService.listarCondominios();
+        let usuario = req.usuario;
+        if (!usuario && req.headers && req.headers.authorization) {
+            try {
+                const token = req.headers.authorization.split(' ')[1];
+                const jwt = require('jsonwebtoken');
+                usuario = jwt.verify(token, process.env.JWT_SECRET);
+            } catch (e) {
+                // Token opcional; ignora caso inválido
+            }
+        }
+        if (usuario && usuario.perfil === 'MORADOR') {
+            const condominiosMorador = condominios.filter(
+                (c) => Number(c.id) === Number(usuario.id_condominio)
+            );
+            return res.status(200).json(condominiosMorador);
+        }
         return res.status(200).json(condominios);
     } catch (error) {
         return responderErro(res, error, 'Erro ao listar condomínios.');
@@ -47,6 +63,16 @@ async function listarCondominios(req, res) {
 async function obterCondominio(req, res) {
     try {
         const { idCondominio } = req.params;
+        if (
+            req.usuario &&
+            req.usuario.perfil === 'MORADOR' &&
+            Number(req.usuario.id_condominio) !== Number(idCondominio)
+        ) {
+            return res.status(403).json({
+                erro: 'Acesso negado. Você só pode acessar o seu próprio condomínio.',
+                codigo: 'ACESSO_NEGADO'
+            });
+        }
         const condominio = await condominioService.buscarCondominioPorId(idCondominio);
         return res.status(200).json(condominio);
     } catch (error) {
