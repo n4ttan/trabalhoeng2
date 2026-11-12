@@ -84,6 +84,62 @@ CREATE TABLE IF NOT EXISTS pedidos_sindico (
         ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS reservas_churrasqueira(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_condominio INT NOT NULL,
+    data_reserva VARCHAR(255) NOT NULL,
+    horario_inicio VARCHAR(255) NOT NULL,
+    horario_fim VARCHAR(255) NOT NULL,
+    status ENUM('PENDENTE', 'CONFIRMADA', 'CANCELADA') NOT NULL DEFAULT 'CONFIRMADA'
+);
+
+
+CREATE TABLE IF NOT EXISTS reunioes(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_condominio INT NOT NULL,
+    titulo VARCHAR(255) NOT NULL,
+    pauta VARCHAR(255) NOT NULL,
+    data_hora VARCHAR(255) NOT NULL,
+    local_link VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS reservas_salao(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_condominio INT NOT NULL,
+    data_reserva VARCHAR(255) NOT NULL,
+    horario_inicio VARCHAR(255) NOT NULL,
+    horario_fim VARCHAR(255) NOT NULL,
+    status ENUM('PENDENTE', 'CONFIRMADA', 'CANCELADA') NOT NULL DEFAULT 'CONFIRMADA'
+);
+
+CREATE TABLE IF NOT EXISTS boletos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_condominio INT NOT NULL,
+    id_usuario INT NOT NULL,
+    mes_referencia VARCHAR(20) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    data_vencimento DATE NOT NULL,
+    status ENUM('PENDENTE', 'PAGO', 'ATRASADO', 'CANCELADO') NOT NULL DEFAULT 'PENDENTE',
+    codigo_barras VARCHAR(100) NOT NULL,
+    linha_digitavel VARCHAR(100) NOT NULL,
+    data_pagamento DATETIME NULL,
+    valor_pago DECIMAL(10, 2) NULL,
+    forma_pagamento VARCHAR(50) NULL,
+    codigo_autenticacao VARCHAR(100) NULL,
+    segunda_via_emitida_em DATETIME NULL,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_boleto_condominio
+        FOREIGN KEY (id_condominio)
+        REFERENCES condominios(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_boleto_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES usuarios(id)
+        ON DELETE CASCADE
+);
+
 INSERT INTO usuarios (nome, email, senha, perfil, id_condominio, status_cadastro) 
 VALUES (
     'Administrador Geral', 

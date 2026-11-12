@@ -84,6 +84,24 @@ jest.mock('../src/controllers/notificacaoController', () => ({
     publicar: jest.fn()
 }));
 
+jest.mock('../src/controllers/reservaSalaoController', () => ({
+    listar: jest.fn(),
+    criar: jest.fn(),
+    cancelar: jest.fn(),
+    obterPorId: jest.fn()
+}));
+
+jest.mock('../src/controllers/boletoController', () => ({
+    criar: jest.fn(),
+    gerarEmLote: jest.fn(),
+    listarMeusBoletos: jest.fn(),
+    listar: jest.fn(),
+    obterSegundaVia: jest.fn(),
+    pagar: jest.fn(),
+    obterEstadoPagamentos: jest.fn(),
+    notificarInadimplentes: jest.fn()
+}));
+
 jest.mock('../src/middleware/auth', () => ({
     verificarToken: jest.fn(),
     verificarSindico: jest.fn(),
@@ -213,11 +231,156 @@ describe('Inicialização do servidor', () => {
         );
     });
 
+    it('deve registrar as rotas de reserva do salão de festas', () => {
+        require('../src/server');
+
+        expect(app.get).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/reservas-salao',
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        expect(app.post).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/reservas-salao',
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        expect(app.patch).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/reservas-salao/:id/cancelar',
+            expect.any(Function),
+            expect.any(Function)
+        );
+    });
+
+    it('deve registrar as rotas de boletos, segunda via, pagamento e notificações de inadimplentes', () => {
+        require('../src/server');
+
+        expect(app.post).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/boletos',
+            expect.any(Function),
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        expect(app.post).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/boletos/gerar-lote',
+            expect.any(Function),
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        expect(app.get).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/boletos/meus-boletos',
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        expect(app.get).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/boletos',
+            expect.any(Function),
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        expect(app.get).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/boletos/:id/segunda-via',
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        expect(app.post).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/boletos/:id/pagar',
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        expect(app.get).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/pagamentos/status',
+            expect.any(Function),
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        expect(app.post).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/pagamentos/notificar-inadimplentes',
+            expect.any(Function),
+            expect.any(Function),
+            expect.any(Function)
+        );
+    });
+
     it('não deve iniciar o servidor HTTP durante a importação do módulo', () => {
         require('../src/server');
 
         const servidor = http.createServer.mock.results[0].value;
 
         expect(servidor.listen).not.toHaveBeenCalled();
+    });
+
+    it('deve autenticar conexões WebSocket via middleware do Socket.IO', () => {
+        const jwt = require('jsonwebtoken');
+        let useCallback;
+        Server.mockImplementation(() => ({
+            use: jest.fn((cb) => {
+                useCallback = cb;
+            }),
+            on: jest.fn()
+        }));
+
+        require('../src/server');
+
+        expect(useCallback).toBeDefined();
+
+        // Sem token
+        const nextSemToken = jest.fn();
+        useCallback({ handshake: { auth: {} } }, nextSemToken);
+        expect(nextSemToken).toHaveBeenCalledWith(new Error('Token não fornecido'));
+
+        // Token inválido
+        jwt.verify.mockImplementation(() => {
+            throw new Error('Invalido');
+        });
+        const nextInvalido = jest.fn();
+        useCallback({ handshake: { auth: { token: 'bad' } } }, nextInvalido);
+        expect(nextInvalido).toHaveBeenCalledWith(new Error('Token inválido ou expirado'));
+
+        // Token válido
+        jwt.verify.mockReturnValue({ id: 99 });
+        const nextValido = jest.fn();
+        const socketValido = { handshake: { auth: { token: 'good' } }, data: {} };
+        useCallback(socketValido, nextValido);
+        expect(socketValido.data.usuario).toEqual({ id: 99 });
+        expect(nextValido).toHaveBeenCalledWith();
+    });
+
+    it('deve registrar conexão do socket e evento de disconnect', () => {
+        let connectionCallback;
+        Server.mockImplementation(() => ({
+            use: jest.fn(),
+            on: jest.fn((event, cb) => {
+                if (event === 'connection') connectionCallback = cb;
+            })
+        }));
+
+        require('../src/server');
+
+        expect(connectionCallback).toBeDefined();
+
+        let disconnectCallback;
+        const socket = {
+            id: 'socket-123',
+            data: { usuario: { id: 77 } },
+            join: jest.fn(),
+            on: jest.fn((event, cb) => {
+                if (event === 'disconnect') disconnectCallback = cb;
+            })
+        };
+
+        connectionCallback(socket);
+
+        expect(socket.join).toHaveBeenCalledWith('usuario:77');
+        expect(disconnectCallback).toBeDefined();
+        disconnectCallback();
     });
 });

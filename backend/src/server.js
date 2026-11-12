@@ -13,6 +13,8 @@ const authController = require('./controllers/authController');
 const notificacaoController = require('./controllers/notificacaoController');
 const reuniaoController = require('./controllers/reuniaoController');
 const reservaController = require('./controllers/reservaController'); // Importado para KAN-14
+const reservaSalaoController = require('./controllers/reservaSalaoController');
+const boletoController = require('./controllers/boletoController');
 const {
     verificarToken,
     verificarSindico,
@@ -280,6 +282,94 @@ app.post(
     '/condominios/:idCondominio/reservas-churrasqueira',
     verificarToken,
     reservaController.criar
+);
+
+// ======================== RESERVAS DE SALÃO DE FESTAS ========================
+
+// Listar reservas do salão de festas de um condomínio
+app.get(
+    '/condominios/:idCondominio/reservas-salao',
+    verificarToken,
+    reservaSalaoController.listar
+);
+
+// Criar nova reserva do salão de festas (Morador ou Síndico)
+app.post(
+    '/condominios/:idCondominio/reservas-salao',
+    verificarToken,
+    reservaSalaoController.criar
+);
+
+// Cancelar reserva do salão de festas
+app.patch(
+    '/condominios/:idCondominio/reservas-salao/:id/cancelar',
+    verificarToken,
+    reservaSalaoController.cancelar
+);
+
+// ======================== BOLETOS, SEGUNDA VIA E PAGAMENTO TEMPLATE ========================
+
+// Criar boleto individual (Admin ou Síndico)
+app.post(
+    '/condominios/:idCondominio/boletos',
+    verificarToken,
+    verificarSindico,
+    boletoController.criar
+);
+
+// Gerar boletos em lote para os moradores do condomínio (Admin ou Síndico)
+app.post(
+    '/condominios/:idCondominio/boletos/gerar-lote',
+    verificarToken,
+    verificarSindico,
+    boletoController.gerarEmLote
+);
+
+// Listar boletos do morador autenticado no condomínio
+app.get(
+    '/condominios/:idCondominio/boletos/meus-boletos',
+    verificarToken,
+    boletoController.listarMeusBoletos
+);
+
+// Listar todos os boletos do condomínio (Síndico ou Admin)
+app.get(
+    '/condominios/:idCondominio/boletos',
+    verificarToken,
+    verificarSindico,
+    boletoController.listar
+);
+
+// Geração da 2ª via do boleto (Morador ou Síndico)
+app.get(
+    '/condominios/:idCondominio/boletos/:id/segunda-via',
+    verificarToken,
+    boletoController.obterSegundaVia
+);
+
+// Realizar pagamento do boleto (template / simulação para cada morador no condomínio)
+app.post(
+    '/condominios/:idCondominio/boletos/:id/pagar',
+    verificarToken,
+    boletoController.pagar
+);
+
+// ======================== GESTÃO FINANCEIRA E NOTIFICAÇÕES (SÍNDICO) ========================
+
+// Verificar o estado de pagamentos do respectivo condomínio (total de contas pagas, pendentes, etc.)
+app.get(
+    '/condominios/:idCondominio/pagamentos/status',
+    verificarToken,
+    verificarCondominioSindico,
+    boletoController.obterEstadoPagamentos
+);
+
+// Sistema de notificação para usuários que ainda não pagaram a conta
+app.post(
+    '/condominios/:idCondominio/pagamentos/notificar-inadimplentes',
+    verificarToken,
+    verificarCondominioSindico,
+    boletoController.notificarInadimplentes
 );
 
 // ======================== ADMIN E GERÊNCIA DE USUÁRIOS ========================

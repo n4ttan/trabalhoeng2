@@ -179,6 +179,25 @@ describe('condominioController', () => {
                 erro: 'Erro ao listar condomínios.'
             });
         });
+
+        it('deve filtrar condomínios para morador autenticado retornando apenas o seu próprio condomínio', async () => {
+            const req = {
+                usuario: { id: 5, perfil: 'MORADOR', id_condominio: 2 }
+            };
+            const res = criarResposta();
+            const condominios = [
+                { id: 1, nome: 'Residencial A' },
+                { id: 2, nome: 'Residencial B' },
+                { id: 3, nome: 'Residencial C' }
+            ];
+
+            condominioService.listarCondominios.mockResolvedValue(condominios);
+
+            await condominioController.listarCondominios(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith([{ id: 2, nome: 'Residencial B' }]);
+        });
     });
 
     describe('obterCondominio', () => {
@@ -192,6 +211,39 @@ describe('condominioController', () => {
             await condominioController.obterCondominio(req, res);
 
             expect(condominioService.buscarCondominioPorId).toHaveBeenCalledWith('7');
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(condominio);
+        });
+
+        it('deve negar morador tentando obter detalhes de outro condomínio', async () => {
+            const req = {
+                params: { idCondominio: '8' },
+                usuario: { id: 5, perfil: 'MORADOR', id_condominio: 2 }
+            };
+            const res = criarResposta();
+
+            await condominioController.obterCondominio(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.json).toHaveBeenCalledWith({
+                erro: 'Acesso negado. Você só pode acessar o seu próprio condomínio.',
+                codigo: 'ACESSO_NEGADO'
+            });
+            expect(condominioService.buscarCondominioPorId).not.toHaveBeenCalled();
+        });
+
+        it('deve permitir morador obter detalhes do seu próprio condomínio', async () => {
+            const req = {
+                params: { idCondominio: '2' },
+                usuario: { id: 5, perfil: 'MORADOR', id_condominio: 2 }
+            };
+            const res = criarResposta();
+            const condominio = { id: 2, nome: 'Residencial B' };
+
+            condominioService.buscarCondominioPorId.mockResolvedValue(condominio);
+
+            await condominioController.obterCondominio(req, res);
+
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith(condominio);
         });
