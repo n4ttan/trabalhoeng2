@@ -1,0 +1,148 @@
+/* Fundo da página (#f4f6f8) é o mesmo para onde a foto se dissolve. */
+.churras-page {
+  --c-ink: #0f172a;
+  --c-muted: #475569;
+  --c-line: #e2e8f0;
+  --c-accent: #2563eb;
+  --c-bg: #f4f6f8;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
+  gap: 32px;
+  max-width: 1040px;
+  margin: 30px auto;
+  padding: 0 20px;
+  color: var(--c-ink);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.churras-conteudo header h2 { margin: 0 0 6px; font-size: 24px; text-wrap: balance; }
+.churras-conteudo header p { margin: 0 0 24px; color: var(--c-muted); max-width: 60ch; }
+.churras-conteudo h3 { margin: 32px 0 12px; font-size: 18px; }
+
+.churras-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+}
+
+.churras-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c-muted);
+}
+
+.churras-campo--cheio { grid-column: 1 / -1; }
+
+.churras-campo input {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: var(--c-ink);
+  font: inherit;
+  font-weight: 400;
+}
+
+.churras-campo input:focus-visible,
+.churras-btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.churras-btn {
+  grid-column: 1 / -1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--c-accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.churras-btn:hover { background: #1d4ed8; }
+
+.churras-msg {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+.churras-msg--sucesso { background: #dcfce7; color: #166534; }
+.churras-msg--erro { background: #fee2e2; color: #991b1b; }
+
+.churras-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.churras-lista li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding: 12px 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.churras-lista li + li { border-top: 1px solid var(--c-line); }
+.churras-quem { margin-left: auto; color: var(--c-muted); }
+
+.churras-vazio {
+  margin: 0;
+  padding: 24px 20px;
+  background: #f8fafc;
+  border-radius: 10px;
+  color: var(--c-muted);
+  text-align: center;
+}
+
+/* Foto vertical que se dissolve no fundo: some pela esquerda (lado do formulário) e por baixo. */
+.churras-foto {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  overflow: hidden;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, #000 38%),
+    linear-gradient(to bottom, #000 62%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0, #000 38%),
+    linear-gradient(to bottom, #000 62%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.churras-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 820px) {
+  .churras-page { grid-template-columns: 1fr; }
+  .churras-foto {
+    position: static;
+    order: -1;
+    aspect-ratio: 16 / 9;
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  }
+  .churras-foto img { object-position: center 70%; }
+}
