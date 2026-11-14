@@ -168,3 +168,34 @@
   color: #94a3b8;
   font-size: 13px;
 }
+.senha-campo {
+  position: relative;
+}
+
+.senha-campo input {
+  padding-right: 46px;
+}
+
+.btn-olho {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.btn-olho:hover { color: #0f172a; background: #e2e8f0; }
+
+.btn-olho:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
