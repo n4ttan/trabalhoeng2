@@ -7,24 +7,25 @@
   --c-bg: #f4f6f8;
 
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
-  gap: 32px;
-  max-width: 1040px;
-  margin: 30px auto;
-  padding: 0 20px;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 46%);
+  gap: clamp(24px, 3vw, 56px);
+  width: min(1680px, 100%);
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: clamp(20px, 2.5vw, 40px) clamp(20px, 3vw, 56px);
   color: var(--c-ink);
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-.churras-conteudo header h2 { margin: 0 0 6px; font-size: 24px; text-wrap: balance; }
-.churras-conteudo header p { margin: 0 0 24px; color: var(--c-muted); max-width: 60ch; }
-.churras-conteudo h3 { margin: 32px 0 12px; font-size: 18px; }
+.churras-conteudo header h2 { margin: 0 0 8px; font-size: clamp(26px, 2.4vw, 38px); text-wrap: balance; }
+.churras-conteudo header p { margin: 0 0 clamp(20px, 2.5vw, 32px); color: var(--c-muted); max-width: 60ch; font-size: clamp(16px, 1.2vw, 19px); }
+.churras-conteudo h3 { margin: clamp(28px, 3vw, 44px) 0 12px; font-size: clamp(18px, 1.5vw, 24px); }
 
 .churras-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  padding: 20px;
+  gap: clamp(16px, 1.6vw, 24px);
+  padding: clamp(20px, 2.2vw, 36px);
   background: #fff;
   border: 1px solid var(--c-line);
   border-radius: 10px;
@@ -34,7 +35,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 14px;
+  font-size: clamp(14px, 1.05vw, 17px);
   font-weight: 600;
   color: var(--c-muted);
 }
@@ -42,7 +43,8 @@
 .churras-campo--cheio { grid-column: 1 / -1; }
 
 .churras-campo input {
-  padding: 10px 12px;
+  padding: clamp(10px, 1vw, 15px) 14px;
+  font-size: clamp(15px, 1.1vw, 18px);
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   background: #f8fafc;
@@ -59,12 +61,13 @@
 
 .churras-btn {
   grid-column: 1 / -1;
-  padding: 12px;
+  padding: clamp(12px, 1.2vw, 18px);
   border: none;
   border-radius: 8px;
   background: var(--c-accent);
   color: #fff;
   font: inherit;
+  font-size: clamp(16px, 1.15vw, 19px);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.15s;
@@ -94,7 +97,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 4px 16px;
-  padding: 12px 20px;
+  padding: 14px 20px;
+  font-size: clamp(15px, 1.1vw, 18px);
   font-variant-numeric: tabular-nums;
 }
 
@@ -115,7 +119,8 @@
   position: sticky;
   top: 24px;
   align-self: start;
-  aspect-ratio: 4 / 5;
+  height: calc(100vh - 160px);
+  min-height: 460px;
   border-radius: 14px;
   overflow: hidden;
   -webkit-mask-image:
@@ -132,6 +137,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 60%;
   display: block;
 }
 
@@ -140,6 +146,8 @@
   .churras-foto {
     position: static;
     order: -1;
+    height: auto;
+    min-height: 0;
     aspect-ratio: 16 / 9;
     -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
     mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
