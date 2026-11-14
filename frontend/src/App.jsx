@@ -17,6 +17,7 @@ import NotificacoesPage from './pages/NotificacoesPage';
 import CondominiosPage from './pages/CondominiosPage';
 import ReunioesPage from './pages/ReunioesPage';
 import ReservasChurrasqueiraPage from './pages/ReservasChurrasqueiraPage';
+import MeusBoletosPage from './pages/MeusBoletosPage';
 
 function App() {
     return (
@@ -57,6 +58,9 @@ function App() {
 
                 {/* Reservas de Churrasqueira */}
                 <Route path="/reservas-churrasqueira" element={<ReservasChurrasqueiraPage />} />
+
+                {/* Boletos do morador */}
+                <Route path="/meus-boletos" element={<MeusBoletosPage />} />
             </Routes>
         </BrowserRouter>
     );

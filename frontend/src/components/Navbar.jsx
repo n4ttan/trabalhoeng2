@@ -104,7 +104,13 @@ export default function Navbar() {
             >
               Churrasqueira
             </button>
-            <button 
+            <button
+              className={`nav-item ${location.pathname === '/meus-boletos' ? 'active' : ''}`}
+              onClick={() => navigate('/meus-boletos')}
+            >
+              Meus Boletos
+            </button>
+            <button
               className={`nav-item ${location.pathname === '/painel-sindico' ? 'active' : ''}`}
               onClick={() => navigate('/painel-sindico')}
             >
