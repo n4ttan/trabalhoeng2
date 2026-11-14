@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { obterPerfil } from '../services/authApi';
 import './Navbar.css';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [condominioAtivo, setCondominioAtivo] = useState(null);
+  const perfil = obterPerfil();
+  const ehSindico = perfil === 'SINDICO' || perfil === 'ADMIN';
+  const ehMorador = perfil === 'MORADOR' || perfil === 'ADMIN';
 
   // Páginas onde a Navbar fica oculta
   const paginasSemNavbar = [
@@ -104,18 +108,22 @@ export default function Navbar() {
             >
               Churrasqueira
             </button>
+            {ehMorador && (
             <button
               className={`nav-item ${location.pathname === '/meus-boletos' ? 'active' : ''}`}
               onClick={() => navigate('/meus-boletos')}
             >
               Meus Boletos
             </button>
+            )}
+            {ehSindico && (
             <button
               className={`nav-item ${location.pathname === '/painel-sindico' ? 'active' : ''}`}
               onClick={() => navigate('/painel-sindico')}
             >
               Painel Síndico
             </button>
+            )}
           </>
         )}
 
