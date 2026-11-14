@@ -40,6 +40,8 @@ export default function MeusBoletosPage() {
   // { id, modo: 'via' | 'pagar' | 'comprovante', carregando, erro, via, forma, comprovante }
   const [painel, setPainel] = useState(null);
   const [copiado, setCopiado] = useState(false);
+  const [de, setDe] = useState('');
+  const [ate, setAte] = useState('');
 
   const navigate = useNavigate();
   const condoSalvo = localStorage.getItem('morada_condominio_ativo');
@@ -112,6 +114,10 @@ export default function MeusBoletosPage() {
   if (!condominioAtivo) return null;
 
   const emAberto = boletos.filter((b) => ['aberto', 'atrasado'].includes(situacao(b).chave));
+  const visiveis = boletos.filter((b) => {
+    const venc = String(b.data_vencimento).slice(0, 10);
+    return (!de || venc >= de) && (!ate || venc <= ate);
+  });
   const totalAberto = emAberto.reduce((soma, b) => soma + Number(b.valor), 0);
 
   return (
@@ -147,8 +153,27 @@ export default function MeusBoletosPage() {
             Você ainda não tem boletos neste condomínio. Quando o síndico gerar a taxa do mês, ela aparece aqui.
           </p>
         ) : (
+          <>
+          <div className="boletos-filtros">
+            <label>
+              Vencimento de
+              <input type="date" value={de} max={ate || undefined} onChange={(e) => setDe(e.target.value)} />
+            </label>
+            <label>
+              até
+              <input type="date" value={ate} min={de || undefined} onChange={(e) => setAte(e.target.value)} />
+            </label>
+            {(de || ate) && (
+              <button type="button" className="btn-secundario" onClick={() => { setDe(''); setAte(''); }}>
+                Limpar datas
+              </button>
+            )}
+          </div>
+          {visiveis.length === 0 ? (
+            <p className="boletos-vazio">Nenhum boleto com vencimento neste período.</p>
+          ) : (
           <ul className="boletos-lista">
-            {boletos.map((b) => {
+            {visiveis.map((b) => {
               const sit = situacao(b);
               return (
                 <li key={b.id} className="boleto-linha">
@@ -253,6 +278,8 @@ export default function MeusBoletosPage() {
               );
             })}
           </ul>
+          )}
+          </>
         ))
       )}
     </main>

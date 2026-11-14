@@ -250,3 +250,35 @@
 @media (max-width: 560px) {
   .boleto-acoes { justify-content: flex-start; }
 }
+
+.boletos-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.boletos-filtros label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--b-muted);
+}
+
+.boletos-filtros input {
+  padding: 7px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--b-ink);
+  font: inherit;
+  font-weight: 400;
+}
+
+.boletos-filtros input:focus-visible {
+  outline: 2px solid var(--b-accent);
+  outline-offset: 2px;
+}
