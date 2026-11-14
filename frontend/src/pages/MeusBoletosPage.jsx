@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listarMeusBoletos } from '../services/boletoApi';
+import { listarMeusBoletos, obterSegundaVia } from '../services/boletoApi';
 import './MeusBoletosPage.css';
 
 const brl = (v) =>
@@ -19,10 +19,18 @@ function situacao(boleto) {
   return { chave: 'aberto', texto: 'Em aberto' };
 }
 
+function abrirTemplate(html) {
+  const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+  window.open(url, '_blank', 'noopener');
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
 export default function MeusBoletosPage() {
   const [boletos, setBoletos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const [painel, setPainel] = useState(null); // { id, carregando, erro, via }
+  const [copiado, setCopiado] = useState(false);
 
   const navigate = useNavigate();
   const condoSalvo = localStorage.getItem('morada_condominio_ativo');
@@ -46,6 +54,30 @@ export default function MeusBoletosPage() {
       setErro(err.message || 'Não foi possível carregar seus boletos.');
     } finally {
       setCarregando(false);
+    }
+  }
+
+  async function abrirSegundaVia(boleto) {
+    if (painel?.id === boleto.id) {
+      setPainel(null);
+      return;
+    }
+    setCopiado(false);
+    setPainel({ id: boleto.id, carregando: true });
+    try {
+      const { boleto: via } = await obterSegundaVia(condominioAtivo.id, boleto.id);
+      setPainel({ id: boleto.id, via });
+    } catch (err) {
+      setPainel({ id: boleto.id, erro: err.message || 'Não foi possível gerar a 2ª via.' });
+    }
+  }
+
+  async function copiarLinha(texto) {
+    try {
+      await navigator.clipboard.writeText(texto);
+      setCopiado(true);
+    } catch {
+      setCopiado(false);
     }
   }
 
@@ -98,6 +130,44 @@ export default function MeusBoletosPage() {
                   </div>
                   <span className={`boleto-status boleto-status--${sit.chave}`}>{sit.texto}</span>
                   <span className="boleto-valor">{brl(b.valor)}</span>
+                  {['aberto', 'atrasado'].includes(sit.chave) && (
+                    <div className="boleto-acoes">
+                      <button
+                        type="button"
+                        className="btn-secundario"
+                        aria-expanded={painel?.id === b.id}
+                        onClick={() => abrirSegundaVia(b)}
+                      >
+                        2ª via
+                      </button>
+                    </div>
+                  )}
+                  {painel?.id === b.id && (
+                    <div className="boleto-painel">
+                      {painel.carregando && <p role="status">Gerando 2ª via…</p>}
+                      {painel.erro && <p className="boleto-painel-erro" role="alert">{painel.erro}</p>}
+                      {painel.via && (
+                        <>
+                          <dl className="boleto-detalhes">
+                            <div><dt>Valor original</dt><dd>{brl(painel.via.valor_original)}</dd></div>
+                            <div><dt>Multa</dt><dd>{brl(painel.via.multa)}</dd></div>
+                            <div><dt>Juros</dt><dd>{brl(painel.via.juros)}</dd></div>
+                            <div><dt>Novo vencimento</dt><dd>{dataBR(painel.via.nova_data_vencimento)}</dd></div>
+                            <div className="boleto-total"><dt>Total a pagar</dt><dd>{brl(painel.via.valor_total)}</dd></div>
+                          </dl>
+                          <p className="boleto-linha-digitavel">{painel.via.linha_digitavel}</p>
+                          <div className="boleto-painel-acoes">
+                            <button type="button" className="btn-secundario" onClick={() => copiarLinha(painel.via.linha_digitavel)}>
+                              {copiado ? 'Linha copiada' : 'Copiar linha digitável'}
+                            </button>
+                            <button type="button" className="btn-secundario" onClick={() => abrirTemplate(painel.via.template_html)}>
+                              Abrir boleto para imprimir
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </li>
               );
             })}

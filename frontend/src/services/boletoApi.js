@@ -34,3 +34,8 @@ async function requisicao(url, options = {}) {
 export async function listarMeusBoletos(idCondominio) {
   return await requisicao(`/condominios/${idCondominio}/boletos/meus-boletos`);
 }
+
+// 2ª via atualizada (multa e juros incluídos) com o template HTML do boleto
+export async function obterSegundaVia(idCondominio, idBoleto) {
+  return await requisicao(`/condominios/${idCondominio}/boletos/${idBoleto}/segunda-via`);
+}
