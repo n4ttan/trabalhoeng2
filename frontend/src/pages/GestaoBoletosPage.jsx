@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listarBoletosCondominio, listarMoradoresCondominio, criarBoleto } from '../services/boletoSindicoApi';
+import { listarBoletosCondominio, listarMoradoresCondominio, criarBoleto, gerarBoletosEmLote } from '../services/boletoSindicoApi';
 import './GestaoBoletosPage.css';
 
 const brl = (v) =>
@@ -38,6 +38,7 @@ export default function GestaoBoletosPage() {
 
   // Geração de boletos
   const [gerando, setGerando] = useState(false); // painel aberto
+  const [modo, setModo] = useState('lote'); // 'lote' | 'individual'
   const [moradores, setMoradores] = useState([]);
   const [form, setForm] = useState({ id_usuario: '', mes_referencia: '', valor: '', data_vencimento: '' });
   const [enviando, setEnviando] = useState(false);
@@ -100,8 +101,28 @@ export default function GestaoBoletosPage() {
     }
   }
 
+  async function enviarLote(e) {
+    e.preventDefault();
+    setEnviando(true);
+    setAviso({ tipo: '', texto: '' });
+    try {
+      const { mensagem } = await gerarBoletosEmLote(condominioAtivo.id, {
+        mes_referencia: form.mes_referencia,
+        valor: form.valor,
+        data_vencimento: form.data_vencimento
+      });
+      setAviso({ tipo: 'sucesso', texto: mensagem });
+      carregar();
+    } catch (err) {
+      setAviso({ tipo: 'erro', texto: err.message || 'Não foi possível gerar os boletos.' });
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   if (!condominioAtivo) return null;
 
+  const jaExistem = boletos.filter((b) => b.mes_referencia === form.mes_referencia).length;
   const termo = busca.trim().toLowerCase();
   const visiveis = boletos.filter(
     (b) =>
@@ -121,17 +142,26 @@ export default function GestaoBoletosPage() {
 
       <section className="gb-gerar">
         <button type="button" className="gb-btn" aria-expanded={gerando} onClick={abrirGeracao}>
-          {gerando ? 'Fechar' : 'Gerar boleto'}
+          {gerando ? 'Fechar' : 'Gerar boletos'}
         </button>
 
         {gerando && (
           <div className="gb-gerar-painel">
+            <div className="gb-abas" role="group" aria-label="Tipo de geração">
+              <button type="button" aria-pressed={modo === 'lote'} onClick={() => { setModo('lote'); setAviso({ tipo: '', texto: '' }); }}>
+                Todos os moradores
+              </button>
+              <button type="button" aria-pressed={modo === 'individual'} onClick={() => { setModo('individual'); setAviso({ tipo: '', texto: '' }); }}>
+                Um morador
+              </button>
+            </div>
             {aviso.texto && (
               <p className={`gb-aviso gb-aviso--${aviso.tipo}`} role={aviso.tipo === 'erro' ? 'alert' : 'status'}>
                 {aviso.texto}
               </p>
             )}
-            <form className="gb-form" onSubmit={enviarIndividual}>
+            <form className="gb-form" onSubmit={modo === 'lote' ? enviarLote : enviarIndividual}>
+              {modo === 'individual' && (
               <label className="gb-form-cheio">
                 Morador
                 <select required value={form.id_usuario} onChange={campo('id_usuario')}>
@@ -143,6 +173,7 @@ export default function GestaoBoletosPage() {
                   ))}
                 </select>
               </label>
+              )}
               <label>
                 Mês de referência
                 <input type="month" required value={form.mes_referencia} onChange={campo('mes_referencia')} />
@@ -155,8 +186,14 @@ export default function GestaoBoletosPage() {
                 Valor (R$)
                 <input type="number" required min="0.01" step="0.01" inputMode="decimal" value={form.valor} onChange={campo('valor')} />
               </label>
+              {modo === 'lote' && (
+                <p className="gb-form-cheio gb-nota">
+                  Gera um boleto para cada morador aprovado do condomínio.
+                  {jaExistem > 0 && ` Atenção: já existem ${jaExistem} boletos de ${form.mes_referencia}; gerar de novo cria boletos repetidos.`}
+                </p>
+              )}
               <button type="submit" className="gb-btn" disabled={enviando}>
-                {enviando ? 'Criando…' : 'Criar boleto'}
+                {enviando ? 'Gerando…' : modo === 'lote' ? 'Gerar boletos do mês' : 'Criar boleto'}
               </button>
             </form>
           </div>

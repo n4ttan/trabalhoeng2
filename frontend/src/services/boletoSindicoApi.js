@@ -47,3 +47,11 @@ export async function criarBoleto(idCondominio, dados) {
     body: JSON.stringify(dados)
   });
 }
+
+// Um boleto para cada morador aprovado do condomínio
+export async function gerarBoletosEmLote(idCondominio, dados) {
+  return await requisicao(`/condominios/${idCondominio}/boletos/gerar-lote`, {
+    method: 'POST',
+    body: JSON.stringify(dados)
+  });
+}

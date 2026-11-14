@@ -203,3 +203,26 @@
 }
 .gb-aviso--sucesso { background: #dcfce7; color: #166534; }
 .gb-aviso--erro { background: #fee2e2; color: #991b1b; }
+
+.gb-abas {
+  display: inline-flex;
+  margin-bottom: 16px;
+  border: 1px solid var(--g-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.gb-abas button {
+  padding: 8px 16px;
+  border: none;
+  background: #fff;
+  color: var(--g-muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gb-abas button + button { border-left: 1px solid var(--g-line); }
+.gb-abas button[aria-pressed='true'] { background: #dbeafe; color: #1e40af; }
+
+.gb-nota { margin: 0; font-size: 14px; color: var(--g-muted); }
