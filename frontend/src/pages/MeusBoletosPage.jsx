@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listarMeusBoletos, obterSegundaVia } from '../services/boletoApi';
+import { listarMeusBoletos, obterSegundaVia, pagarBoleto } from '../services/boletoApi';
 import './MeusBoletosPage.css';
 
 const brl = (v) =>
@@ -9,9 +9,17 @@ const brl = (v) =>
 // Datas do MySQL chegam como ISO; usar só a parte da data evita deslocar o dia pelo fuso.
 const dataBR = (iso) => String(iso).slice(0, 10).split('-').reverse().join('/');
 
+const FORMAS = {
+  PIX: 'Pix',
+  CARTAO_DEBITO: 'Cartão de débito',
+  CARTAO_CREDITO: 'Cartão de crédito',
+  BOLETO_BANCARIO: 'Boleto bancário'
+};
+
 function situacao(boleto) {
   if (boleto.status === 'PAGO') return { chave: 'pago', texto: 'Pago' };
   if (boleto.status === 'CANCELADO') return { chave: 'cancelado', texto: 'Cancelado' };
+  if (boleto.status === 'ATRASADO') return { chave: 'atrasado', texto: 'Em atraso' };
   const hoje = new Date().toISOString().slice(0, 10);
   if (String(boleto.data_vencimento).slice(0, 10) < hoje) {
     return { chave: 'atrasado', texto: 'Em atraso' };
@@ -29,7 +37,8 @@ export default function MeusBoletosPage() {
   const [boletos, setBoletos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
-  const [painel, setPainel] = useState(null); // { id, carregando, erro, via }
+  // { id, modo: 'via' | 'pagar' | 'comprovante', carregando, erro, via, forma, comprovante }
+  const [painel, setPainel] = useState(null);
   const [copiado, setCopiado] = useState(false);
 
   const navigate = useNavigate();
@@ -44,9 +53,9 @@ export default function MeusBoletosPage() {
     carregar();
   }, [condominioAtivo?.id]);
 
-  async function carregar() {
+  async function carregar(mostrarCarregando = true) {
     try {
-      setCarregando(true);
+      if (mostrarCarregando) setCarregando(true);
       setErro('');
       const dados = await listarMeusBoletos(condominioAtivo.id);
       setBoletos(Array.isArray(dados) ? dados : []);
@@ -58,17 +67,36 @@ export default function MeusBoletosPage() {
   }
 
   async function abrirSegundaVia(boleto) {
-    if (painel?.id === boleto.id) {
+    if (painel?.id === boleto.id && painel.modo === 'via') {
       setPainel(null);
       return;
     }
     setCopiado(false);
-    setPainel({ id: boleto.id, carregando: true });
+    setPainel({ id: boleto.id, modo: 'via', carregando: true });
     try {
       const { boleto: via } = await obterSegundaVia(condominioAtivo.id, boleto.id);
-      setPainel({ id: boleto.id, via });
+      setPainel({ id: boleto.id, modo: 'via', via });
     } catch (err) {
-      setPainel({ id: boleto.id, erro: err.message || 'Não foi possível gerar a 2ª via.' });
+      setPainel({ id: boleto.id, modo: 'via', erro: err.message || 'Não foi possível gerar a 2ª via.' });
+    }
+  }
+
+  function abrirPagamento(boleto) {
+    if (painel?.id === boleto.id && painel.modo === 'pagar') {
+      setPainel(null);
+      return;
+    }
+    setPainel({ id: boleto.id, modo: 'pagar', forma: 'PIX' });
+  }
+
+  async function confirmarPagamento() {
+    setPainel((p) => ({ ...p, carregando: true, erro: '' }));
+    try {
+      const { comprovante } = await pagarBoleto(condominioAtivo.id, painel.id, painel.forma);
+      setPainel({ id: painel.id, modo: 'comprovante', comprovante });
+      carregar(false);
+    } catch (err) {
+      setPainel((p) => ({ ...p, carregando: false, erro: err.message || 'Não foi possível concluir o pagamento.' }));
     }
   }
 
@@ -135,14 +163,67 @@ export default function MeusBoletosPage() {
                       <button
                         type="button"
                         className="btn-secundario"
-                        aria-expanded={painel?.id === b.id}
+                        aria-expanded={painel?.id === b.id && painel.modo === 'via'}
                         onClick={() => abrirSegundaVia(b)}
                       >
                         2ª via
                       </button>
+                      <button
+                        type="button"
+                        className="btn-primario"
+                        aria-expanded={painel?.id === b.id && painel.modo === 'pagar'}
+                        onClick={() => abrirPagamento(b)}
+                      >
+                        Pagar
+                      </button>
                     </div>
                   )}
-                  {painel?.id === b.id && (
+                  {painel?.id === b.id && painel.modo === 'pagar' && (
+                    <div className="boleto-painel">
+                      <label className="boleto-forma">
+                        Forma de pagamento
+                        <select
+                          value={painel.forma}
+                          disabled={painel.carregando}
+                          onChange={(e) => setPainel({ ...painel, forma: e.target.value })}
+                        >
+                          {Object.entries(FORMAS).map(([valor, rotulo]) => (
+                            <option key={valor} value={valor}>{rotulo}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <p className="boleto-aviso">
+                        Se o boleto estiver vencido, multa e juros entram no valor cobrado.
+                      </p>
+                      {painel.erro && <p className="boleto-painel-erro" role="alert">{painel.erro}</p>}
+                      <div className="boleto-painel-acoes">
+                        <button type="button" className="btn-primario" disabled={painel.carregando} onClick={confirmarPagamento}>
+                          {painel.carregando ? 'Pagando…' : 'Confirmar pagamento'}
+                        </button>
+                        <button type="button" className="btn-secundario" disabled={painel.carregando} onClick={() => setPainel(null)}>
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {painel?.id === b.id && painel.modo === 'comprovante' && (
+                    <div className="boleto-painel boleto-comprovante" role="status">
+                      <h3>Pagamento confirmado</h3>
+                      <dl className="boleto-detalhes">
+                        <div><dt>Referência</dt><dd>{painel.comprovante.mes_referencia}</dd></div>
+                        <div><dt>Valor original</dt><dd>{brl(painel.comprovante.valor_original)}</dd></div>
+                        <div><dt>Encargos</dt><dd>{brl(painel.comprovante.encargos)}</dd></div>
+                        <div><dt>Forma</dt><dd>{FORMAS[painel.comprovante.forma_pagamento] || painel.comprovante.forma_pagamento}</dd></div>
+                        <div><dt>Data</dt><dd>{new Date(painel.comprovante.data_pagamento).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</dd></div>
+                        <div className="boleto-total"><dt>Valor pago</dt><dd>{brl(painel.comprovante.valor_pago)}</dd></div>
+                      </dl>
+                      <p className="boleto-linha-digitavel">{painel.comprovante.codigo_autenticacao}</p>
+                      <div className="boleto-painel-acoes">
+                        <button type="button" className="btn-secundario" onClick={() => setPainel(null)}>Fechar</button>
+                      </div>
+                    </div>
+                  )}
+                  {painel?.id === b.id && painel.modo === 'via' && (
                     <div className="boleto-painel">
                       {painel.carregando && <p role="status">Gerando 2ª via…</p>}
                       {painel.erro && <p className="boleto-painel-erro" role="alert">{painel.erro}</p>}

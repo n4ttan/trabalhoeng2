@@ -187,3 +187,66 @@
     text-align: left;
   }
 }
+
+.boleto-acoes {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-primario {
+  padding: 6px 14px;
+  border: 1px solid var(--b-accent);
+  border-radius: 6px;
+  background: var(--b-accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btn-primario:hover:not(:disabled) { background: var(--b-accent-strong); }
+
+.btn-primario:disabled,
+.btn-secundario:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.boleto-forma {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 260px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.boleto-forma select {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  font-weight: 400;
+}
+
+.boleto-forma select:focus-visible {
+  outline: 2px solid var(--b-accent);
+  outline-offset: 2px;
+}
+
+.boleto-aviso {
+  margin-bottom: 12px !important;
+  font-size: 14px;
+  color: var(--b-muted);
+}
+
+.boleto-comprovante h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: #166534;
+}
+
+@media (max-width: 560px) {
+  .boleto-acoes { justify-content: flex-start; }
+}

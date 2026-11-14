@@ -39,3 +39,11 @@ export async function listarMeusBoletos(idCondominio) {
 export async function obterSegundaVia(idCondominio, idBoleto) {
   return await requisicao(`/condominios/${idCondominio}/boletos/${idBoleto}/segunda-via`);
 }
+
+// Pagamento simulado; sem valor_pago o backend cobra o total com encargos
+export async function pagarBoleto(idCondominio, idBoleto, formaPagamento) {
+  return await requisicao(`/condominios/${idCondominio}/boletos/${idBoleto}/pagar`, {
+    method: 'POST',
+    body: JSON.stringify({ forma_pagamento: formaPagamento })
+  });
+}
