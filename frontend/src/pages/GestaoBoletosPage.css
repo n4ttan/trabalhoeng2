@@ -142,3 +142,64 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+.gb-gerar { margin-bottom: 24px; }
+
+.gb-btn {
+  padding: 9px 18px;
+  border: 1px solid var(--g-accent);
+  border-radius: 6px;
+  background: var(--g-accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.gb-btn:hover:not(:disabled) { background: var(--g-accent-strong); }
+.gb-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.gb-gerar-painel {
+  margin-top: 12px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid var(--g-line);
+  border-radius: 10px;
+}
+
+.gb-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+.gb-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--g-muted);
+}
+
+.gb-form input,
+.gb-form select {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--g-ink);
+  font: inherit;
+  font-weight: 400;
+}
+
+.gb-form-cheio { grid-column: 1 / -1; }
+
+.gb-aviso {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+.gb-aviso--sucesso { background: #dcfce7; color: #166534; }
+.gb-aviso--erro { background: #fee2e2; color: #991b1b; }

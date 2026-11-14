@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listarBoletosCondominio } from '../services/boletoSindicoApi';
+import { listarBoletosCondominio, listarMoradoresCondominio, criarBoleto } from '../services/boletoSindicoApi';
 import './GestaoBoletosPage.css';
 
 const brl = (v) =>
@@ -36,6 +36,13 @@ export default function GestaoBoletosPage() {
   const [mes, setMes] = useState('');
   const [busca, setBusca] = useState('');
 
+  // Geração de boletos
+  const [gerando, setGerando] = useState(false); // painel aberto
+  const [moradores, setMoradores] = useState([]);
+  const [form, setForm] = useState({ id_usuario: '', mes_referencia: '', valor: '', data_vencimento: '' });
+  const [enviando, setEnviando] = useState(false);
+  const [aviso, setAviso] = useState({ tipo: '', texto: '' });
+
   const navigate = useNavigate();
   const condoSalvo = localStorage.getItem('morada_condominio_ativo');
   const condominioAtivo = condoSalvo ? JSON.parse(condoSalvo) : null;
@@ -61,6 +68,38 @@ export default function GestaoBoletosPage() {
     }
   }
 
+  async function abrirGeracao() {
+    setAviso({ tipo: '', texto: '' });
+    setGerando(!gerando);
+    if (moradores.length === 0) {
+      try {
+        const lista = await listarMoradoresCondominio(condominioAtivo.id);
+        setMoradores(Array.isArray(lista) ? lista : []);
+      } catch (err) {
+        setAviso({ tipo: 'erro', texto: err.message || 'Não foi possível carregar os moradores.' });
+      }
+    }
+  }
+
+  const campo = (nome) => (e) => setForm({ ...form, [nome]: e.target.value });
+
+  async function enviarIndividual(e) {
+    e.preventDefault();
+    setEnviando(true);
+    setAviso({ tipo: '', texto: '' });
+    try {
+      await criarBoleto(condominioAtivo.id, { ...form, id_usuario: Number(form.id_usuario) });
+      const nome = moradores.find((m) => String(m.id) === form.id_usuario)?.nome;
+      setAviso({ tipo: 'sucesso', texto: `Boleto de ${form.mes_referencia} criado para ${nome || 'o morador'}.` });
+      setForm({ ...form, id_usuario: '' });
+      carregar();
+    } catch (err) {
+      setAviso({ tipo: 'erro', texto: err.message || 'Não foi possível criar o boleto.' });
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   if (!condominioAtivo) return null;
 
   const termo = busca.trim().toLowerCase();
@@ -79,6 +118,50 @@ export default function GestaoBoletosPage() {
         <h2>Boletos do condomínio</h2>
         <p>{condominioAtivo.nome}</p>
       </header>
+
+      <section className="gb-gerar">
+        <button type="button" className="gb-btn" aria-expanded={gerando} onClick={abrirGeracao}>
+          {gerando ? 'Fechar' : 'Gerar boleto'}
+        </button>
+
+        {gerando && (
+          <div className="gb-gerar-painel">
+            {aviso.texto && (
+              <p className={`gb-aviso gb-aviso--${aviso.tipo}`} role={aviso.tipo === 'erro' ? 'alert' : 'status'}>
+                {aviso.texto}
+              </p>
+            )}
+            <form className="gb-form" onSubmit={enviarIndividual}>
+              <label className="gb-form-cheio">
+                Morador
+                <select required value={form.id_usuario} onChange={campo('id_usuario')}>
+                  <option value="">Escolha um morador</option>
+                  {moradores.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.nome}{m.unidade ? ` — ${[m.bloco_nome || m.bloco, m.unidade].filter(Boolean).join(' ')}` : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Mês de referência
+                <input type="month" required value={form.mes_referencia} onChange={campo('mes_referencia')} />
+              </label>
+              <label>
+                Vencimento
+                <input type="date" required value={form.data_vencimento} onChange={campo('data_vencimento')} />
+              </label>
+              <label>
+                Valor (R$)
+                <input type="number" required min="0.01" step="0.01" inputMode="decimal" value={form.valor} onChange={campo('valor')} />
+              </label>
+              <button type="submit" className="gb-btn" disabled={enviando}>
+                {enviando ? 'Criando…' : 'Criar boleto'}
+              </button>
+            </form>
+          </div>
+        )}
+      </section>
 
       {erro && (
         <div className="gb-erro" role="alert">

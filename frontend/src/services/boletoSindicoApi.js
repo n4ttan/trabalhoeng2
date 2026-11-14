@@ -34,3 +34,16 @@ async function requisicao(url, options = {}) {
 export async function listarBoletosCondominio(idCondominio) {
   return await requisicao(`/condominios/${idCondominio}/boletos`);
 }
+
+// Moradores aprovados do condomínio, para escolher o destinatário de um boleto individual
+export async function listarMoradoresCondominio(idCondominio) {
+  return await requisicao(`/condominios/${idCondominio}/moradores`);
+}
+
+// Boleto individual
+export async function criarBoleto(idCondominio, dados) {
+  return await requisicao(`/condominios/${idCondominio}/boletos`, {
+    method: 'POST',
+    body: JSON.stringify(dados)
+  });
+}
