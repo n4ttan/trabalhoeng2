@@ -19,6 +19,7 @@ import CondominiosPage from './pages/CondominiosPage';
 import ReunioesPage from './pages/ReunioesPage';
 import ReservasChurrasqueiraPage from './pages/ReservasChurrasqueiraPage';
 import MeusBoletosPage from './pages/MeusBoletosPage';
+import GestaoBoletosPage from './pages/GestaoBoletosPage';
 
 function App() {
     return (
@@ -62,6 +63,9 @@ function App() {
 
                 {/* Boletos do morador */}
                 <Route path="/meus-boletos" element={<RotaProtegida perfis={['MORADOR', 'ADMIN']}><MeusBoletosPage /></RotaProtegida>} />
+
+                {/* Boletos do condomínio (síndico) */}
+                <Route path="/gestao-boletos" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><GestaoBoletosPage /></RotaProtegida>} />
             </Routes>
         </BrowserRouter>
     );

@@ -118,6 +118,14 @@ export default function Navbar() {
             )}
             {ehSindico && (
             <button
+              className={`nav-item ${location.pathname === '/gestao-boletos' ? 'active' : ''}`}
+              onClick={() => navigate('/gestao-boletos')}
+            >
+              Boletos
+            </button>
+            )}
+            {ehSindico && (
+            <button
               className={`nav-item ${location.pathname === '/painel-sindico' ? 'active' : ''}`}
               onClick={() => navigate('/painel-sindico')}
             >
