@@ -1,0 +1,57 @@
+const API_URL = 'http://localhost:3000';
+
+function obterToken() {
+  return localStorage.getItem('morada_token');
+}
+
+async function requisicao(url, options = {}) {
+  const token = obterToken();
+
+  const response = await fetch(`${API_URL}${url}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    data = {};
+  }
+
+  if (!response.ok) {
+    throw new Error(data.erro || data.mensagem || 'Erro ao realizar operação.');
+  }
+
+  return data;
+}
+
+// Todos os boletos do condomínio (Síndico/Admin)
+export async function listarBoletosCondominio(idCondominio) {
+  return await requisicao(`/condominios/${idCondominio}/boletos`);
+}
+
+// Moradores aprovados do condomínio, para escolher o destinatário de um boleto individual
+export async function listarMoradoresCondominio(idCondominio) {
+  return await requisicao(`/condominios/${idCondominio}/moradores`);
+}
+
+// Boleto individual
+export async function criarBoleto(idCondominio, dados) {
+  return await requisicao(`/condominios/${idCondominio}/boletos`, {
+    method: 'POST',
+    body: JSON.stringify(dados)
+  });
+}
+
+// Um boleto para cada morador aprovado do condomínio
+export async function gerarBoletosEmLote(idCondominio, dados) {
+  return await requisicao(`/condominios/${idCondominio}/boletos/gerar-lote`, {
+    method: 'POST',
+    body: JSON.stringify(dados)
+  });
+}

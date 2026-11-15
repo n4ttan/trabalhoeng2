@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { obterReservas, criarReserva } from '../services/reservaApi';
+import fotoChurrasqueira from '../assets/churrasqueira.jpg';
+import './ReservasChurrasqueiraPage.css';
+
+const dataBR = (iso) => String(iso).slice(0, 10).split('-').reverse().join('/');
+const hora = (t) => String(t).slice(0, 5);
 
 export default function ReservasChurrasqueiraPage() {
   const [reservas, setReservas] = useState([]);
@@ -47,45 +52,56 @@ export default function ReservasChurrasqueiraPage() {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <h2>🍖 Reserva de Churrasqueira</h2>
+    <main className="churras-page">
+      <div className="churras-conteudo">
+        <header>
+          <h2>Reserva da churrasqueira</h2>
+          <p>Escolha o dia e o horário. Horários já ocupados não podem ser reservados.</p>
+        </header>
 
-      {mensagem.texto && (
-        <div style={{
-          padding: '10px',
-          marginBottom: '15px',
-          backgroundColor: mensagem.tipo === 'sucesso' ? '#d4edda' : '#f8d7da',
-          color: mensagem.tipo === 'sucesso' ? '#155724' : '#721c24',
-          borderRadius: '4px'
-        }}>
-          {mensagem.texto}
-        </div>
-      )}
+        {mensagem.texto && (
+          <div className={`churras-msg churras-msg--${mensagem.tipo}`} role={mensagem.tipo === 'erro' ? 'alert' : 'status'}>
+            {mensagem.texto}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '30px' }}>
-        <label>
-          Data da Reserva:
-          <input type="date" value={dataReserva} onChange={(e) => setDataReserva(e.target.value)} required />
-        </label>
-        <label>
-          Horário de Início:
-          <input type="time" value={horarioInicio} onChange={(e) => setHorarioInicio(e.target.value)} required />
-        </label>
-        <label>
-          Horário de Término:
-          <input type="time" value={horarioFim} onChange={(e) => setHorarioFim(e.target.value)} required />
-        </label>
-        <button type="submit" style={{ padding: '10px', cursor: 'pointer' }}>Reservar Horário</button>
-      </form>
+        <form className="churras-form" onSubmit={handleSubmit}>
+          <label className="churras-campo churras-campo--cheio">
+            Data da reserva
+            <input type="date" value={dataReserva} onChange={(e) => setDataReserva(e.target.value)} required />
+          </label>
+          <label className="churras-campo">
+            Início
+            <input type="time" value={horarioInicio} onChange={(e) => setHorarioInicio(e.target.value)} required />
+          </label>
+          <label className="churras-campo">
+            Término
+            <input type="time" value={horarioFim} onChange={(e) => setHorarioFim(e.target.value)} required />
+          </label>
+          <button type="submit" className="churras-btn">Reservar horário</button>
+        </form>
 
-      <h3>Reservas Confirmadas</h3>
-      <ul>
-        {reservas.map((reserva) => (
-          <li key={reserva.id}>
-            <strong>{reserva.data_reserva}</strong>: {reserva.horario_inicio} às {reserva.horario_fim} (Reservado por: {reserva.usuario_nome || 'Morador'})
-          </li>
-        ))}
-      </ul>
-    </div>
+        <section>
+          <h3>Reservas confirmadas</h3>
+          {reservas.length === 0 ? (
+            <p className="churras-vazio">Nenhuma reserva por enquanto. O primeiro horário é seu.</p>
+          ) : (
+            <ul className="churras-lista">
+              {reservas.map((reserva) => (
+                <li key={reserva.id}>
+                  <strong>{dataBR(reserva.data_reserva)}</strong>
+                  <span>{hora(reserva.horario_inicio)} às {hora(reserva.horario_fim)}</span>
+                  <span className="churras-quem">{reserva.usuario_nome || 'Morador'}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+
+      <div className="churras-foto" role="img" aria-label="Carnes grelhadas na churrasqueira, com brasas e fumaça">
+        <img src={fotoChurrasqueira} alt="" />
+      </div>
+    </main>
   );
 }

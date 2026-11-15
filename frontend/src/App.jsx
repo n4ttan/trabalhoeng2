@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
+import RotaProtegida from './components/RotaProtegida';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import CadastroMoradorValidacaoPage from './pages/CadastroMoradorValidacaoPage';
@@ -17,6 +18,8 @@ import NotificacoesPage from './pages/NotificacoesPage';
 import CondominiosPage from './pages/CondominiosPage';
 import ReunioesPage from './pages/ReunioesPage';
 import ReservasChurrasqueiraPage from './pages/ReservasChurrasqueiraPage';
+import MeusBoletosPage from './pages/MeusBoletosPage';
+import GestaoBoletosPage from './pages/GestaoBoletosPage';
 
 function App() {
     return (
@@ -35,28 +38,34 @@ function App() {
                 <Route path="/morador/cadastro" element={<CadastroMoradorValidacaoPage />} />
 
                 {/* Múltiplos Condomínios */}
-                <Route path="/condominios" element={<CondominiosPage />} />
+                <Route path="/condominios" element={<RotaProtegida><CondominiosPage /></RotaProtegida>} />
 
                 {/* Solicitação para ser síndico */}
-                <Route path="/permissao-sindico" element={<PermissaoSindicoPage />} />
+                <Route path="/permissao-sindico" element={<RotaProtegida><PermissaoSindicoPage /></RotaProtegida>} />
 
                 {/* Autorização de síndico */}
-                <Route path="/autorizacao-sindico" element={<AutorizacaoSindicoPage />} />
+                <Route path="/autorizacao-sindico" element={<RotaProtegida perfis={['ADMIN']}><AutorizacaoSindicoPage /></RotaProtegida>} />
 
                 {/* Painel administrativo */}
-                <Route path="/painel-sindico" element={<PainelSindicoPage />} />
+                <Route path="/painel-sindico" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><PainelSindicoPage /></RotaProtegida>} />
 
                 {/* Perfil do Morador */}
-                <Route path="/perfil" element={<PerfilMoradorPage />} />
+                <Route path="/perfil" element={<RotaProtegida><PerfilMoradorPage /></RotaProtegida>} />
 
                 {/* Notificações / Mural */}
-                <Route path="/notificacoes" element={<NotificacoesPage />} />
+                <Route path="/notificacoes" element={<RotaProtegida><NotificacoesPage /></RotaProtegida>} />
 
                 {/* Reuniões */}
-                <Route path="/reunioes" element={<ReunioesPage />} />
+                <Route path="/reunioes" element={<RotaProtegida><ReunioesPage /></RotaProtegida>} />
 
                 {/* Reservas de Churrasqueira */}
-                <Route path="/reservas-churrasqueira" element={<ReservasChurrasqueiraPage />} />
+                <Route path="/reservas-churrasqueira" element={<RotaProtegida><ReservasChurrasqueiraPage /></RotaProtegida>} />
+
+                {/* Boletos do morador */}
+                <Route path="/meus-boletos" element={<RotaProtegida perfis={['MORADOR', 'ADMIN']}><MeusBoletosPage /></RotaProtegida>} />
+
+                {/* Boletos do condomínio (síndico) */}
+                <Route path="/gestao-boletos" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><GestaoBoletosPage /></RotaProtegida>} />
             </Routes>
         </BrowserRouter>
     );

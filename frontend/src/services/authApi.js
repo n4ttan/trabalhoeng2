@@ -118,3 +118,16 @@ export function logout() {
     );
 
 }
+// Lê o perfil de dentro do JWT (só para decidir o que mostrar; quem barra de verdade é o backend).
+// Retorna null se não há token, ele está corrompido ou expirou.
+export function obterPerfil() {
+    const token = obterToken();
+    if (!token) return null;
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        if (payload.exp && payload.exp * 1000 < Date.now()) return null;
+        return payload.perfil || null;
+    } catch {
+        return null;
+    }
+}
