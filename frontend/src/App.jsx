@@ -20,6 +20,7 @@ import ReunioesPage from './pages/ReunioesPage';
 import ReservasChurrasqueiraPage from './pages/ReservasChurrasqueiraPage';
 import MeusBoletosPage from './pages/MeusBoletosPage';
 import GestaoBoletosPage from './pages/GestaoBoletosPage';
+import PainelFinanceiroPage from './pages/PainelFinanceiroPage';
 
 function App() {
     return (
@@ -66,6 +67,9 @@ function App() {
 
                 {/* Boletos do condomínio (síndico) */}
                 <Route path="/gestao-boletos" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><GestaoBoletosPage /></RotaProtegida>} />
+
+                {/* Painel Financeiro (síndico) */}
+                <Route path="/painel-financeiro" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><PainelFinanceiroPage /></RotaProtegida>} />
             </Routes>
         </BrowserRouter>
     );

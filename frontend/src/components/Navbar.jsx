@@ -132,6 +132,14 @@ export default function Navbar() {
               Painel Síndico
             </button>
             )}
+            {ehSindico && (
+              <button
+                className={`nav-item ${location.pathname === '/painel-financeiro' ? 'active' : ''}`}
+                onClick={() => navigate('/painel-financeiro')}
+              >
+                Financeiro
+              </button>
+            )}
           </>
         )}
 
