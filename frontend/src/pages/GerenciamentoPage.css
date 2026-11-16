@@ -1,0 +1,247 @@
+.gerenciamento-container {
+  max-width: 1050px;
+  margin: 32px auto;
+  padding: 0 24px;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #1e293b;
+}
+
+.gerenciamento-header {
+  margin-bottom: 24px;
+}
+
+.gerenciamento-tag {
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+.gerenciamento-header h2 {
+  margin: 10px 0 4px 0;
+  font-size: 1.75rem;
+  color: #0f172a;
+}
+
+.gerenciamento-sub {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.gerenciamento-alerta {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+
+.gerenciamento-alerta.sucesso {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.gerenciamento-alerta.erro {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.gerenciamento-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin-bottom: 22px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.gerenciamento-card h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.busca-gestor-form {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.busca-gestor-form input {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.busca-gestor-form button {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.busca-gestor-form button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.atribuicao-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 14px;
+  align-items: end;
+}
+
+@media (max-width: 768px) {
+  .atribuicao-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-grupo label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.campo-grupo select {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  background: #ffffff;
+}
+
+.btn-adicionar-fila {
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-adicionar-fila:hover {
+  background: #1e293b;
+}
+
+.fila-atribuicao {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.fila-atribuicao h4 {
+  margin: 0 0 10px 0;
+  font-size: 0.92rem;
+  color: #334155;
+}
+
+.fila-atribuicao ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fila-atribuicao li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.btn-remover-item {
+  background: transparent;
+  color: #dc2626;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-salvar-atribuicao {
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  padding: 11px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-salvar-atribuicao:hover:not(:disabled) {
+  background: #15803d;
+}
+
+.gerenciamento-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.92rem;
+}
+
+.gerenciamento-tabela th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.gerenciamento-tabela td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.badge-escopo {
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.btn-desassociar {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.btn-desassociar:hover {
+  background: #fecaca;
+}
+
+.sem-vinculos {
+  color: #64748b;
+  text-align: center;
+  padding: 16px 0;
+}

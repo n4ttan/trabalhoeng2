@@ -109,30 +109,48 @@ export default function Navbar() {
               Churrasqueira
             </button>
             {ehMorador && (
-            <button
-              className={`nav-item ${location.pathname === '/meus-boletos' ? 'active' : ''}`}
-              onClick={() => navigate('/meus-boletos')}
-            >
-              Meus Boletos
-            </button>
+              <button
+                className={`nav-item ${location.pathname === '/meus-boletos' ? 'active' : ''}`}
+                onClick={() => navigate('/meus-boletos')}
+              >
+                Meus Boletos
+              </button>
             )}
             {ehSindico && (
-            <button
-              className={`nav-item ${location.pathname === '/gestao-boletos' ? 'active' : ''}`}
-              onClick={() => navigate('/gestao-boletos')}
-            >
-              Boletos
-            </button>
+              <button
+                className={`nav-item ${location.pathname === '/gestao-boletos' ? 'active' : ''}`}
+                onClick={() => navigate('/gestao-boletos')}
+              >
+                Boletos
+              </button>
             )}
             {ehSindico && (
-            <button
-              className={`nav-item ${location.pathname === '/painel-sindico' ? 'active' : ''}`}
-              onClick={() => navigate('/painel-sindico')}
-            >
-              Painel Síndico
-            </button>
+              <button
+                className={`nav-item ${location.pathname === '/painel-sindico' ? 'active' : ''}`}
+                onClick={() => navigate('/painel-sindico')}
+              >
+                Painel Síndico
+              </button>
+            )}
+            {ehSindico && (
+              <button
+                className={`nav-item ${location.pathname === '/painel-financeiro' ? 'active' : ''}`}
+                onClick={() => navigate('/painel-financeiro')}
+              >
+                Financeiro
+              </button>
             )}
           </>
+        )}
+
+        {/* Atalho global de Gerenciamento (apenas Admin) */}
+        {perfil === 'ADMIN' && (
+          <button
+            className={`nav-item ${location.pathname === '/gerenciamento' ? 'active' : ''}`}
+            onClick={() => navigate('/gerenciamento')}
+          >
+            Gerenciamento
+          </button>
         )}
 
         {/* Exibe o atalho do Perfil quando estiver dentro do condomínio ou na seleção */}
