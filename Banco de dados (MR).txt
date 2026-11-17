@@ -1,0 +1,173 @@
+---------------------------------------------------------------------------------------------------------------------
+Methodology Explorer – Trabalho de Engenharia de Software II 2026.2
+Graduandos: Adrian Henrique Maranesi Soares
+Felipe Herbert Couto Heleno
+Matheus Kersul
+Nattan Silva Montel 
+Otávio Augusto Trindade
+Rafael de Oliveira Monteiro
+Ryan Andreoli da Silva Araújo
+Victor Vellasco
+Professor: Straus Michalsky Martins
+---------------------------------------------------------------------------------------------------------------------
+   Banco de dados do Sistema
+   Morada Residências - Modelo Relacional
+---------------------------------------------------------------------------------------------------------------------
+1. USUÁRIOS (USUARIOS)
+============================================================
+
+USUARIOS (
+    id INT PK,
+    nome VARCHAR(225),
+    email VARCHAR(225) UNIQUE,
+    senha VARCHAR(225),
+    perfil ENUM,
+    id_condominio INT FK -> CONDOMINIOS(id) NULL,
+    id_bloco INT FK -> BLOCOS(id) NULL,
+    bloco VARCHAR(100),
+    unidade VARCHAR(50),
+    status_cadastro ENUM DEFAULT 'Aguardando email',
+    token_validacao VARCHAR(225),
+    token_expira_em DATETIME,
+    tentativas_validacao INT DEFAULT 0
+)
+
+
+============================================================
+2. CONDOMÍNIOS (CONDOMINIOS)
+============================================================
+
+CONDOMINIOS (
+    id INT PK,
+    nome VARCHAR(225),
+    numero_moradores INT DEFAULT 0,
+    sindico_responsavel INT NULL
+)
+
+
+============================================================
+3. BLOCOS (BLOCOS)
+============================================================
+
+BLOCOS (
+    id INT PK,
+    nome VARCHAR(100),
+    id_condominio INT FK -> CONDOMINIOS(id)
+)
+
+
+============================================================
+4. GESTORES DE CONDOMÍNIOS (GESTORES_CONDOMINIOS)
+============================================================
+
+GESTORES_CONDOMINIOS (
+    id INT PK,
+    usuario_id INT FK -> USUARIOS(id),
+    condominio_id INT FK -> CONDOMINIOS(id),
+    bloco_id INT FK -> BLOCOS(id) NULL
+)
+
+
+============================================================
+5. PEDIDOS DE SÍNDICO (PEDIDOS_SINDICO)
+============================================================
+
+PEDIDOS_SINDICO (
+    id INT PK,
+    usuario_id INT FK -> USUARIOS(id),
+    condominio_id INT FK -> CONDOMINIOS(id),
+    deferido BOOLEAN DEFAULT FALSE
+)
+
+
+============================================================
+6. MENSAGENS (MENSAGENS)
+============================================================
+
+MENSAGENS (
+    id INT PK,
+    texto VARCHAR(225)
+)
+
+
+============================================================
+7. NOTIFICAÇÕES (NOTIFICACOES)
+============================================================
+
+NOTIFICACOES (
+    id INT PK,
+    titulo VARCHAR(150),
+    mensagem TEXT,
+    tipo ENUM DEFAULT 'AVISO',
+    escopo ENUM,
+    id_condominio INT FK -> CONDOMINIOS(id) NULL,
+    criado_por INT FK -> USUARIOS(id) NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+
+
+============================================================
+8. DESTINATÁRIOS DE NOTIFICAÇÕES (NOTIFICACAO_DESTINATARIOS)
+============================================================
+
+NOTIFICACAO_DESTINATARIOS (
+    notificacao_id INT PK FK -> NOTIFICACOES(id),
+    usuario_id INT PK FK -> USUARIOS(id),
+    lida_em TIMESTAMP
+)
+
+OBSERVAÇÃO:
+A tabela NOTIFICACAO_DESTINATARIOS possui uma chave
+primária composta pelos atributos notificacao_id e usuario_id.
+Essa tabela permite implementar o relacionamento N:M entre
+USUARIOS e NOTIFICACOES.
+
+
+============================================================
+9. RESUMO DAS CHAVES ESTRANGEIRAS (FK)
+============================================================
+
+USUARIOS:
+- id_condominio -> CONDOMINIOS(id)
+- id_bloco -> BLOCOS(id)
+
+BLOCOS:
+- id_condominio -> CONDOMINIOS(id)
+
+GESTORES_CONDOMINIOS:
+- usuario_id -> USUARIOS(id)
+- condominio_id -> CONDOMINIOS(id)
+- bloco_id -> BLOCOS(id)
+
+PEDIDOS_SINDICO:
+- usuario_id -> USUARIOS(id)
+- condominio_id -> CONDOMINIOS(id)
+
+NOTIFICACOES:
+- id_condominio -> CONDOMINIOS(id)
+- criado_por -> USUARIOS(id)
+
+NOTIFICACAO_DESTINATARIOS:
+- notificacao_id -> NOTIFICACOES(id)
+- usuario_id -> USUARIOS(id)
+
+
+============================================================
+10. RESUMO DOS RELACIONAMENTOS
+============================================================
+
+1. CONDOMINIOS — BLOCOS: 1:N
+2. CONDOMINIOS — USUARIOS: 1:N
+3. BLOCOS — USUARIOS: 1:N
+4. USUARIOS — GESTORES_CONDOMINIOS: 1:N
+5. CONDOMINIOS — GESTORES_CONDOMINIOS: 1:N
+6. BLOCOS — GESTORES_CONDOMINIOS: 1:N
+7. USUARIOS — PEDIDOS_SINDICO: 1:N
+8. CONDOMINIOS — PEDIDOS_SINDICO: 1:N
+9. CONDOMINIOS — NOTIFICACOES: 1:N
+10. USUARIOS — NOTIFICACOES (AUTOR): 1:N
+11. NOTIFICACOES — NOTIFICACAO_DESTINATARIOS: 1:N
+12. USUARIOS — NOTIFICACAO_DESTINATARIOS: 1:N
+13. USUARIOS — NOTIFICACOES (DESTINATÁRIO): N:M
+
+---------------------------------------------------------------------------------------------------------------------
