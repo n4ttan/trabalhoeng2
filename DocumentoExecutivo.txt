@@ -1,0 +1,83 @@
+----------------------------------------------------------------------------
+Methodology Explorer – Trabalho de Engenharia de Software II 2002.2
+Graduandos: Adrian Henrique Maranesi Soares
+Felipe Herbert Couto Heleno
+Matheus Kersul
+Nattan Silva Montel 
+Otávio Augusto Trindade
+Rafael de Oliveira Monteiro
+Ryan Andreoli da Silva Araújo
+Victor Vellasco
+Professor: Straus Michalsky Martins
+
+----------------------------------------------------------------------------
+
+Documentação executiva do sistema
+Morada Residências
+
+----------------------------------------------------------------------------
+
+1. O projeto Morada Residências
+
+    
+O site Morada residências, tem como objetivo ser um software 
+que é um site web, que pode atuar em qualquer conjunto de condomínios. 
+No site morada são cadastrados administradores e síndicos para estarem 
+fazendo a manutenção e as mediações das normas dos condomínios 
+( cobrança de aluguel, pagamento de água, pagamento de taxa 
+pagamento de luz, contato com síndico, etc). Também serão cadastrados 
+os moradores de cada bloco de prédio para que se tenha as funcionalidades 
+de um condomínio de forma digital de tudo o que se normalmente é feito de 
+forma física. O software morada residence vem com o intuito de modernizar 
+e facilitar as relações burocráticas de condomínios.
+
+----------------------------------------------------------------------------
+
+2. Stack tecnológica do projeto Morada Residências
+
+O projeto Morada Residências utiliza uma stack tecnológica composta por 
+ferramentas voltadas ao desenvolvimento de aplicações web, abrangendo a 
+interface do usuário, o processamento das requisições no servidor e o 
+armazenamento dos dados. A escolha dessas tecnologias permite organizar 
+o sistema em camadas, facilitando a manutenção, a separação de 
+responsabilidades e a evolução da aplicação.
+
+----------------------------------------------------------------------------
+
+3. Tecnologias utilizadas
+Frontend — React e Vite: o React é utilizado para desenvolver a interface
+do sistema, permitindo a criação de componentes reutilizáveis e interfaces
+dinâmicas. O Vite é empregado como ferramenta de desenvolvimento e construção
+do frontend.
+
+Backend — Node.js e Express: o Node.js permite executar JavaScript no servidor,
+enquanto o Express auxilia na criação das rotas e no processamento das 
+requisições realizadas pelo frontend.
+
+Banco de dados — MySQL: responsável pelo armazenamento e gerenciamento
+das informações do sistema, permitindo organizar os dados relacionados
+à administração dos condomínios.
+
+Linguagens e estilos — JavaScript, HTML e CSS: o JavaScript é a principal 
+linguagem identificada no projeto, sendo utilizado na implementação das 
+funcionalidades. O HTML estrutura os elementos da interface, enquanto o CSS 
+define a apresentação visual e a estilização das páginas.
+
+----------------------------------------------------------------------------
+
+4.  Arquitetura do sistema
+
+A aplicação segue uma arquitetura em camadas, organizada no seguinte fluxo:
+
+React → Express → Controller → Service → Repository → MySQL
+
+Essa estrutura separa a interface da lógica de negócio e do acesso aos dados. 
+Os Controllers recebem e direcionam as requisições, os Services concentram 
+as regras de negócio, e os Repositories organizam as operações de acesso ao
+banco de dados. O MySQL realiza a persistência das informações.
+
+Dessa forma, a stack tecnológica do Morada Residências fornece a base para 
+o desenvolvimento de um sistema web organizado, modular e preparado para 
+facilitar futuras manutenções e implementações de novas funcionalidades.
+
+----------------------------------------------------------------------------
