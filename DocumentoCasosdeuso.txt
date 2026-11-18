@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------------------------------------------
+DESCRIÇÃO DO DIAGRAMA DE CASOS DE USO
+
+O diagrama de casos de uso tem como objetivo representar as principais funcionalidades do sistema, 
+demonstrando as interações entre os atores e as operações disponibilizadas. Ele permite compreender 
+como os usuários utilizam o sistema
+e quais são as relações existentes entre suas funcionalidades.
+
+---------------------------------------------------------------------------------------------------------------
+
+DESCRIÇÃO DAS LIGAÇÕES
+
+1. ASSOCIAÇÃO
+Representa a interação entre um ator e um caso de uso, indicando que determinado usuário pode 
+executar uma funcionalidade do sistema.
+
+2. INCLUSÃO (<<include>>)
+Representa uma relação obrigatória, na qual um caso de uso necessita executar outro para concluir sua operação.
+
+3. EXTENSÃO (<<extend>>)
+Representa uma funcionalidade complementar, executada somente quando determinada condição é atendida.
+
+4. GENERALIZAÇÃO
+Representa uma relação de herança, na qual um ator ou caso de uso especializado herda características de outro.
+
+---------------------------------------------------------------------------------------------------------------
+
+IMPORTÂNCIA DOS RELACIONAMENTOS
+
+As ligações presentes no diagrama permitem identificar as dependências entre as funcionalidades, 
+as responsabilidades de cada ator e as interações com o sistema. Dessa forma, contribuem para 
+uma melhor compreensão dos requisitos funcionais e do comportamento esperado da aplicação.
+---------------------------------------------------------------------------------------------------------------
+Link do diagrama de casos de uso
+
+https://app.diagrams.net/#G1jc8UX4TOPCpl_3_CTC7khelYvNVD5xHT#%7B"pageId"%3A"QOecilXVgVpXTQ2UBCnf"%7D
+
+---------------------------------------------------------------------------------------------------------------
