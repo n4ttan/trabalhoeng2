@@ -1,0 +1,176 @@
+---------------------------------------------------------------------------------------------------------------------
+Methodology Explorer – Trabalho de Engenharia de Software II 2026.2
+Graduandos: Adrian Henrique Maranesi Soares
+Felipe Herbert Couto Heleno
+Matheus Kersul
+Nattan Silva Montel 
+Otávio Augusto Trindade
+Rafael de Oliveira Monteiro
+Ryan Andreoli da Silva Araújo
+Victor Vellasco
+Professor: Straus Michalsky Martins
+---------------------------------------------------------------------------------------------------------------------
+
+Documento de Requisitos do Sistema
+Morada Residências
+
+---------------------------------------------------------------------------------------------------------------------
+
+DESCRIÇÃO DO DOCUMENTO DE REQUISITOS DO SISTEMA
+
+O documento de requisitos do sistema Morada Residências apresenta as principais funcionalidades e 
+características necessárias para o funcionamento da aplicação. Seu objetivo é especificar os requisitos 
+funcionais e não funcionais, descrevendo os comportamentos esperados, as condições de utilização e as 
+tecnologias utilizadas no desenvolvimento do sistema.
+
+O sistema tem como finalidade facilitar o gerenciamento de condomínios residenciais, oferecendo recursos 
+para cadastro de usuários, autenticação, validação de e-mail, aprovação de cadastros, gerenciamento de 
+condomínios e blocos, administração de síndicos e gerenciamento de notificações.
+
+---------------------------------------------------------------------------------------------------------------------
+
+DESCRIÇÃO DOS REQUISITOS FUNCIONAIS
+
+1. RF01 – CADASTRO DE USUÁRIO
+Permite que novos usuários realizem seu cadastro no sistema, preenchendo as informações solicitadas. 
+Após o envio, o cadastro segue para a etapa de validação de e-mail.
+
+2. RF02 – VALIDAÇÃO DE ENDEREÇO DE E-MAIL
+Permite que o usuário confirme seu endereço eletrônico por meio de um código de verificação enviado ao 
+e-mail informado durante o cadastro.
+
+3. RF03 – REENVIO DO CÓDIGO DE VERIFICAÇÃO
+Permite solicitar um novo código de verificação quando necessário, respeitando o intervalo mínimo estabelecido 
+pelo sistema.
+
+4. RF04 – AUTENTICAÇÃO DE USUÁRIO
+Permite que usuários cadastrados realizem login utilizando suas credenciais, verificando as informações antes 
+de conceder acesso ao sistema.
+
+5. RF05 – CONTROLE DA SITUAÇÃO DO CADASTRO
+Responsável por acompanhar e atualizar o estado dos cadastros, utilizando as situações AGUARDANDO_EMAIL, 
+PENDENTE_APROVACAO, APROVADO e REJEITADO.
+
+6. RF06 – CONSULTA DE CADASTROS PENDENTES
+Permite que usuários autorizados consultem os cadastros que aguardam aprovação administrativa.
+
+7. RF07 – APROVAÇÃO DE CADASTRO
+Permite que usuários autorizados aprovem cadastros pendentes, atualizando sua situação para APROVADO.
+
+8. RF08 – REJEIÇÃO DE CADASTRO
+Permite que usuários autorizados rejeitem cadastros pendentes, atualizando sua situação para REJEITADO.
+
+9. RF09 – ARMAZENAMENTO DAS INFORMAÇÕES
+Responsável por armazenar e recuperar as informações necessárias ao funcionamento da aplicação utilizando 
+o banco de dados MySQL.
+
+10. RF10 – COMUNICAÇÃO ENTRE INTERFACE E SERVIDOR
+Permite a troca de informações entre a interface web e o servidor, por meio do envio de solicitações e 
+recebimento de respostas.
+
+11. RF11 – ENVIO DE MENSAGENS POR E-MAIL
+Responsável por solicitar o envio de mensagens relacionadas ao processo de validação de endereço eletrônico 
+por meio de um serviço externo.
+
+12. RF12 – COMUNICAÇÃO EM TEMPO REAL
+Permite a comunicação em tempo real entre cliente e servidor utilizando Socket.IO, possibilitando a transmissão 
+e o recebimento de eventos.
+
+13. RF13 – SOLICITAÇÃO PARA SE TORNAR SÍNDICO
+Permite que um usuário solicite autorização para atuar como síndico, registrando o pedido e associando-o à sua conta.
+
+14. RF14 – CONSULTA E ANÁLISE DE PEDIDOS DE SÍNDICO
+Permite que usuários autorizados consultem solicitações para se tornar síndico e registrem decisões de aprovação 
+ou reprovação.
+
+15. RF15 – CADASTRO E CONSULTA DE CONDOMÍNIOS
+Permite cadastrar novos condomínios e consultar as informações registradas, respeitando as permissões e 
+validações do sistema.
+
+16. RF16 – REMOÇÃO DE CONDOMÍNIOS
+Permite que usuários autorizados removam condomínios, respeitando as regras de integridade dos dados e os 
+vínculos existentes.
+
+17. RF17 – CADASTRO E CONSULTA DE BLOCOS
+Permite criar e consultar blocos associados a um condomínio, garantindo que o condomínio relacionado exista.
+
+18. RF18 – ASSOCIAÇÃO DE SÍNDICOS A CONDOMÍNIOS E BLOCOS
+Permite associar síndicos a condomínios e blocos, definindo o escopo de gerenciamento de cada responsável.
+
+19. RF19 – NOTIFICAÇÕES
+Permite criar e consultar notificações, além de definir seus respectivos destinatários conforme as regras 
+de autorização da aplicação.
+
+20. RF20 – REGISTRO DE LEITURA DE NOTIFICAÇÕES
+Responsável por registrar se uma notificação foi lida por determinado destinatário, mantendo o estado de 
+leitura individual.
+
+---------------------------------------------------------------------------------------------------------------------
+
+DESCRIÇÃO DOS REQUISITOS NÃO FUNCIONAIS
+
+1. RNF01 – TECNOLOGIA DE DESENVOLVIMENTO
+Define as tecnologias utilizadas no desenvolvimento do sistema, incluindo React e Vite na interface web, 
+Node.js e Express no servidor e MySQL no banco de dados.
+
+2. RNF02 – SEGURANÇA DE AUTENTICAÇÃO
+Estabelece a utilização de JWT para gerenciar a autenticação dos usuários e controlar o acesso ao sistema.
+
+3. RNF03 – PROTEÇÃO DE SENHAS
+Determina a utilização do bcrypt para proteger as senhas armazenadas no banco de dados por meio de hashes.
+
+4. RNF04 – VERIFICAÇÃO DE E-MAIL
+Define que o código de verificação deve possuir seis dígitos e validade de 15 minutos.
+
+5. RNF05 – LIMITE DE TENTATIVAS DE VALIDAÇÃO
+Estabelece o limite máximo de cinco tentativas incorretas na validação do código de verificação.
+
+6. RNF06 – INTERVALO PARA REENVIO DE CÓDIGO
+Determina um intervalo mínimo de 60 segundos entre as solicitações de reenvio do código de verificação.
+
+7. RNF07 – LIMITAÇÃO DE REQUISIÇÕES
+Estabelece a limitação de requisições por endereço IP nas rotas de envio de e-mails, evitando solicitações excessivas.
+
+8. RNF08 – BANCO DE DADOS
+Determina a utilização do MySQL para armazenar e persistir os dados da aplicação.
+
+9. RNF09 – ENVIO DE E-MAILS
+Define a utilização da plataforma Brevo para realizar o envio de e-mails de verificação.
+
+10. RNF10 – COMUNICAÇÃO EM TEMPO REAL
+Estabelece a utilização do Socket.IO para permitir a comunicação em tempo real entre cliente e servidor 
+quando necessário.
+
+11. RNF11 – ORGANIZAÇÃO DO CÓDIGO
+Determina que o código-fonte seja organizado de maneira a facilitar a manutenção, as alterações e as correções 
+do sistema.
+
+12. RNF12 – TRATAMENTO DE ERROS
+Estabelece que o sistema deve tratar erros e apresentar mensagens compreensíveis aos usuários, sem expor 
+informações internas sensíveis.
+
+13. RNF13 – COMPATIBILIDADE COM NAVEGADORES
+Determina que o sistema seja compatível com navegadores modernos, permitindo o acesso adequado às suas 
+funcionalidades.
+
+14. RNF14 – CONTROLE DE AUTORIZAÇÃO
+Estabelece que o servidor deve verificar as permissões dos usuários antes de executar operações administrativas 
+e de gerenciamento.
+
+15. RNF15 – CONSISTÊNCIA DOS SCRIPTS DE BANCO DE DADOS
+Determina que os scripts SQL de criação e atualização do banco de dados possuam uma sequência documentada 
+e compatível com a versão da aplicação, evitando operações destrutivas acidentais.
+
+---------------------------------------------------------------------------------------------------------------------
+
+IMPORTÂNCIA DOS REQUISITOS
+
+Os requisitos funcionais e não funcionais são fundamentais para definir o comportamento e as características 
+do sistema Morada Residências. Enquanto os requisitos funcionais descrevem as operações que a aplicação deve 
+oferecer, os requisitos não funcionais estabelecem critérios relacionados à segurança, tecnologias, organização, 
+compatibilidade e funcionamento.
+
+A documentação desses requisitos contribui para orientar o desenvolvimento, facilitar a manutenção e garantir 
+que as funcionalidades implementadas estejam de acordo com os objetivos propostos para o sistema.
+
+---------------------------------------------------------------------------------------------------------------------
