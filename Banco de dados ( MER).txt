@@ -13,306 +13,576 @@ Professor: Straus Michalsky Martins
    Banco de dados do Sistema
    Morada Residências
 ---------------------------------------------------------------------------------------------------------------------
-============================================================
+
+1. ENTIDADES E SEUS ATRIBUTOS
+
+=====================================================================
 1. USUÁRIOS (usuarios)
-============================================================
+=====================================================================
 
-ATRIBUTO              | TIPO          | IDENTIFICAÇÃO
-------------------------------------------------------------
-id                    | INT           | PK
-nome                  | VARCHAR(225)  | Atributo obrigatório
-email                 | VARCHAR(225)  | Obrigatório único
-senha                 | VARCHAR(225)  | Obrigatório
-perfil                | ENUM          | Obrigatório
-id_condominio         | INT           | FK, aceita NULL
-id_bloco              | INT           | FK, aceita NULL
-bloco                 | VARCHAR(100)  | Opcional
-unidade               | VARCHAR(50)   | Opcional
-status_cadastro       | ENUM          | Padrão: Aguardando email
-token_validacao       | VARCHAR(225)  | Opcional
-token_expira_em       | DATETIME      | Opcional
-tentativas_validacao  | INT           | Padrão: 0
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+nome                     | VARCHAR(255)  | Obrigatório
+email                    | VARCHAR(255)  | Obrigatório, único
+senha                    | VARCHAR(255)  | Obrigatório
+perfil                   | ENUM          | Obrigatório
+id_condominio            | INT           | FK, aceita NULL
+id_bloco                 | INT           | FK, aceita NULL
+bloco                    | VARCHAR(100)  | Opcional
+unidade                  | VARCHAR(50)   | Opcional
+status_cadastro          | ENUM          | Padrão: AGUARDANDO_EMAIL
+token_validacao          | VARCHAR(255)  | Opcional
+token_expira_em          | DATETIME      | Opcional
+tentativas_validacao     | INT           | Padrão: 0
 
 Atribuição:
-Armazenar os dados dos usuários, suas credenciais, seus
-perfis, sua situação cadastral e os vínculos com condomínio
-e bloco.
+
+Armazenar os dados cadastrais dos usuários, suas credenciais
+de acesso, perfis, situação cadastral e vínculos com
+condomínios e blocos.
 
 
-============================================================
+=====================================================================
 2. CONDOMÍNIOS (condominios)
-============================================================
+=====================================================================
 
-ATRIBUTO              | TIPO          | IDENTIFICAÇÃO
-------------------------------------------------------------
-id                    | INT           | PK
-Nome                  | VARCHAR(225)  | Obrigatório
-numero_moradores      | INT           | Obrigatório, padrão 0
-sindico_responsavel   | INT           | Opcional
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+nome                     | VARCHAR(255)  | Obrigatório
+numero_moradores         | INT           | Obrigatório, padrão 0
+sindico_responsavel      | INT           | Opcional
 
 Atribuição:
-Armazenar os dados de cada condomínio e o identificador
-do síndico responsável, conforme a estrutura atual.
+
+Armazenar os dados dos condomínios cadastrados no sistema,
+incluindo o número de moradores e o identificador do
+síndico responsável.
 
 
-============================================================
+=====================================================================
 3. BLOCOS (blocos)
-============================================================
+=====================================================================
 
-ATRIBUTO              | TIPO          | IDENTIFICAÇÃO
-------------------------------------------------------------
-id                    | INT           | PK
-Nome                  | VARCHAR(100)  | Obrigatório
-id_condominio         | INT           | FK -> condominios.id
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+nome                     | VARCHAR(100)  | Obrigatório
+id_condominio            | INT           | FK -> condominios.id
 
 Atribuição:
-Armazenar os blocos e associar cada bloco a um condomínio.
+
+Armazenar os blocos existentes e associar cada bloco ao
+respectivo condomínio.
 
 
-============================================================
+=====================================================================
 4. GESTORES DE CONDOMÍNIOS (gestores_condominios)
-============================================================
+=====================================================================
 
-ATRIBUTO              | TIPO          | IDENTIFICAÇÃO
-------------------------------------------------------------
-id                    | INT           | PK
-usuario_id            | INT           | FK -> usuarios.id
-condominio_id         | INT           | FK -> condominios.id
-bloco_id              | INT           | FK -> blocos.id, aceita NULL
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+usuario_id               | INT           | FK -> usuarios.id
+condominio_id            | INT           | FK -> condominios.id
+bloco_id                 | INT           | FK -> blocos.id, aceita NULL
 
 Atribuição:
-Permitir registrar quais usuários gerenciam quais
-condomínios e, opcionalmente, quais blocos.
+
+Registrar os usuários responsáveis pela gestão de
+condomínios e, opcionalmente, de blocos específicos.
 
 
-============================================================
+=====================================================================
 5. PEDIDOS DE SÍNDICO (pedidos_sindico)
-============================================================
+=====================================================================
 
-ATRIBUTO              | TIPO          | IDENTIFICAÇÃO
-------------------------------------------------------------
-id                    | INT           | PK
-usuario_id            | INT           | FK -> usuarios.id
-condominio_id         | INT           | FK -> condominios.id
-deferido              | BOOLEAN       | Obrigatório, padrão FALSE
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+usuario_id               | INT           | FK -> usuarios.id
+condominio_id            | INT           | FK -> condominios.id
+deferido                 | BOOLEAN       | Obrigatório, padrão FALSE
 
 Atribuição:
-Armazenar os pedidos e a indicação de deferimento.
+
+Armazenar as solicitações realizadas pelos usuários para
+se tornarem síndicos de condomínios, registrando se o
+pedido foi deferido.
 
 
-============================================================
+=====================================================================
 6. MENSAGENS (mensagens)
-============================================================
+=====================================================================
 
-ATRIBUTO              | TIPO          | IDENTIFICAÇÃO
-------------------------------------------------------------
-id                    | INT           | PK
-texto                 | VARCHAR(225)  | Obrigatório
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+texto                    | VARCHAR(255)  | Obrigatório
 
 Atribuição:
-Armazenar mensagens textuais simples.
+
+Armazenar mensagens textuais simples utilizadas pelo sistema.
 
 
-============================================================
+=====================================================================
 7. NOTIFICAÇÕES (notificacoes)
-============================================================
+=====================================================================
 
-ATRIBUTO              | TIPO          | IDENTIFICAÇÃO
-------------------------------------------------------------
-id                    | INT           | PK
-titulo                | VARCHAR(150)  | Obrigatório
-mensagem              | TEXT          | Obrigatório
-tipo                  | ENUM          | Obrigatório, padrão AVISO
-escopo                | ENUM          | Obrigatório
-id_condominio         | INT           | FK -> condominios.id, aceita NULL
-criado_por            | INT           | FK -> usuarios.id, aceita NULL
-criado_em             | TIMESTAMP     | Obrigatório, padrão data e hora atual
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+titulo                   | VARCHAR(150)  | Obrigatório
+mensagem                 | TEXT          | Obrigatório
+tipo                     | ENUM          | Obrigatório, padrão AVISO
+escopo                   | ENUM          | Obrigatório
+condominio_id            | INT           | FK -> condominios.id, aceita NULL
+criado_por               | INT           | FK -> usuarios.id, aceita NULL
+criado_em                | TIMESTAMP     | Padrão: data e hora atual
 
 Atribuição:
-Armazenar as notificações, seu conteúdo, tipo, escopo,
-condomínio relacionado, autor e data de criação.
+
+Armazenar notificações enviadas pelo sistema, incluindo
+título, mensagem, tipo, escopo, condomínio relacionado,
+usuário responsável pela criação e data de registro.
 
 
-============================================================
+=====================================================================
 8. DESTINATÁRIOS DE NOTIFICAÇÕES (notificacao_destinatarios)
-============================================================
+=====================================================================
 
-ATRIBUTO              | TIPO          | IDENTIFICAÇÃO
-------------------------------------------------------------
-notificacao_id        | INT           | PK composta e FK -> notificacoes.id
-usuario_id            | INT           | PK composta e FK -> usuarios.id
-lida_em               | TIMESTAMP     | Opcional
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+notificacao_id           | INT           | PK composta e FK -> notificacoes.id
+usuario_id               | INT           | PK composta e FK -> usuarios.id
+lida_em                  | TIMESTAMP     | Opcional
 
 Atribuição:
-Registrar quais usuários recebem cada notificação e
-quando cada um a leu.
 
----------------------------------------------------------------------------------------------------------------------
+Registrar os usuários que recebem cada notificação,
+identificando também a data e o horário em que cada
+usuário realizou a leitura.
 
-2. Relacionamentos, cardinalidades e atribuições
 
-============================================================
-1. CONDOMÍNIO — BLOCO
-============================================================
+=====================================================================
+9. RESERVAS DE CHURRASQUEIRA (reservas_churrasqueira)
+=====================================================================
 
-RELACIONAMENTO: Condomínio — Bloco
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+id_usuario               | INT           | Obrigatório, referência lógica a usuarios.id
+id_condominio            | INT           | Obrigatório, referência lógica a condominios.id
+data_reserva             | VARCHAR(255)  | Obrigatório
+horario_inicio           | VARCHAR(255)  | Obrigatório
+horario_fim              | VARCHAR(255)  | Obrigatório
+status                   | ENUM          | Obrigatório, padrão CONFIRMADA
+
+Atribuição:
+
+Armazenar as reservas realizadas pelos usuários para
+utilização da churrasqueira, registrando o condomínio,
+a data, os horários de início e término e a situação
+da reserva.
+
+
+=====================================================================
+10. RESERVAS DE SALÃO (reservas_salao)
+=====================================================================
+
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+id_usuario               | INT           | Obrigatório, referência lógica a usuarios.id
+id_condominio            | INT           | Obrigatório, referência lógica a condominios.id
+data_reserva             | VARCHAR(255)  | Obrigatório
+horario_inicio           | VARCHAR(255)  | Obrigatório
+horario_fim              | VARCHAR(255)  | Obrigatório
+status                   | ENUM          | Obrigatório, padrão CONFIRMADA
+
+Atribuição:
+
+Armazenar as reservas realizadas pelos usuários para
+utilização do salão de festas, incluindo a identificação
+do usuário, condomínio, data, horários e situação
+da reserva.
+
+
+=====================================================================
+11. REUNIÕES (reunioes)
+=====================================================================
+
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+id_condominio            | INT           | Obrigatório, referência lógica a condominios.id
+titulo                   | VARCHAR(255)  | Obrigatório
+pauta                    | VARCHAR(255)  | Obrigatório
+data_hora                | VARCHAR(255)  | Obrigatório
+local_link               | VARCHAR(255)  | Obrigatório
+
+Atribuição:
+
+Armazenar as reuniões cadastradas para os condomínios,
+incluindo título, pauta, data, horário e local ou link
+de acesso.
+
+
+=====================================================================
+12. BOLETOS (boletos)
+=====================================================================
+
+ATRIBUTO                 | TIPO          | IDENTIFICAÇÃO
+---------------------------------------------------------------------
+id                       | INT           | PK, AUTO_INCREMENT
+id_condominio            | INT           | FK -> condominios.id
+id_usuario               | INT           | FK -> usuarios.id
+mes_referencia           | VARCHAR(20)   | Obrigatório
+valor                    | DECIMAL(10,2) | Obrigatório
+data_vencimento          | DATE          | Obrigatório
+status                   | ENUM          | Obrigatório, padrão PENDENTE
+codigo_barras            | VARCHAR(100)  | Obrigatório
+linha_digitavel          | VARCHAR(100)  | Obrigatório
+data_pagamento           | DATETIME      | Opcional
+valor_pago               | DECIMAL(10,2) | Opcional
+forma_pagamento          | VARCHAR(50)   | Opcional
+codigo_autenticacao      | VARCHAR(100)  | Opcional
+segunda_via_emitida_em   | DATETIME      | Opcional
+criado_em                | TIMESTAMP     | Padrão: data e hora atual
+
+Atribuição:
+
+Armazenar os boletos vinculados aos usuários e condomínios,
+incluindo valores, mês de referência, vencimento, situação
+do pagamento, informações de pagamento e emissão de
+segunda via.
+
+
+=====================================================================
+2. RELACIONAMENTOS, CARDINALIDADES E ATRIBUIÇÕES
+=====================================================================
+
+=====================================================================
+1. CONDOMÍNIO - BLOCO
+=====================================================================
+
+RELACIONAMENTO: Condomínio - Bloco
 CARDINALIDADE: 1:N
 
 Atribuição:
-Um condomínio pode possuir vários blocos; cada bloco
-pertence a um condomínio.
+
+Um condomínio pode possuir vários blocos, enquanto cada
+bloco pertence a um único condomínio.
 
 
-============================================================
-2. CONDOMÍNIO — USUÁRIO
-============================================================
+=====================================================================
+2. CONDOMÍNIO - USUÁRIO
+=====================================================================
 
-RELACIONAMENTO: Condomínio — Usuário
-CARDINALIDADE: 1:N, opcional do lado do usuário
-
-Atribuição:
-Um condomínio pode estar associado a vários usuários;
-cada usuário pode referenciar zero ou um condomínio por
-id_condominio.
-
-
-============================================================
-3. BLOCO — USUÁRIO
-============================================================
-
-RELACIONAMENTO: Bloco — Usuário
-CARDINALIDADE: 1:N, opcional do lado do usuário
+RELACIONAMENTO: Condomínio - Usuário
+CARDINALIDADE: 1:N, opcional do lado do usuário.
 
 Atribuição:
-Um bloco pode estar associado a vários usuários; cada
-usuário pode referenciar zero ou um bloco por id_bloco.
+
+Um condomínio pode estar associado a vários usuários.
+Cada usuário pode estar vinculado a zero ou um condomínio
+por meio do atributo id_condominio.
 
 
-============================================================
-4. USUÁRIO — GESTOR DE CONDOMÍNIO
-============================================================
+=====================================================================
+3. BLOCO - USUÁRIO
+=====================================================================
 
-RELACIONAMENTO: Usuário — Gestor de condomínio
+RELACIONAMENTO: Bloco - Usuário
+CARDINALIDADE: 1:N, opcional do lado do usuário.
+
+Atribuição:
+
+Um bloco pode estar associado a vários usuários. Cada
+usuário pode estar vinculado a zero ou um bloco por meio
+do atributo id_bloco.
+
+
+=====================================================================
+4. USUÁRIO - GESTOR DE CONDOMÍNIO
+=====================================================================
+
+RELACIONAMENTO: Usuário - Gestor de condomínio
 CARDINALIDADE: 1:N
 
 Atribuição:
-Um usuário pode ter vários vínculos de gestão; cada
-vínculo pertence a um usuário.
+
+Um usuário pode possuir vários registros de gestão,
+enquanto cada registro de gestão está associado a um
+único usuário.
 
 
-============================================================
-5. CONDOMÍNIO — GESTOR DE CONDOMÍNIO
-============================================================
+=====================================================================
+5. CONDOMÍNIO - GESTOR DE CONDOMÍNIO
+=====================================================================
 
-RELACIONAMENTO: Condomínio — Gestor de condomínio
+RELACIONAMENTO: Condomínio - Gestor de condomínio
 CARDINALIDADE: 1:N
 
 Atribuição:
-Um condomínio pode possuir vários registros de gestão;
-cada registro aponta para um condomínio.
+
+Um condomínio pode possuir vários registros de gestão,
+enquanto cada registro está associado a um único
+condomínio.
 
 
-============================================================
-6. BLOCO — GESTOR DE CONDOMÍNIO
-============================================================
+=====================================================================
+6. BLOCO - GESTOR DE CONDOMÍNIO
+=====================================================================
 
-RELACIONAMENTO: Bloco — Gestor de condomínio
-CARDINALIDADE: 1:N, opcional no vínculo
+RELACIONAMENTO: Bloco - Gestor de condomínio
+CARDINALIDADE: 1:N, opcional no vínculo de gestão.
 
 Atribuição:
-Um bloco pode aparecer em vários vínculos de gestão;
-cada vínculo pode referenciar zero ou um bloco.
+
+Um bloco pode estar associado a vários registros de
+gestão. Cada registro de gestão pode referenciar zero
+ou um bloco.
 
 
-============================================================
-7. USUÁRIO — PEDIDO DE SÍNDICO
-============================================================
+=====================================================================
+7. USUÁRIO - PEDIDO DE SÍNDICO
+=====================================================================
 
-RELACIONAMENTO: Usuário — Pedido de síndico
+RELACIONAMENTO: Usuário - Pedido de síndico
 CARDINALIDADE: 1:N
 
 Atribuição:
-Um usuário pode registrar vários pedidos; cada pedido
-pertence a um usuário.
+
+Um usuário pode registrar vários pedidos para se tornar
+síndico, enquanto cada pedido pertence a um único usuário.
 
 
-============================================================
-8. CONDOMÍNIO — PEDIDO DE SÍNDICO
-============================================================
+=====================================================================
+8. CONDOMÍNIO - PEDIDO DE SÍNDICO
+=====================================================================
 
-RELACIONAMENTO: Condomínio — Pedido de síndico
+RELACIONAMENTO: Condomínio - Pedido de síndico
 CARDINALIDADE: 1:N
 
 Atribuição:
-Um condomínio pode receber vários pedidos; cada pedido
-se refere a um condomínio.
+
+Um condomínio pode receber vários pedidos de candidatura
+para síndico, enquanto cada pedido está associado a um
+único condomínio.
 
 
-============================================================
-9. CONDOMÍNIO — NOTIFICAÇÃO
-============================================================
+=====================================================================
+9. CONDOMÍNIO - NOTIFICAÇÃO
+=====================================================================
 
-RELACIONAMENTO: Condomínio — Notificação
-CARDINALIDADE: 1:N, opcional na notificação
-
-Atribuição:
-Um condomínio pode ter várias notificações associadas;
-cada notificação pode referenciar zero ou um condomínio.
-
-
-============================================================
-10. USUÁRIO — NOTIFICAÇÃO (AUTOR)
-============================================================
-
-RELACIONAMENTO: Usuário — Notificação (autor)
-CARDINALIDADE: 1:N, opcional na notificação
+RELACIONAMENTO: Condomínio - Notificação
+CARDINALIDADE: 1:N, opcional na notificação.
 
 Atribuição:
-Um usuário pode criar várias notificações; cada
-notificação pode ter zero ou um autor registrado.
+
+Um condomínio pode possuir várias notificações associadas.
+Cada notificação pode estar vinculada a zero ou um
+condomínio.
 
 
-============================================================
-11. NOTIFICAÇÃO — DESTINATÁRIO
-============================================================
+=====================================================================
+10. USUÁRIO - NOTIFICAÇÃO (AUTOR)
+=====================================================================
 
-RELACIONAMENTO: Notificação — Destinatário
+RELACIONAMENTO: Usuário - Notificação (autor)
+CARDINALIDADE: 1:N, opcional na notificação.
+
+Atribuição:
+
+Um usuário pode criar várias notificações, enquanto cada
+notificação pode possuir zero ou um usuário responsável
+pela criação.
+
+
+=====================================================================
+11. NOTIFICAÇÃO - DESTINATÁRIO
+=====================================================================
+
+RELACIONAMENTO: Notificação - Destinatário
 CARDINALIDADE: 1:N
 
 Atribuição:
-Uma notificação pode ter vários registros de
-destinatários; cada registro se refere a uma notificação.
+
+Uma notificação pode possuir vários registros de
+destinatários, enquanto cada registro pertence a uma
+única notificação.
 
 
-============================================================
-12. USUÁRIO — DESTINATÁRIO DE NOTIFICAÇÃO
-============================================================
+=====================================================================
+12. USUÁRIO - DESTINATÁRIO DE NOTIFICAÇÃO
+=====================================================================
 
-RELACIONAMENTO: Usuário — Destinatário de notificação
+RELACIONAMENTO: Usuário - Destinatário de notificação
 CARDINALIDADE: 1:N
 
 Atribuição:
-Um usuário pode possuir vários registros de destinatários;
-cada registro se refere a um usuário.
+
+Um usuário pode possuir vários registros de destinatários,
+enquanto cada registro está associado a um único usuário.
 
 
-============================================================
-13. USUÁRIO — NOTIFICAÇÃO (DESTINATÁRIO)
-============================================================
+=====================================================================
+13. USUÁRIO - NOTIFICAÇÃO (DESTINATÁRIO)
+=====================================================================
 
-RELACIONAMENTO: Usuário — Notificação (destinatário)
+RELACIONAMENTO: Usuário - Notificação (destinatário)
 CARDINALIDADE: N:M, por meio da tabela associativa
+notificacao_destinatarios.
 
 Atribuição:
+
 Um usuário pode receber várias notificações, e uma
-notificação pode ser destinada a vários usuários.
+notificação pode ser destinada a vários usuários. A tabela
+associativa registra os destinatários e a data de leitura.
+
+
+=====================================================================
+14. USUÁRIO - RESERVA DE CHURRASQUEIRA
+=====================================================================
+
+RELACIONAMENTO: Usuário - Reserva de churrasqueira
+CARDINALIDADE: 1:N, referência lógica.
+
+Atribuição:
+
+Um usuário pode realizar várias reservas de churrasqueira,
+enquanto cada reserva registra um único identificador
+de usuário.
+
+
+=====================================================================
+15. CONDOMÍNIO - RESERVA DE CHURRASQUEIRA
+=====================================================================
+
+RELACIONAMENTO: Condomínio - Reserva de churrasqueira
+CARDINALIDADE: 1:N, referência lógica.
+
+Atribuição:
+
+Um condomínio pode possuir várias reservas de churrasqueira,
+enquanto cada reserva registra um único identificador
+de condomínio.
+
+
+=====================================================================
+16. USUÁRIO - RESERVA DE SALÃO
+=====================================================================
+
+RELACIONAMENTO: Usuário - Reserva de salão
+CARDINALIDADE: 1:N, referência lógica.
+
+Atribuição:
+
+Um usuário pode realizar várias reservas do salão de festas,
+enquanto cada reserva registra um único identificador
+de usuário.
+
+
+=====================================================================
+17. CONDOMÍNIO - RESERVA DE SALÃO
+=====================================================================
+
+RELACIONAMENTO: Condomínio - Reserva de salão
+CARDINALIDADE: 1:N, referência lógica.
+
+Atribuição:
+
+Um condomínio pode possuir várias reservas de salão,
+enquanto cada reserva registra um único identificador
+de condomínio.
+
+
+=====================================================================
+18. CONDOMÍNIO - REUNIÃO
+=====================================================================
+
+RELACIONAMENTO: Condomínio - Reunião
+CARDINALIDADE: 1:N, referência lógica.
+
+Atribuição:
+
+Um condomínio pode possuir várias reuniões cadastradas,
+enquanto cada reunião registra um único identificador
+de condomínio.
+
+
+=====================================================================
+19. CONDOMÍNIO - BOLETO
+=====================================================================
+
+RELACIONAMENTO: Condomínio - Boleto
+CARDINALIDADE: 1:N
+
+Atribuição:
+
+Um condomínio pode possuir vários boletos cadastrados,
+enquanto cada boleto está associado a um único condomínio.
+
+
+=====================================================================
+20. USUÁRIO - BOLETO
+=====================================================================
+
+RELACIONAMENTO: Usuário - Boleto
+CARDINALIDADE: 1:N
+
+Atribuição:
+
+Um usuário pode possuir vários boletos associados,
+enquanto cada boleto está vinculado a um único usuário.
+
+
+=====================================================================
+21. USUÁRIO - CONDOMÍNIO (SÍNDICO RESPONSÁVEL)
+=====================================================================
+
+RELACIONAMENTO: Usuário - Condomínio (síndico responsável)
+CARDINALIDADE: Referência lógica.
+
+Atribuição:
+
+O atributo sindico_responsavel da tabela condominios
+armazena o identificador do usuário responsável pelo
+condomínio. Entretanto, o script SQL atual não declara
+uma chave estrangeira para esse atributo.
+
+
+=====================================================================
+3. MODELO ENTIDADE-RELACIONAMENTO (MER)
+=====================================================================
+
+O Modelo Entidade-Relacionamento do sistema Morada
+Residências representa as entidades responsáveis pelo
+armazenamento das informações do sistema, seus atributos
+e os relacionamentos existentes entre elas.
+
+O modelo contempla o gerenciamento de usuários,
+condomínios, blocos, gestores, pedidos de síndico,
+notificações, reservas de áreas comuns, reuniões e boletos.
+
+A entidade notificacao_destinatarios atua como tabela
+associativa para representar o relacionamento muitos-para-
+muitos entre usuários e notificações.
+
+As entidades de reservas e reuniões possuem atributos que
+identificam usuários e condomínios relacionados, porém
+esses vínculos não possuem restrições de chave estrangeira
+declaradas nos scripts SQL analisados.
+
+OBSERVAÇÃO SOBRE A INTEGRIDADE REFERENCIAL:
+
+Os relacionamentos identificados por chaves estrangeiras
+são efetivamente definidos no banco de dados. Os
+relacionamentos classificados como referências lógicas
+representam associações feitas por identificadores, sem
+garantia de integridade referencial por meio de constraints
+de chave estrangeira.
 
 ---------------------------------------------------------------------------------------------------------------------
-
-3. Modelo Entidade-Relacionamento (MER)
-
-Para melhor visualização da estrutura do banco de dados,
-acesse o diagrama completo pelo link abaixo:
-
-[📊 Visualizar Diagrama Entidade-Relacionamento (MER)]
-(https://app.diagrams.net/#G1jc8UX4TOPCpl_3_CTC7khelYvNVD5xHT#%7B%22pageId%22%3A%22A7pJt16K2BksVolZ4hmb%22%7D)
