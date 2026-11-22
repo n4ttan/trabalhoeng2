@@ -199,18 +199,22 @@ function rejeitarMorador(usuarioId, condominioId = null) {
 // Busca um usuário pelo ID (sem a senha); devolve null se não existir.
 function buscarPorId(id) {
     return new Promise((resolve, reject) => {
-        connection.query(
-            'SELECT id, nome, email, perfil, id_condominio FROM usuarios WHERE id = ?',
-            [id],
-            (error, results) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-
-                resolve(results[0] || null);
+        const query = `
+            SELECT u.id, u.nome, u.email, u.perfil, u.id_condominio, u.id_bloco, u.bloco, u.unidade, u.status_cadastro,
+                   c.nome AS condominio_nome, b.nome AS bloco_nome
+            FROM usuarios u
+            LEFT JOIN condominios c ON u.id_condominio = c.id
+            LEFT JOIN blocos b ON u.id_bloco = b.id
+            WHERE u.id = ?
+        `;
+        connection.query(query, [id], (error, results) => {
+            if (error) {
+                reject(error);
+                return;
             }
-        );
+
+            resolve(results[0] || null);
+        });
     });
 }
 

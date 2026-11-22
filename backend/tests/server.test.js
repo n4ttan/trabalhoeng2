@@ -55,7 +55,8 @@ jest.mock('../src/controllers/usuarioController', () => ({
     rebaixarUsuario: jest.fn(),
     listarPendentes: jest.fn(),
     aprovarMorador: jest.fn(),
-    rejeitarMorador: jest.fn()
+    rejeitarMorador: jest.fn(),
+    buscarPerfil: jest.fn()
 }));
 
 jest.mock('../src/controllers/condominioController', () => ({
@@ -188,6 +189,12 @@ describe('Inicialização do servidor', () => {
             expect.any(Function),
             expect.any(Function)
         );
+
+        expect(app.get).toHaveBeenCalledWith(
+            '/usuarios/me',
+            expect.any(Function),
+            expect.any(Function)
+        );
     });
 
     it('deve registrar as rotas administrativas de pedidos de síndico', () => {
@@ -248,6 +255,12 @@ describe('Inicialização do servidor', () => {
 
         expect(app.patch).toHaveBeenCalledWith(
             '/condominios/:idCondominio/reservas-salao/:id/cancelar',
+            expect.any(Function),
+            expect.any(Function)
+        );
+
+        expect(app.get).toHaveBeenCalledWith(
+            '/condominios/:idCondominio/reservas-salao/:id',
             expect.any(Function),
             expect.any(Function)
         );

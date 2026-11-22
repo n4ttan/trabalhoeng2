@@ -46,9 +46,41 @@ export async function criarCondominio(dados) {
   });
 }
 
+export async function excluirCondominio(idCondominio) {
+  return await requisicao(`/condominios/${idCondominio}`, {
+    method: 'DELETE'
+  });
+}
+
 // ### Moradores e Blocos por Condomínio
 export async function listarBlocosCondominio(idCondominio) {
   return await requisicao(`/condominios/${idCondominio}/blocos`);
+}
+
+export async function criarBlocoCondominio(idCondominio, nome) {
+  return await requisicao(`/condominios/${idCondominio}/blocos`, {
+    method: 'POST',
+    body: JSON.stringify({ nome })
+  });
+}
+
+export async function listarMoradoresCondominio(idCondominio, blocoId = null) {
+  const query = blocoId ? `?blocoId=${blocoId}` : '';
+  return await requisicao(`/condominios/${idCondominio}/moradores${query}`);
+}
+
+export async function adicionarMoradorAoCondominio(idCondominio, dadosMorador) {
+  return await requisicao(`/condominios/${idCondominio}/adicionarMorador`, {
+    method: 'POST',
+    body: JSON.stringify(dadosMorador)
+  });
+}
+
+export async function definirMoradorBloco(idCondominio, usuarioId, dadosBloco) {
+  return await requisicao(`/condominios/${idCondominio}/moradores/${usuarioId}/bloco`, {
+    method: 'PATCH',
+    body: JSON.stringify(dadosBloco)
+  });
 }
 
 export async function acessarCondominioMorador(idCondominio) {

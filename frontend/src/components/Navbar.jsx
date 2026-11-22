@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { obterPerfil } from '../services/authApi';
+import { obterPerfil, obterUsuario, logout, estaLogado } from '../services/authApi';
 import './Navbar.css';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [condominioAtivo, setCondominioAtivo] = useState(null);
-  const perfil = obterPerfil();
-  const ehSindico = perfil === 'SINDICO' || perfil === 'ADMIN';
-  const ehMorador = perfil === 'MORADOR' || perfil === 'ADMIN';
 
-  // Páginas onde a Navbar fica oculta
+  const [aberto, setAberto] = useState(false);
+  const [condominioAtivo, setCondominioAtivo] = useState(null);
+  const [usuario, setUsuario] = useState(null);
+
+  const perfil = obterPerfil();
+  const logado = estaLogado();
+
+  const ehAdmin = perfil === 'ADMIN';
+  const ehSindico = perfil === 'SINDICO' || ehAdmin;
+  const ehMorador = perfil === 'MORADOR' || ehAdmin;
+
+  // Páginas públicas onde a navegação não deve aparecer
   const paginasSemNavbar = [
     '/',
     '/login',
@@ -21,148 +28,368 @@ export default function Navbar() {
   ];
 
   useEffect(() => {
+    // Carrega condomínio ativo
     const condoSalvo = localStorage.getItem('morada_condominio_ativo');
     if (condoSalvo) {
       try {
         setCondominioAtivo(JSON.parse(condoSalvo));
-      } catch (e) {
+      } catch {
         setCondominioAtivo(null);
       }
     } else {
       setCondominioAtivo(null);
     }
+
+    // Carrega dados do usuário
+    const usuarioSalvo = obterUsuario();
+    if (usuarioSalvo) {
+      setUsuario(usuarioSalvo);
+    }
+
+    // Fecha a sidebar ao mudar de página
+    setAberto(false);
   }, [location.pathname]);
 
-  if (paginasSemNavbar.includes(location.pathname)) {
+  if (!logado || paginasSemNavbar.includes(location.pathname)) {
     return null;
   }
 
-  const estaNoPerfil = location.pathname === '/perfil';
-  const estaNaListaDeCondominios = location.pathname === '/condominios';
-
-  // Exibe as funcionalidades internas do condomínio apenas se:
-  // 1. Tiver um condomínio ativo
-  // 2. Não estiver na lista de seleção (/condominios)
-  // 3. Não estiver no perfil (/perfil)
-  const exibirBotoesInternos = condominioAtivo && !estaNaListaDeCondominios && !estaNoPerfil;
-
-  // O botão 'Meus Condomínios' só aparece na lista de seleção ou na tela de Perfil
-  const exibirBotaoMeusCondominios = estaNaListaDeCondominios || estaNoPerfil;
+  const handleNavegar = (caminho) => {
+    navigate(caminho);
+    setAberto(false);
+  };
 
   const handleTrocarCondominio = () => {
     localStorage.removeItem('morada_condominio_ativo');
     setCondominioAtivo(null);
     navigate('/condominios');
+    setAberto(false);
   };
 
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem('morada_condominio_ativo');
+    navigate('/login');
+    setAberto(false);
+  };
+
+  const isRotaAtiva = (caminho) => location.pathname === caminho;
+
   return (
-    <header className="app-navbar">
-      <div className="navbar-left">
-        <h1 className="navbar-logo" onClick={() => navigate('/condominios')}>
-          🏢 Morada
-        </h1>
-        {exibirBotoesInternos && (
-          <div className="condo-badge">
-            <span className="condo-icon">📍</span>
-            <span className="condo-name">{condominioAtivo.nome}</span>
+    <>
+      {/* Barra Superior Fixa (Topbar) */}
+      <header className="app-topbar">
+        <div className="topbar-left">
+          <button 
+            type="button"
+            className="btn-hamburguer"
+            onClick={() => setAberto(!aberto)}
+            title="Abrir/Fechar menu lateral"
+            aria-label="Abrir menu lateral"
+          >
+            <span className="hamburguer-icon">{aberto ? '✕' : '☰'}</span>
+            <span className="hamburguer-label">Menu</span>
+          </button>
+
+          <div className="topbar-logo" onClick={() => handleNavegar('/condominios')}>
+            <span className="logo-icon">🏢</span>
+            <span className="logo-texto">Morada</span>
+            <small className="logo-sub">Residências</small>
+          </div>
+        </div>
+
+        <div className="topbar-center">
+          {condominioAtivo ? (
+            <div className="topbar-condo-badge" title="Condomínio selecionado">
+              <span className="badge-pin">📍</span>
+              <span className="badge-nome">{condominioAtivo.nome}</span>
+              <button 
+                type="button"
+                className="btn-badge-trocar" 
+                onClick={handleTrocarCondominio}
+                title="Trocar condomínio"
+              >
+                Trocar
+              </button>
+            </div>
+          ) : (
             <button 
-              className="btn-trocar-condo" 
-              onClick={handleTrocarCondominio}
-              title="Trocar condomínio selecionado"
+              type="button" 
+              className="topbar-condo-badge alerta-selecao"
+              onClick={() => handleNavegar('/condominios')}
             >
-              Trocar
+              ⚠️ Selecione um Condomínio
+            </button>
+          )}
+        </div>
+
+        <div className="topbar-right">
+          <div className="usuario-badge" onClick={() => handleNavegar('/perfil')} title="Ver meu perfil">
+            <span className="usuario-avatar-circulo">
+              {usuario?.nome ? usuario.nome.charAt(0).toUpperCase() : '👤'}
+            </span>
+            <div className="usuario-detalhes-header">
+              <span className="usuario-nome-header">{usuario?.nome?.split(' ')[0] || 'Usuário'}</span>
+              <span className={`usuario-perfil-tag tag-${perfil?.toLowerCase()}`}>{perfil || 'MORADOR'}</span>
+            </div>
+          </div>
+
+          <button 
+            type="button"
+            className="btn-topbar-logout"
+            onClick={handleLogout}
+            title="Sair da conta"
+          >
+            Sair
+          </button>
+        </div>
+      </header>
+
+      {/* Fundo escuro semi-transparente ao abrir menu */}
+      {aberto && (
+        <div 
+          className="sidebar-overlay" 
+          onClick={() => setAberto(false)}
+          title="Clique para fechar"
+        />
+      )}
+
+      {/* Barra Lateral Retrátil (Sidebar) */}
+      <aside className={`sidebar-lateral ${aberto ? 'aberto' : 'fechado'}`}>
+        <div className="sidebar-cabecalho">
+          <div className="sidebar-marca">
+            <span className="sidebar-marca-icon">🏢</span>
+            <div>
+              <h2 className="sidebar-marca-titulo">Morada</h2>
+              <span className="sidebar-marca-sub">Gestão Condominial</span>
+            </div>
+          </div>
+          <button 
+            type="button"
+            className="btn-fechar-sidebar"
+            onClick={() => setAberto(false)}
+            aria-label="Fechar menu lateral"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Card do condomínio atual na barra */}
+        <div className="sidebar-condo-card">
+          <span className="sidebar-condo-rotulo">Condomínio Atual</span>
+          {condominioAtivo ? (
+            <div className="sidebar-condo-info">
+              <strong>{condominioAtivo.nome}</strong>
+              <button 
+                type="button" 
+                className="btn-sidebar-trocar"
+                onClick={handleTrocarCondominio}
+              >
+                Alternar Condomínio
+              </button>
+            </div>
+          ) : (
+            <button 
+              type="button" 
+              className="btn-sidebar-selecionar"
+              onClick={() => handleNavegar('/condominios')}
+            >
+              Escolher Condomínio
+            </button>
+          )}
+        </div>
+
+        {/* Lista de Navegação por Sessões Constantes */}
+        <nav className="sidebar-menu">
+          {/* Seção Geral */}
+          <div className="sidebar-secao">
+            <span className="sidebar-secao-titulo">GERAL</span>
+            
+            <button 
+              type="button"
+              className={`sidebar-item ${isRotaAtiva('/condominios') ? 'ativo' : ''}`}
+              onClick={() => handleNavegar('/condominios')}
+            >
+              <span className="item-icon">🏢</span>
+              <span>Meus Condomínios</span>
+            </button>
+
+            <button 
+              type="button"
+              className={`sidebar-item ${isRotaAtiva('/notificacoes') ? 'ativo' : ''}`}
+              onClick={() => handleNavegar('/notificacoes')}
+            >
+              <span className="item-icon">📢</span>
+              <span>Mural de Avisos</span>
+            </button>
+
+            <button 
+              type="button"
+              className={`sidebar-item ${isRotaAtiva('/perfil') ? 'ativo' : ''}`}
+              onClick={() => handleNavegar('/perfil')}
+            >
+              <span className="item-icon">👤</span>
+              <span>Meu Perfil</span>
             </button>
           </div>
-        )}
-      </div>
 
-      <nav className="navbar-links">
-        {/* Só exibe 'Meus Condomínios' se estiver na tela de Seleção ou no Perfil */}
-        {exibirBotaoMeusCondominios && (
-          <button 
-            className={`nav-item ${estaNaListaDeCondominios || estaNoPerfil ? 'active' : ''}`}
-            onClick={() => navigate('/condominios')}
-          >
-            Meus Condomínios
-          </button>
-        )}
+          {/* Seção Áreas Comuns & Eventos */}
+          <div className="sidebar-secao">
+            <span className="sidebar-secao-titulo">ÁREAS & EVENTOS</span>
 
-        {/* Exibe as abas internas do condomínio quando estiver navegando no condomínio */}
-        {exibirBotoesInternos && (
-          <>
             <button 
-              className={`nav-item ${location.pathname === '/notificacoes' ? 'active' : ''}`}
-              onClick={() => navigate('/notificacoes')}
+              type="button"
+              className={`sidebar-item ${isRotaAtiva('/reunioes') ? 'ativo' : ''}`}
+              onClick={() => handleNavegar('/reunioes')}
             >
-              Mural / Avisos
+              <span className="item-icon">📅</span>
+              <span>Reuniões</span>
             </button>
-            <button
-              className={`nav-item ${location.pathname === '/reunioes' ? 'active' : ''}`}
-              onClick={() => navigate('/reunioes')}
+
+            <button 
+              type="button"
+              className={`sidebar-item ${isRotaAtiva('/reservas-salao') ? 'ativo' : ''}`}
+              onClick={() => handleNavegar('/reservas-salao')}
             >
-              Reuniões
+              <span className="item-icon">🎉</span>
+              <span>Salão de Festas</span>
             </button>
-            <button
-              className={`nav-item ${location.pathname === '/reservas-churrasqueira' ? 'active' : ''}`}
-              onClick={() => navigate('/reservas-churrasqueira')}
+
+            <button 
+              type="button"
+              className={`sidebar-item ${isRotaAtiva('/reservas-churrasqueira') ? 'ativo' : ''}`}
+              onClick={() => handleNavegar('/reservas-churrasqueira')}
             >
-              Churrasqueira
+              <span className="item-icon">🍖</span>
+              <span>Churrasqueira</span>
             </button>
+          </div>
+
+          {/* Seção Financeira */}
+          <div className="sidebar-secao">
+            <span className="sidebar-secao-titulo">FINANCEIRO</span>
+
             {ehMorador && (
-              <button
-                className={`nav-item ${location.pathname === '/meus-boletos' ? 'active' : ''}`}
-                onClick={() => navigate('/meus-boletos')}
+              <button 
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/meus-boletos') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/meus-boletos')}
               >
-                Meus Boletos
+                <span className="item-icon">📄</span>
+                <span>Meus Boletos</span>
               </button>
             )}
-            {ehSindico && (
-              <button
-                className={`nav-item ${location.pathname === '/gestao-boletos' ? 'active' : ''}`}
-                onClick={() => navigate('/gestao-boletos')}
-              >
-                Boletos
-              </button>
-            )}
-            {ehSindico && (
-              <button
-                className={`nav-item ${location.pathname === '/painel-sindico' ? 'active' : ''}`}
-                onClick={() => navigate('/painel-sindico')}
-              >
-                Painel Síndico
-              </button>
-            )}
-            {ehSindico && (
-              <button
-                className={`nav-item ${location.pathname === '/painel-financeiro' ? 'active' : ''}`}
-                onClick={() => navigate('/painel-financeiro')}
-              >
-                Financeiro
-              </button>
-            )}
-          </>
-        )}
 
-        {/* Atalho global de Gerenciamento (apenas Admin) */}
-        {perfil === 'ADMIN' && (
-          <button
-            className={`nav-item ${location.pathname === '/gerenciamento' ? 'active' : ''}`}
-            onClick={() => navigate('/gerenciamento')}
-          >
-            Gerenciamento
-          </button>
-        )}
+            {ehSindico && (
+              <button 
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/gestao-boletos') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/gestao-boletos')}
+              >
+                <span className="item-icon">🧾</span>
+                <span>Gestão de Boletos</span>
+              </button>
+            )}
 
-        {/* Exibe o atalho do Perfil quando estiver dentro do condomínio ou na seleção */}
-        {!estaNoPerfil && (
+            {ehSindico && (
+              <button 
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/painel-financeiro') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/painel-financeiro')}
+              >
+                <span className="item-icon">📊</span>
+                <span>Painel Financeiro</span>
+              </button>
+            )}
+          </div>
+
+          {/* Seção Gestão e Síndico */}
+          {ehSindico && (
+            <div className="sidebar-secao">
+              <span className="sidebar-secao-titulo">GESTÃO DO CONDOMÍNIO</span>
+
+              <button 
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/moradores') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/moradores')}
+              >
+                <span className="item-icon">👥</span>
+                <span>Moradores & Blocos</span>
+              </button>
+
+              <button 
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/painel-sindico') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/painel-sindico')}
+              >
+                <span className="item-icon">🛡️</span>
+                <span>Painel do Síndico</span>
+              </button>
+            </div>
+          )}
+
+          {/* Seção Exclusiva de Administração Global */}
+          {ehAdmin && (
+            <div className="sidebar-secao">
+              <span className="sidebar-secao-titulo">ADMINISTRAÇÃO GERAL</span>
+
+              <button 
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/gerenciamento') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/gerenciamento')}
+              >
+                <span className="item-icon">🔑</span>
+                <span>Atribuir Gerenciamento</span>
+              </button>
+
+              <button 
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/autorizacao-sindico') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/autorizacao-sindico')}
+              >
+                <span className="item-icon">✍️</span>
+                <span>Autorizar Síndicos</span>
+              </button>
+            </div>
+          )}
+
+          {/* Candidatura (visível apenas para Morador que não é Síndico nem Admin) */}
+          {!ehSindico && (
+            <div className="sidebar-secao">
+              <span className="sidebar-secao-titulo">OPORTUNIDADES</span>
+              <button 
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/permissao-sindico') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/permissao-sindico')}
+              >
+                <span className="item-icon">📝</span>
+                <span>Candidatar a Síndico</span>
+              </button>
+            </div>
+          )}
+        </nav>
+
+        {/* Rodapé da Sidebar */}
+        <div className="sidebar-rodape">
+          <div className="sidebar-usuario-info">
+            <span className="sidebar-avatar">
+              {usuario?.nome ? usuario.nome.charAt(0).toUpperCase() : '👤'}
+            </span>
+            <div className="sidebar-usuario-textos">
+              <span className="sidebar-usuario-nome">{usuario?.nome || 'Usuário Conectado'}</span>
+              <span className="sidebar-usuario-email">{usuario?.email || 'morador@morada.com'}</span>
+            </div>
+          </div>
+
           <button 
-            className={`nav-item ${location.pathname === '/perfil' ? 'active' : ''}`}
-            onClick={() => navigate('/perfil')}
+            type="button"
+            className="btn-sidebar-sair"
+            onClick={handleLogout}
           >
-            Meu Perfil
+            Encerrar Sessão
           </button>
-        )}
-      </nav>
-    </header>
+        </div>
+      </aside>
+    </>
   );
 }

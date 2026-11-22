@@ -116,6 +116,13 @@ app.post(
     usuarioController.reenviarCodigo
 );
 
+// Buscar perfil do usuário autenticado
+app.get(
+    '/usuarios/me',
+    verificarToken,
+    usuarioController.buscarPerfil
+);
+
 // ======================== ROTAS DE CONDOMÍNIOS ========================
 
 // Acessar painel do condomínio pelo morador ou admin
@@ -305,6 +312,13 @@ app.patch(
     '/condominios/:idCondominio/reservas-salao/:id/cancelar',
     verificarToken,
     reservaSalaoController.cancelar
+);
+
+// Obter detalhes de reserva do salão de festas
+app.get(
+    '/condominios/:idCondominio/reservas-salao/:id',
+    verificarToken,
+    reservaSalaoController.obterPorId
 );
 
 // ======================== BOLETOS, SEGUNDA VIA E PAGAMENTO TEMPLATE ========================

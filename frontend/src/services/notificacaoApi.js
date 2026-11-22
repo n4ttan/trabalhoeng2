@@ -46,3 +46,12 @@ export async function publicarNotificacao(dadosNotificacao) {
     body: JSON.stringify(dadosNotificacao)
   });
 }
+
+/*
+ * MARCAR NOTIFICAÇÃO COMO LIDA
+ */
+export async function marcarNotificacaoComoLida(notificacaoId) {
+  return await requisicao(`/notificacoes/${notificacaoId}/lida`, {
+    method: 'PATCH'
+  });
+}

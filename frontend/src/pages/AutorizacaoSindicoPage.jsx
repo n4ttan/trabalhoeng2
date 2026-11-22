@@ -7,7 +7,8 @@ import {
 } from 'react-router-dom';
 
 import {
-    aprovarPedidoSindico
+    aprovarPedidoSindico,
+    reprovarPedidoSindico
 } from '../services/pedidoSindicoApi';
 
 import './AutorizacaoSindicoPage.css';
@@ -17,24 +18,20 @@ function AutorizacaoSindicoPage() {
 
     const navigate = useNavigate();
 
-
     const [
         pedidoId,
         setPedidoId
     ] = useState('');
-
 
     const [
         carregando,
         setCarregando
     ] = useState(false);
 
-
     const [
         mensagem,
         setMensagem
     ] = useState('');
-
 
     const [
         erro,
@@ -42,181 +39,105 @@ function AutorizacaoSindicoPage() {
     ] = useState('');
 
 
-    async function autorizarPedido(event) {
-
-        event.preventDefault();
-
+    async function processarPedido(acao) {
         setMensagem('');
         setErro('');
 
-
         if (!pedidoId) {
-
-            setErro(
-                'Informe o ID do pedido.'
-            );
-
+            setErro('Informe o ID do pedido.');
             return;
-
         }
 
-
-        if (
-            Number.isNaN(
-                Number(pedidoId)
-            ) ||
-            Number(pedidoId) <= 0
-        ) {
-
-            setErro(
-                'Informe um ID de pedido válido.'
-            );
-
+        const idNum = Number(pedidoId);
+        if (Number.isNaN(idNum) || idNum <= 0) {
+            setErro('Informe um ID de pedido válido (número positivo).');
             return;
-
         }
-
 
         try {
+            setCarregando(acao);
 
-            setCarregando(true);
-
-
-            const data =
-                await aprovarPedidoSindico(
-                    pedidoId
-                );
-
-
-            setMensagem(
-                data.mensagem ||
-                'Pedido de síndico aprovado com sucesso!'
-            );
-
+            if (acao === 'aprovar') {
+                const data = await aprovarPedidoSindico(idNum);
+                setMensagem(data.mensagem || 'Pedido de síndico aprovado com sucesso!');
+            } else if (acao === 'reprovar') {
+                const data = await reprovarPedidoSindico(idNum);
+                setMensagem(data.mensagem || 'Pedido de síndico reprovado com sucesso!');
+            }
 
             setPedidoId('');
-
         } catch (error) {
-
-            setErro(
-                error.message ||
-                'Não foi possível aprovar o pedido.'
-            );
-
+            setErro(error.message || `Não foi possível ${acao === 'aprovar' ? 'aprovar' : 'reprovar'} o pedido.`);
         } finally {
-
             setCarregando(false);
-
         }
-
     }
 
 
     function voltar() {
-
         navigate('/');
-
     }
 
 
     return (
-
-        <main className="autorizacao-page">
-
+        <main className="autorizacao-sindico-page">
             <div className="autorizacao-container">
 
-
                 <header className="autorizacao-header">
-
                     <button
                         type="button"
-                        className="autorizacao-voltar"
+                        className="botao-voltar-autorizacao"
                         onClick={voltar}
                     >
                         ← Voltar
                     </button>
 
-
                     <div className="autorizacao-logo">
-
-                        <span>
-                            Morada
-                        </span>
-
-                        <small>
-                            Residências
-                        </small>
-
+                        <span>Morada</span>
+                        <small>Residências</small>
                     </div>
-
                 </header>
 
-
-
                 <section className="autorizacao-card">
-
-
                     <div className="autorizacao-icone">
                         ✓
                     </div>
-
 
                     <span className="autorizacao-etiqueta">
                         ADMINISTRAÇÃO
                     </span>
 
-
                     <h1>
                         Autorizar síndico
                     </h1>
 
-
                     <p className="autorizacao-descricao">
-
-                        Informe o ID do pedido de síndico
-                        para aprovar a solicitação.
-
+                        Informe o ID do pedido de candidatura para aprovar ou reprovar a solicitação de síndico.
                     </p>
 
-
-
                     {erro && (
-
                         <div className="autorizacao-alerta erro">
-
                             ⚠ {erro}
-
                         </div>
-
                     )}
-
-
 
                     {mensagem && (
-
                         <div className="autorizacao-alerta sucesso">
-
                             ✓ {mensagem}
-
                         </div>
-
                     )}
-
-
 
                     <form
                         className="autorizacao-form"
-                        onSubmit={autorizarPedido}
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            processarPedido('aprovar');
+                        }}
                     >
-
-                        <div className="autorizacao-campo">
-
+                        <div className="campo-autorizacao">
                             <label htmlFor="pedidoId">
-
                                 ID do pedido
-
                             </label>
-
 
                             <input
                                 id="pedidoId"
@@ -224,124 +145,72 @@ function AutorizacaoSindicoPage() {
                                 min="1"
                                 value={pedidoId}
                                 onChange={(event) =>
-                                    setPedidoId(
-                                        event.target.value
-                                    )
+                                    setPedidoId(event.target.value)
                                 }
-                                placeholder="Digite o ID do pedido"
+                                placeholder="Digite o ID do pedido (ex: 1)"
                             />
-
+                            <span className="campo-ajuda-autorizacao">
+                                Identificador único do pedido de candidatura registrado no sistema.
+                            </span>
                         </div>
 
+                        <div className="botoes-autorizacao-acoes">
+                            <button
+                                type="submit"
+                                className="botao-autorizar"
+                                disabled={Boolean(carregando)}
+                            >
+                                {carregando === 'aprovar'
+                                    ? 'Aprovando...'
+                                    : 'Aprovar pedido'}
+                            </button>
 
-
-                        <button
-                            type="submit"
-                            className="autorizacao-botao"
-                            disabled={carregando}
-                        >
-
-                            {carregando
-                                ? 'Aprovando...'
-                                : 'Aprovar pedido'}
-
-                        </button>
-
+                            <button
+                                type="button"
+                                className="botao-reprovar-autorizacao"
+                                disabled={Boolean(carregando)}
+                                onClick={() => processarPedido('reprovar')}
+                            >
+                                {carregando === 'reprovar'
+                                    ? 'Reprovando...'
+                                    : 'Reprovar pedido'}
+                            </button>
+                        </div>
                     </form>
 
-
-
                     <div className="autorizacao-info">
-
-                        <div className="autorizacao-info-item">
-
-                            <strong>
-                                1
-                            </strong>
-
+                        <div className="info-autorizacao">
+                            <span>1</span>
                             <div>
-
-                                <b>
-                                    Localize o pedido
-                                </b>
-
-                                <span>
-                                    Utilize o ID da solicitação
-                                    que precisa ser analisada.
-                                </span>
-
+                                <strong>Localize o pedido</strong>
+                                <p>Utilize o ID da solicitação que precisa ser analisada pela administração.</p>
                             </div>
-
                         </div>
 
-
-
-                        <div className="autorizacao-info-item">
-
-                            <strong>
-                                2
-                            </strong>
-
+                        <div className="info-autorizacao">
+                            <span>2</span>
                             <div>
-
-                                <b>
-                                    Confirme a autorização
-                                </b>
-
-                                <span>
-                                    O sistema processará a
-                                    aprovação do pedido.
-                                </span>
-
+                                <strong>Confirme a autorização ou recusa</strong>
+                                <p>O sistema promoverá o usuário a síndico ou registrará a recusa conforme sua escolha.</p>
                             </div>
-
                         </div>
 
-
-
-                        <div className="autorizacao-info-item">
-
-                            <strong>
-                                3
-                            </strong>
-
+                        <div className="info-autorizacao">
+                            <span>3</span>
                             <div>
-
-                                <b>
-                                    Permissão concedida
-                                </b>
-
-                                <span>
-                                    O usuário poderá receber
-                                    as permissões correspondentes.
-                                </span>
-
+                                <strong>Permissão atualizada</strong>
+                                <p>Em caso de aprovação, o morador assume o gerenciamento do condomínio indicado.</p>
                             </div>
-
                         </div>
-
                     </div>
-
-
                 </section>
 
-
-
                 <footer className="autorizacao-footer">
-
-                    Morada Residências · Gestão
-                    condominial simplificada
-
+                    Morada Residências · Gestão condominial simplificada
                 </footer>
-
-
             </div>
-
         </main>
-
     );
-
 }
-
 
 export default AutorizacaoSindicoPage;

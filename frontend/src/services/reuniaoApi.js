@@ -43,3 +43,10 @@ export async function criarReuniaoCondominio(idCondominio, dadosReuniao) {
     body: JSON.stringify(dadosReuniao)
   });
 }
+
+// Cancela / Exclui uma reunião marcada (Síndico/Admin)
+export async function deletarReuniaoCondominio(idCondominio, reuniaoId) {
+  return await requisicao(`/condominios/${idCondominio}/reunioes/${reuniaoId}`, {
+    method: 'DELETE'
+  });
+}

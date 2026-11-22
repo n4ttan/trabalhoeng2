@@ -18,6 +18,8 @@ import NotificacoesPage from './pages/NotificacoesPage';
 import CondominiosPage from './pages/CondominiosPage';
 import ReunioesPage from './pages/ReunioesPage';
 import ReservasChurrasqueiraPage from './pages/ReservasChurrasqueiraPage';
+import ReservasSalaoPage from './pages/ReservasSalaoPage';
+import MoradoresPage from './pages/MoradoresPage';
 import MeusBoletosPage from './pages/MeusBoletosPage';
 import GestaoBoletosPage from './pages/GestaoBoletosPage';
 import PainelFinanceiroPage from './pages/PainelFinanceiroPage';
@@ -62,6 +64,12 @@ function App() {
 
                 {/* Reservas de Churrasqueira */}
                 <Route path="/reservas-churrasqueira" element={<RotaProtegida><ReservasChurrasqueiraPage /></RotaProtegida>} />
+
+                {/* Reservas de Salão de Festas */}
+                <Route path="/reservas-salao" element={<RotaProtegida><ReservasSalaoPage /></RotaProtegida>} />
+
+                {/* Gestão de Moradores e Blocos (Síndico/Admin) */}
+                <Route path="/moradores" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><MoradoresPage /></RotaProtegida>} />
 
                 {/* Boletos do morador */}
                 <Route path="/meus-boletos" element={<RotaProtegida perfis={['MORADOR', 'ADMIN']}><MeusBoletosPage /></RotaProtegida>} />
