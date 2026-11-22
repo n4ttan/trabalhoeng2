@@ -196,26 +196,30 @@
 }
 
 .btn-primary {
-    background: #2563eb;
-
+    background: #1d4ed8;
     color: white;
-
+    border: 1.5px solid #1e3a8a;
     box-shadow:
-        0 8px 20px rgba(37, 99, 235, 0.2);
+        0 8px 20px rgba(29, 78, 216, 0.3);
 }
 
 .btn-primary:hover {
-    background: #1d4ed8;
-
+    background: #1e40af;
+    border-color: #172554;
     transform: translateY(-1px);
+    box-shadow:
+        0 10px 24px rgba(29, 78, 216, 0.4);
 }
 
 .btn-secondary {
-    border: 1px solid #d0d5dd;
-
+    border: 2px solid #1d4ed8;
     background: white;
+    color: #1d4ed8;
+}
 
-    color: #344054;
+.btn-secondary:hover {
+    background: #1d4ed8;
+    color: white;
 }
 
 .btn-secondary:hover {

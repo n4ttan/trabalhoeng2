@@ -435,16 +435,18 @@
 }
 
 .sidebar-item:hover {
-  background-color: #1e293b;
+  background-color: #1e3a8a;
   color: #ffffff;
   transform: translateX(4px);
+  border-left: 3px solid #60a5fa;
 }
 
 .sidebar-item.ativo {
-  background-color: #2563eb;
-  color: #ffffff;
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  border-left: 3px solid #93c5fd;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.45);
 }
 
 .item-icon {

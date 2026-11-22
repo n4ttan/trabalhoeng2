@@ -122,20 +122,23 @@
 
 .btn-entrar {
   width: 100%;
-  background-color: #2563eb;
+  background-color: #1d4ed8;
   color: #ffffff;
-  border: none;
+  border: 1.5px solid #1e3a8a;
   padding: 12px;
   border-radius: 8px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   margin-top: 8px;
-  transition: background-color 0.2s ease;
+  box-shadow: 0 2px 4px rgba(29, 78, 216, 0.25);
+  transition: all 0.2s ease;
 }
 
 .btn-entrar:hover {
-  background-color: #1d4ed8;
+  background-color: #1e40af;
+  border-color: #172554;
+  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.35);
 }
 
 .btn-entrar:disabled {

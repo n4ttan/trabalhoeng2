@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "seed": "node scripts/criar_condominios_teste.js"
   },
   "keywords": [],
   "author": "",
