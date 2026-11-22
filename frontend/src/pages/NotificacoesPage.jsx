@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { listarNotificacoes, publicarNotificacao } from '../services/notificacaoApi';
+import { listarNotificacoes, publicarNotificacao, marcarNotificacaoComoLida } from '../services/notificacaoApi';
 import './NotificacoesPage.css';
 
 function decodificarToken(token) {
@@ -147,6 +147,19 @@ export default function NotificacoesPage() {
 
     return true;
   });
+
+  const handleMarcarLida = async (id) => {
+    try {
+      await marcarNotificacaoComoLida(id);
+      setAvisos((prev) =>
+        prev.map((a) =>
+          (a.id === id || a.idNotificacao === id) ? { ...a, lida: true } : a
+        )
+      );
+    } catch (err) {
+      setErro(err.message || 'Erro ao marcar notificação como lida.');
+    }
+  };
 
   if (loading) {
     return (
@@ -369,6 +382,18 @@ export default function NotificacoesPage() {
                 <p className="card-aviso-mensagem">
                   {aviso.mensagem || aviso.descricao}
                 </p>
+
+                {!aviso.lida && (
+                  <div className="card-aviso-acoes">
+                    <button
+                      type="button"
+                      className="btn-marcar-lida"
+                      onClick={() => handleMarcarLida(aviso.id || aviso.idNotificacao)}
+                    >
+                      ✓ Marcar como lida
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })

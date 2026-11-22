@@ -1,0 +1,401 @@
+.salao-page {
+  min-height: calc(100vh - 64px);
+  background-color: #f8fafc;
+  padding: 30px 20px;
+  color: #1e293b;
+}
+
+.salao-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Banner de Topo */
+.salao-banner {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 16px;
+  padding: 32px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+}
+
+.salao-badge-topo {
+  display: inline-block;
+  background-color: #2563eb;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.salao-banner-texto h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.salao-banner-texto p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 15px;
+  max-width: 650px;
+  line-height: 1.5;
+}
+
+.salao-banner-ilustracao {
+  font-size: 56px;
+  padding: 10px 20px;
+  user-select: none;
+}
+
+/* Alertas */
+.salao-alerta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.salao-alerta p {
+  margin: 0;
+}
+
+.salao-alerta--sucesso {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.salao-alerta--erro {
+  background-color: #fff1f2;
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+}
+
+/* Layout em Grid */
+.salao-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.salao-card {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.salao-card-header h2 {
+  margin: 0 0 4px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.salao-card-header p {
+  margin: 0 0 20px 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.salao-header-com-filtro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Filtro por Botões */
+.salao-filtro-botoes {
+  display: flex;
+  gap: 6px;
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.btn-filtro {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-filtro.ativo {
+  background-color: #1d4ed8;
+  color: #ffffff;
+  border: 1px solid #1e3a8a;
+  box-shadow: 0 2px 6px rgba(29, 78, 216, 0.35);
+}
+
+/* Formulário */
+.salao-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.salao-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.salao-campo label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.salao-campo input {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.salao-campo input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.salao-dupla-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.salao-regras {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.salao-regras strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #1e293b;
+}
+
+.salao-regras ul {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.5;
+}
+
+.salao-btn-submeter {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 4px;
+}
+
+.salao-btn-submeter:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.salao-btn-submeter:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Tabela de Reservas */
+.salao-tabela-wrapper {
+  overflow-x: auto;
+}
+
+.salao-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.salao-tabela th {
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.salao-tabela td {
+  padding: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.linha-cancelada {
+  opacity: 0.6;
+  background-color: #f8fafc;
+}
+
+.horario-badge {
+  display: inline-block;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.morador-info-celula {
+  display: flex;
+  flex-direction: column;
+}
+
+.morador-info-celula small {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.status-badge-salao {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-confirmada {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.status-cancelada {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-cancelar-salao {
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #e11d48;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancelar-salao:hover {
+  background-color: #e11d48;
+  color: #ffffff;
+}
+
+.sem-acao {
+  color: #cbd5e1;
+}
+
+/* Estado Vazio */
+.salao-vazio,
+.salao-carregando {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+}
+
+.salao-vazio span {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.salao-vazio h3 {
+  margin: 0 0 6px 0;
+  color: #1e293b;
+  font-size: 16px;
+}
+
+/* Sem Condomínio Selecionado */
+.salao-sem-condo {
+  max-width: 500px;
+  margin: 60px auto;
+  text-align: center;
+  background-color: #ffffff;
+  padding: 40px 30px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.salao-icone-aviso {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.salao-sem-condo h2 {
+  margin: 0 0 10px 0;
+  color: #0f172a;
+  font-size: 22px;
+}
+
+.salao-sem-condo p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.salao-btn-selecionar {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.salao-btn-selecionar:hover {
+  background-color: #1d4ed8;
+}
+
+@media (max-width: 900px) {
+  .salao-grid {
+    grid-template-columns: 1fr;
+  }
+}

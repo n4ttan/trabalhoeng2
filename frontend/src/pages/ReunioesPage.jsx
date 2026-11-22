@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listarReunioesCondominio, criarReuniaoCondominio } from '../services/reuniaoApi';
+import { listarReunioesCondominio, criarReuniaoCondominio, deletarReuniaoCondominio } from '../services/reuniaoApi';
+import { obterPerfil } from '../services/authApi';
 import './ReunioesPage.css';
 
 export default function ReunioesPage() {
   const [reunioes, setReunioes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
+  const [sucesso, setSucesso] = useState('');
   const [exibirForm, setExibirForm] = useState(false);
+  const [processando, setProcessando] = useState(false);
 
   // Form states
   const [titulo, setTitulo] = useState('');
@@ -16,6 +19,9 @@ export default function ReunioesPage() {
   const [localLink, setLocalLink] = useState('');
 
   const navigate = useNavigate();
+  const perfil = obterPerfil();
+  const ehSindicoOuAdmin = perfil === 'SINDICO' || perfil === 'ADMIN';
+
   const condoSalvo = localStorage.getItem('morada_condominio_ativo');
   const condominioAtivo = condoSalvo ? JSON.parse(condoSalvo) : null;
 
@@ -41,21 +47,48 @@ export default function ReunioesPage() {
 
   const handleCriarReuniao = async (e) => {
     e.preventDefault();
+    setErro('');
+    setSucesso('');
+
     try {
+      setProcessando(true);
       await criarReuniaoCondominio(condominioAtivo.id, {
         titulo,
         pauta,
         data_hora: dataHora,
         local_link: localLink
       });
+      setSucesso('Reunião agendada com sucesso!');
       setTitulo('');
       setPauta('');
       setDataHora('');
       setLocalLink('');
       setExibirForm(false);
-      carregarReunioes();
+      await carregarReunioes();
     } catch (err) {
-      alert(err.message || 'Erro ao agendar reunião.');
+      setErro(err.message || 'Erro ao agendar reunião.');
+    } finally {
+      setProcessando(false);
+    }
+  };
+
+  const handleCancelarReuniao = async (reuniaoId) => {
+    if (!window.confirm('Tem certeza que deseja cancelar esta reunião?')) {
+      return;
+    }
+
+    setErro('');
+    setSucesso('');
+
+    try {
+      setProcessando(true);
+      await deletarReuniaoCondominio(condominioAtivo.id, reuniaoId);
+      setSucesso('Reunião cancelada com sucesso!');
+      await carregarReunioes();
+    } catch (err) {
+      setErro(err.message || 'Erro ao cancelar reunião.');
+    } finally {
+      setProcessando(false);
     }
   };
 
@@ -68,15 +101,18 @@ export default function ReunioesPage() {
           <h2>📅 Reuniões Marcadas — {condominioAtivo.nome}</h2>
           <p>Assembleias e encontros agendados para os moradores.</p>
         </div>
-        <button 
-          className="btn-nova-reuniao" 
-          onClick={() => setExibirForm(!exibirForm)}
-        >
-          {exibirForm ? 'Cancelar' : '+ Agendar Reunião'}
-        </button>
+        {ehSindicoOuAdmin && (
+          <button 
+            className="btn-nova-reuniao" 
+            onClick={() => setExibirForm(!exibirForm)}
+          >
+            {exibirForm ? 'Fechar Formulário' : '+ Agendar Reunião'}
+          </button>
+        )}
       </div>
 
-      {erro && <div className="alerta-erro">{erro}</div>}
+      {erro && <div className="alerta-erro">⚠️ {erro}</div>}
+      {sucesso && <div className="alerta-sucesso" style={{ backgroundColor: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px', fontWeight: 'bold' }}>✓ {sucesso}</div>}
 
       {exibirForm && (
         <form className="form-reuniao" onSubmit={handleCriarReuniao}>
@@ -118,7 +154,9 @@ export default function ReunioesPage() {
               placeholder="Assuntos a serem debatidos..." 
             />
           </div>
-          <button type="submit" className="btn-salvar-reuniao">Salvar e Notificar Moradores</button>
+          <button type="submit" className="btn-salvar-reuniao" disabled={processando}>
+            {processando ? 'Agendando...' : 'Salvar e Notificar Moradores'}
+          </button>
         </form>
       )}
 
@@ -132,18 +170,42 @@ export default function ReunioesPage() {
             </div>
           ) : (
             reunioes.map((item) => (
-              <div key={item.id} className="card-reuniao">
-                <div className="card-reuniao-data">
-                  <span className="icon-calendar">📅</span>
-                  <span>{new Date(item.data_hora).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</span>
+              <div key={item.id} className="card-reuniao" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ flex: 1 }}>
+                  <div className="card-reuniao-data">
+                    <span className="icon-calendar">📅</span>
+                    <span>{new Date(item.data_hora).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</span>
+                  </div>
+                  <div className="card-reuniao-conteudo">
+                    <h4>{item.titulo}</h4>
+                    <p><strong>Pauta:</strong> {item.pauta || 'Sem pauta informada.'}</p>
+                    {item.local_link && (
+                      <p className="local-tag">📍 <strong>Local/Link:</strong> {item.local_link}</p>
+                    )}
+                  </div>
                 </div>
-                <div className="card-reuniao-conteudo">
-                  <h4>{item.titulo}</h4>
-                  <p><strong>Pauta:</strong> {item.pauta || 'Sem pauta informada.'}</p>
-                  {item.local_link && (
-                    <p className="local-tag">📍 <strong>Local/Link:</strong> {item.local_link}</p>
-                  )}
-                </div>
+                {ehSindicoOuAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => handleCancelarReuniao(item.id)}
+                    disabled={processando}
+                    style={{
+                      backgroundColor: '#fff1f2',
+                      border: '1px solid #fecdd3',
+                      color: '#e11d48',
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      marginLeft: '14px',
+                      whiteSpace: 'nowrap'
+                    }}
+                    title="Cancelar esta reunião"
+                  >
+                    🗑️ Cancelar Reunião
+                  </button>
+                )}
               </div>
             ))
           )}

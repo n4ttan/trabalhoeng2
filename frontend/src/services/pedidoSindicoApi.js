@@ -97,14 +97,31 @@ export async function criarPedidoSindico(
 
 
 /*
- * APROVAR PEDIDO DE SÍNDICO
+ * APROVAR PEDIDO DE SÍNDICO (ADMIN)
  */
 export async function aprovarPedidoSindico(
     pedidoId
 ) {
 
     return await requisicao(
-        `/pedidos-sindico/${pedidoId}/aprovar`,
+        `/admin/pedidos-sindico/${pedidoId}/aprovar`,
+        {
+            method: 'PATCH'
+        }
+    );
+
+}
+
+
+/*
+ * REPROVAR PEDIDO DE SÍNDICO (ADMIN)
+ */
+export async function reprovarPedidoSindico(
+    pedidoId
+) {
+
+    return await requisicao(
+        `/admin/pedidos-sindico/${pedidoId}/reprovar`,
         {
             method: 'PATCH'
         }

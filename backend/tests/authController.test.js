@@ -50,10 +50,12 @@ describe('authController - login', () => {
             ['teste@email.com']
         );
 
-        expect(res.json).toHaveBeenCalledWith({
-            mensagem: 'Login realizado com sucesso!',
-            token: 'token-fake-123'
-        });
+        expect(res.json).toHaveBeenCalledWith(
+            expect.objectContaining({
+                mensagem: 'Login realizado com sucesso!',
+                token: 'token-fake-123'
+            })
+        );
     });
 
     it('grava id_condominio no token, o mesmo campo lido pelos middlewares', async () => {

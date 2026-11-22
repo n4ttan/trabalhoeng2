@@ -41,7 +41,18 @@ async function login(req, res){
 
         return res.json({
             mensagem: 'Login realizado com sucesso!',
-            token: token
+            token: token,
+            usuario: {
+                id: usuario.id,
+                nome: usuario.nome,
+                email: usuario.email,
+                perfil: usuario.perfil,
+                id_condominio: usuario.id_condominio,
+                id_bloco: usuario.id_bloco,
+                bloco: usuario.bloco,
+                unidade: usuario.unidade,
+                status_cadastro: usuario.status_cadastro
+            }
         });
     }
     catch(error){
@@ -50,4 +61,4 @@ async function login(req, res){
     }
 }
 
-module.exports = { login };""
+module.exports = { login };

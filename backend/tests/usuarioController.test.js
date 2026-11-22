@@ -8,6 +8,8 @@ jest.mock('../src/services/usuarioService', () => ({
     listarPendentes: jest.fn(),
     aprovarMorador: jest.fn(),
     rejeitarMorador: jest.fn(),
+    rebaixarUsuario: jest.fn(),
+    buscarPerfil: jest.fn()
 }));
 
 jest.mock('../src/services/emailService', () => ({
@@ -1012,5 +1014,45 @@ describe('escopo por condomínio (síndico x admin)', () => {
 
         expect(usuarioService[metodo]).not.toHaveBeenCalled();
         expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+    describe('buscarPerfil', () => {
+        it('deve retornar dados do perfil do usuário autenticado', async () => {
+            const req = { usuario: { id: 10, perfil: 'MORADOR' } };
+            const res = novoRes();
+            const perfilMock = { id: 10, nome: 'Ana', email: 'ana@teste.com', perfil: 'MORADOR' };
+
+            usuarioService.buscarPerfil.mockResolvedValue(perfilMock);
+
+            await usuarioController.buscarPerfil(req, res);
+
+            expect(usuarioService.buscarPerfil).toHaveBeenCalledWith(10);
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(perfilMock);
+        });
+
+        it('deve retornar 401 se req.usuario não existir', async () => {
+            const req = {};
+            const res = novoRes();
+
+            await usuarioController.buscarPerfil(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(401);
+            expect(res.json).toHaveBeenCalledWith({ erro: 'Usuário não autenticado.' });
+        });
+
+        it('deve retornar erro tratado quando o serviço falhar', async () => {
+            const req = { usuario: { id: 10 } };
+            const res = novoRes();
+            const erro = new Error('Usuário não encontrado.');
+            erro.status = 404;
+
+            usuarioService.buscarPerfil.mockRejectedValue(erro);
+
+            await usuarioController.buscarPerfil(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ erro: 'Usuário não encontrado.' }));
+        });
     });
 });

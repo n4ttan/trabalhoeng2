@@ -4,11 +4,13 @@ jest.mock('../src/repositories/usuarioRepository', () => ({
     excluirUsuarioEPedido: jest.fn(),
     salvarTokenValidacao: jest.fn(),
     buscarPorEmail: jest.fn(),
+    buscarPorId: jest.fn(),
     reservarTentativaValidacao: jest.fn(),
     confirmarEmail: jest.fn(),
     listarPendentes: jest.fn(),
     aprovarMorador: jest.fn(),
     rejeitarMorador: jest.fn(),
+    rebaixarUsuario: jest.fn()
 }));
 
 jest.mock('../src/services/emailService', () => ({
@@ -521,5 +523,32 @@ describe('reenviarCodigo', () => {
         expect(erro.codigo).toBe('EMAIL_INVALIDO');
         expect(erro.status).toBe(400);
         expect(usuarioRepository.buscarPorEmail).not.toHaveBeenCalled();
+    });
+
+    describe('buscarPerfil', () => {
+        it('deve buscar perfil por id com sucesso', async () => {
+            const perfilMock = { id: 5, nome: 'Carlos', email: 'carlos@teste.com' };
+            usuarioRepository.buscarPorId.mockResolvedValue(perfilMock);
+
+            const resultado = await usuarioService.buscarPerfil(5);
+
+            expect(usuarioRepository.buscarPorId).toHaveBeenCalledWith(5);
+            expect(resultado).toEqual(perfilMock);
+        });
+
+        it('deve lançar ID_INVALIDO se o id for inválido ou menor/igual a zero', async () => {
+            await expect(usuarioService.buscarPerfil('abc'))
+                .rejects.toMatchObject({ status: 400, codigo: 'ID_INVALIDO' });
+
+            await expect(usuarioService.buscarPerfil(0))
+                .rejects.toMatchObject({ status: 400, codigo: 'ID_INVALIDO' });
+        });
+
+        it('deve lançar USUARIO_NAO_ENCONTRADO se o usuário não existir', async () => {
+            usuarioRepository.buscarPorId.mockResolvedValue(null);
+
+            await expect(usuarioService.buscarPerfil(99))
+                .rejects.toMatchObject({ status: 404, codigo: 'USUARIO_NAO_ENCONTRADO' });
+        });
     });
 });

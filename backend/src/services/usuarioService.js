@@ -260,6 +260,20 @@ async function rebaixarUsuario(usuarioId) {
     return { mensagem: "Privilégios revogados. Usuário rebaixado para morador." };
 }
 
+async function buscarPerfil(usuarioId) {
+    const id = Number(usuarioId);
+    if (!id || id <= 0) {
+        throw erroNegocio(400, 'ID_INVALIDO', 'ID de usuário inválido.');
+    }
+
+    const usuario = await usuarioRepository.buscarPorId(id);
+    if (!usuario) {
+        throw erroNegocio(404, 'USUARIO_NAO_ENCONTRADO', 'Usuário não encontrado.');
+    }
+
+    return usuario;
+}
+
 module.exports = {
     criarUsuario,
     criarMorador,
@@ -271,5 +285,6 @@ module.exports = {
     listarPendentes,
     aprovarMorador,
     rejeitarMorador,
-    rebaixarUsuario
+    rebaixarUsuario,
+    buscarPerfil
 };

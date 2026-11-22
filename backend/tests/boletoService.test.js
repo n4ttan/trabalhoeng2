@@ -316,7 +316,7 @@ describe('boletoService', () => {
                 bloco: 'A',
                 mes_referencia: '11/2026',
                 valor: 350.00,
-                data_vencimento: '2026-11-20',
+                data_vencimento: '2099-12-31',
                 status: 'PENDENTE',
                 condominio_nome: 'Residencial Flores'
             };

@@ -1,0 +1,604 @@
+.moradores-page {
+  min-height: calc(100vh - 64px);
+  background-color: #f8fafc;
+  padding: 30px 20px;
+  color: #1e293b;
+}
+
+.moradores-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Banner */
+.moradores-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 16px;
+  padding: 30px 32px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+}
+
+.moradores-tag {
+  display: inline-block;
+  background-color: #3b82f6;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.moradores-banner h1 {
+  margin: 0 0 6px 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.moradores-banner p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 14px;
+  max-width: 600px;
+}
+
+.moradores-resumo-numeros {
+  display: flex;
+  gap: 16px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 14px 22px;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 100px;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: 26px;
+  color: #38bdf8;
+}
+
+.stat-card span {
+  font-size: 11px;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Alertas */
+.moradores-alerta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.moradores-alerta p {
+  margin: 0;
+}
+
+.moradores-alerta--sucesso {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.moradores-alerta--erro {
+  background-color: #fff1f2;
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+}
+
+/* Abas */
+.moradores-abas {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.aba-btn {
+  background: transparent;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.aba-btn:hover {
+  background-color: #e0e7ff;
+  color: #1d4ed8;
+}
+
+.aba-btn.ativa {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #1e3a8a !important;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.35);
+}
+
+/* Painel de Conteúdo */
+.moradores-painel {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Barra de Filtros */
+.moradores-filtros-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filtro-pesquisa {
+  flex: 1;
+  min-width: 260px;
+}
+
+.filtro-pesquisa input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filtro-pesquisa input:focus {
+  border-color: #3b82f6;
+}
+
+.filtro-bloco-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filtro-bloco-select label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.filtro-bloco-select select {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  outline: none;
+  background-color: #ffffff;
+}
+
+/* Tabela de Moradores */
+.moradores-tabela-responsive {
+  overflow-x: auto;
+}
+
+.moradores-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.moradores-tabela th {
+  padding: 12px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.moradores-tabela td {
+  padding: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.morador-nome-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.morador-avatar-circulo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.bloco-tag {
+  display: inline-block;
+  background-color: #f1f5f9;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.status-cadastro-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.status-aprovado {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.status-pendente_aprovacao {
+  background-color: #fef9c3;
+  color: #a16207;
+}
+
+.status-aguardando_email {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.btn-editar-bloco {
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-editar-bloco:hover {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* Painel de Formulário de Adicionar Morador */
+.painel-formulario-adicionar {
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.painel-formulario-adicionar h2 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.painel-formulario-adicionar p {
+  margin: 0 0 24px 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.form-adicionar-morador {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.campo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-form label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.campo-form input,
+.campo-form select {
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background-color: #ffffff;
+  color: #0f172a;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo-form input:focus,
+.campo-form select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.campo-form small {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.dupla-campos-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.btn-confirmar-adicao {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-confirmar-adicao:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+/* Painel de Blocos Grid */
+.painel-blocos-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.painel-criar-bloco h2,
+.painel-lista-blocos h2 {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.painel-criar-bloco p {
+  margin: 0 0 18px 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.form-novo-bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.btn-salvar-bloco {
+  background-color: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 11px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-salvar-bloco:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.cards-blocos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.card-bloco-item {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.bloco-icon-card {
+  font-size: 24px;
+}
+
+.bloco-info-card h3 {
+  margin: 0 0 3px 0;
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.bloco-info-card span {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-card {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 26px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.btn-fechar-modal {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.modal-morador-sub {
+  margin: 0 0 20px 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.form-modal-edicao {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-cancelar-modal {
+  background: transparent;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-salvar-modal {
+  background-color: #2563eb;
+  border: none;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-salvar-modal:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+/* Sem condomínio */
+.moradores-sem-condo,
+.moradores-vazio,
+.moradores-carregando,
+.blocos-vazio {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+}
+
+.moradores-sem-condo {
+  max-width: 500px;
+  margin: 60px auto;
+  background-color: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.moradores-sem-condo span {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.moradores-sem-condo h2 {
+  margin: 0 0 8px 0;
+  color: #0f172a;
+}
+
+.moradores-sem-condo p {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+}
+
+.btn-ir-condominios {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 850px) {
+  .moradores-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .painel-blocos-grid {
+    grid-template-columns: 1fr;
+  }
+}

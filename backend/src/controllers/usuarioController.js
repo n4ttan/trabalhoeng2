@@ -224,6 +224,20 @@ async function rebaixarUsuario(req, res) {
     }
 }
 
+async function buscarPerfil(req, res) {
+    try {
+        if (!req.usuario || !req.usuario.id) {
+            return res.status(401).json({ erro: 'Usuário não autenticado.' });
+        }
+
+        const usuario = await usuarioService.buscarPerfil(req.usuario.id);
+        return res.status(200).json(usuario);
+    } catch (error) {
+        console.error('Erro ao buscar perfil do usuário:', error);
+        return responderErro(res, error, 'Erro ao buscar perfil do usuário.');
+    }
+}
+
 module.exports = {
     criarUsuario,
     criarMorador,
@@ -233,5 +247,6 @@ module.exports = {
     listarPendentes,
     aprovarMorador,
     rejeitarMorador,
-    rebaixarUsuario
+    rebaixarUsuario,
+    buscarPerfil
 };

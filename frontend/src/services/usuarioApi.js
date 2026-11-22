@@ -97,3 +97,17 @@ export async function buscarPerfilUsuario() {
     return await requisicao('/usuarios/me');
 
 }
+
+/*
+ * REBAIXAR USUÁRIO (ADMIN)
+ */
+export async function rebaixarUsuario(usuarioId) {
+
+    return await requisicao(
+        `/admin/usuarios/${usuarioId}/rebaixar`,
+        {
+            method: 'PATCH'
+        }
+    );
+
+}
