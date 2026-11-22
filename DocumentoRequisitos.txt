@@ -15,162 +15,843 @@ Documento de Requisitos do Sistema
 Morada Residências
 
 ---------------------------------------------------------------------------------------------------------------------
+Documento de Requisitos do Sistema
+Morada Residências
+Versão 4.0
 
-DESCRIÇÃO DO DOCUMENTO DE REQUISITOS DO SISTEMA
+Conteúdo
+1. Introdução
+   1.1 Visão geral do documento
+   1.2 Convenções, termos e abreviações
+   1.2.1 Identificação dos requisitos
+   1.2.2 Prioridades dos requisitos
+2. Descrição geral do sistema
+   2.1 Abrangência e sistemas relacionados
+3. Requisitos funcionais (casos de uso)
+4. Requisitos não funcionais
+5. Referências
 
-O documento de requisitos do sistema Morada Residências apresenta as principais funcionalidades e 
-características necessárias para o funcionamento da aplicação. Seu objetivo é especificar os requisitos 
-funcionais e não funcionais, descrevendo os comportamentos esperados, as condições de utilização e as 
-tecnologias utilizadas no desenvolvimento do sistema.
+1. Introdução
+O sistema Morada Residências tem como objetivo facilitar o gerenciamento de condomínios residenciais, oferecendo recursos para o cadastro de usuários, controle de acesso, aprovação de moradores, gerenciamento de condomínios e blocos, comunicação entre usuários e administração de atividades condominiais.
 
-O sistema tem como finalidade facilitar o gerenciamento de condomínios residenciais, oferecendo recursos 
-para cadastro de usuários, autenticação, validação de e-mail, aprovação de cadastros, gerenciamento de 
-condomínios e blocos, administração de síndicos e gerenciamento de notificações.
+A aplicação possui uma interface web desenvolvida com React e Vite, além de um servidor construído com Node.js e Express. O sistema utiliza banco de dados MySQL para armazenar as informações e mecanismos de autenticação baseados em JWT para controlar o acesso dos usuários.
 
----------------------------------------------------------------------------------------------------------------------
+O sistema também possui funcionalidades relacionadas à validação de e-mail, aprovação de cadastros, solicitações para atuação como síndico, gerenciamento de notificações, reuniões, reservas de espaços comuns e controle de boletos condominiais.
 
-DESCRIÇÃO DOS REQUISITOS FUNCIONAIS
+Além disso, utiliza Socket.IO para permitir comunicação em tempo real e a plataforma Brevo para o envio de mensagens de validação de e-mail.
+1.1 Visão geral do documento
+Este documento apresenta os requisitos funcionais e não funcionais do sistema Morada Residências, descrevendo suas principais funcionalidades, seus comportamentos esperados e as condições necessárias para sua utilização.
 
-1. RF01 – CADASTRO DE USUÁRIO
-Permite que novos usuários realizem seu cadastro no sistema, preenchendo as informações solicitadas. 
-Após o envio, o cadastro segue para a etapa de validação de e-mail.
+O documento está organizado em seções que apresentam a introdução, a descrição geral do sistema, os requisitos funcionais organizados em casos de uso, os requisitos não funcionais e as referências utilizadas.
+1.2 Convenções, termos e abreviações
+RF: Requisito Funcional.
 
-2. RF02 – VALIDAÇÃO DE ENDEREÇO DE E-MAIL
-Permite que o usuário confirme seu endereço eletrônico por meio de um código de verificação enviado ao 
-e-mail informado durante o cadastro.
+RNF: Requisito Não Funcional.
 
-3. RF03 – REENVIO DO CÓDIGO DE VERIFICAÇÃO
-Permite solicitar um novo código de verificação quando necessário, respeitando o intervalo mínimo estabelecido 
-pelo sistema.
+Usuário: Pessoa cadastrada ou que deseja realizar cadastro no sistema.
 
-4. RF04 – AUTENTICAÇÃO DE USUÁRIO
-Permite que usuários cadastrados realizem login utilizando suas credenciais, verificando as informações antes 
-de conceder acesso ao sistema.
+Morador: Usuário vinculado a um condomínio residencial.
 
-5. RF05 – CONTROLE DA SITUAÇÃO DO CADASTRO
-Responsável por acompanhar e atualizar o estado dos cadastros, utilizando as situações AGUARDANDO_EMAIL, 
-PENDENTE_APROVACAO, APROVADO e REJEITADO.
+Síndico: Usuário responsável por atividades administrativas do condomínio, conforme as permissões previstas no sistema.
 
-6. RF06 – CONSULTA DE CADASTROS PENDENTES
-Permite que usuários autorizados consultem os cadastros que aguardam aprovação administrativa.
+Administrador: Usuário responsável por operações administrativas da plataforma.
 
-7. RF07 – APROVAÇÃO DE CADASTRO
-Permite que usuários autorizados aprovem cadastros pendentes, atualizando sua situação para APROVADO.
+Condomínio: Conjunto residencial administrado por meio do sistema.
 
-8. RF08 – REJEIÇÃO DE CADASTRO
-Permite que usuários autorizados rejeitem cadastros pendentes, atualizando sua situação para REJEITADO.
+Bloco: Divisão ou agrupamento de unidades pertencente a um condomínio.
 
-9. RF09 – ARMAZENAMENTO DAS INFORMAÇÕES
-Responsável por armazenar e recuperar as informações necessárias ao funcionamento da aplicação utilizando 
-o banco de dados MySQL.
+Unidade: Apartamento ou residência vinculada a um morador.
 
-10. RF10 – COMUNICAÇÃO ENTRE INTERFACE E SERVIDOR
-Permite a troca de informações entre a interface web e o servidor, por meio do envio de solicitações e 
-recebimento de respostas.
+Boleto: Documento utilizado para representar uma cobrança condominial.
 
-11. RF11 – ENVIO DE MENSAGENS POR E-MAIL
-Responsável por solicitar o envio de mensagens relacionadas ao processo de validação de endereço eletrônico 
-por meio de um serviço externo.
+Autenticação: Processo de verificação da identidade de um usuário.
 
-12. RF12 – COMUNICAÇÃO EM TEMPO REAL
-Permite a comunicação em tempo real entre cliente e servidor utilizando Socket.IO, possibilitando a transmissão 
-e o recebimento de eventos.
+JWT: JSON Web Token, utilizado para representar informações de autenticação.
 
-13. RF13 – SOLICITAÇÃO PARA SE TORNAR SÍNDICO
-Permite que um usuário solicite autorização para atuar como síndico, registrando o pedido e associando-o à sua conta.
+API: Interface que permite a comunicação entre diferentes partes do sistema.
 
-14. RF14 – CONSULTA E ANÁLISE DE PEDIDOS DE SÍNDICO
-Permite que usuários autorizados consultem solicitações para se tornar síndico e registrem decisões de aprovação 
-ou reprovação.
+MySQL: Sistema gerenciador de banco de dados utilizado pela aplicação.
 
-15. RF15 – CADASTRO E CONSULTA DE CONDOMÍNIOS
-Permite cadastrar novos condomínios e consultar as informações registradas, respeitando as permissões e 
-validações do sistema.
+Socket.IO: Tecnologia utilizada para permitir comunicação em tempo real entre cliente e servidor.
 
-16. RF16 – REMOÇÃO DE CONDOMÍNIOS
-Permite que usuários autorizados removam condomínios, respeitando as regras de integridade dos dados e os 
-vínculos existentes.
+Código de verificação: Código enviado ao e-mail do usuário para confirmar o endereço eletrônico.
+1.2.1 Identificação dos requisitos
+Os requisitos são identificados por siglas e números sequenciais.
 
-17. RF17 – CADASTRO E CONSULTA DE BLOCOS
-Permite criar e consultar blocos associados a um condomínio, garantindo que o condomínio relacionado exista.
+RF01, RF02, RF03...: identificam os requisitos funcionais.
 
-18. RF18 – ASSOCIAÇÃO DE SÍNDICOS A CONDOMÍNIOS E BLOCOS
-Permite associar síndicos a condomínios e blocos, definindo o escopo de gerenciamento de cada responsável.
+RNF01, RNF02, RNF03...: identificam os requisitos não funcionais.
 
-19. RF19 – NOTIFICAÇÕES
-Permite criar e consultar notificações, além de definir seus respectivos destinatários conforme as regras 
-de autorização da aplicação.
+Cada requisito descreve uma funcionalidade ou característica esperada do sistema.
+1.2.2 Prioridades dos requisitos
+Os requisitos são classificados conforme sua importância para o funcionamento do sistema.
 
-20. RF20 – REGISTRO DE LEITURA DE NOTIFICAÇÕES
-Responsável por registrar se uma notificação foi lida por determinado destinatário, mantendo o estado de 
-leitura individual.
+Essencial: requisito necessário para as principais operações do sistema.
 
----------------------------------------------------------------------------------------------------------------------
+Importante: requisito que contribui significativamente para o funcionamento e a utilização da aplicação.
 
-DESCRIÇÃO DOS REQUISITOS NÃO FUNCIONAIS
+Desejável: requisito complementar, cuja ausência não impede necessariamente o funcionamento das funcionalidades principais.
 
-1. RNF01 – TECNOLOGIA DE DESENVOLVIMENTO
-Define as tecnologias utilizadas no desenvolvimento do sistema, incluindo React e Vite na interface web, 
-Node.js e Express no servidor e MySQL no banco de dados.
+2. Descrição geral do sistema
+2.1 Abrangência e sistemas relacionados
+O sistema Morada Residências contempla as seguintes áreas:
+- Cadastro de usuários.
+- Validação de endereço de e-mail por código.
+- Autenticação de usuários.
+- Controle da situação dos cadastros.
+- Aprovação ou rejeição de cadastros por usuários com função administrativa.
+- Solicitação para atuar como síndico.
+- Consulta e análise de solicitações de síndico.
+- Cadastro, consulta e remoção de condomínios.
+- Cadastro e gerenciamento de blocos.
+- Associação de moradores a blocos e unidades.
+- Associação de síndicos a condomínios e blocos.
+- Gerenciamento de notificações.
+- Registro de leitura de notificações.
+- Agendamento e consulta de reuniões.
+- Gerenciamento de reservas de churrasqueiras.
+- Gerenciamento de reservas de salões de festas.
+- Emissão e consulta de boletos.
+- Geração de boletos individuais e em lote.
+- Emissão de segunda via de boletos.
+- Simulação de pagamento de boletos.
+- Consulta da situação financeira dos condomínios.
+- Identificação de moradores com boletos pendentes.
+- Comunicação em tempo real.
+O sistema utiliza tecnologias externas para apoiar seu funcionamento, incluindo MySQL para o banco de dados e a API de envio de e-mails Brevo para o envio de mensagens de validação.
 
-2. RNF02 – SEGURANÇA DE AUTENTICAÇÃO
-Estabelece a utilização de JWT para gerenciar a autenticação dos usuários e controlar o acesso ao sistema.
+A aplicação também utiliza bibliotecas e serviços de apoio à autenticação, à comunicação entre cliente e servidor e à atualização de informações em tempo real.
 
-3. RNF03 – PROTEÇÃO DE SENHAS
-Determina a utilização do bcrypt para proteger as senhas armazenadas no banco de dados por meio de hashes.
+3. Requisitos funcionais (casos de uso)
+[RF01] Cadastro de usuário
+Descrição do caso de uso: O sistema deve permitir que novos usuários realizem seu cadastro por meio da interface da aplicação, fornecendo as informações solicitadas pelo formulário.
 
-4. RNF04 – VERIFICAÇÃO DE E-MAIL
-Define que o código de verificação deve possuir seis dígitos e validade de 15 minutos.
+Prioridade:
 
-5. RNF05 – LIMITE DE TENTATIVAS DE VALIDAÇÃO
-Estabelece o limite máximo de cinco tentativas incorretas na validação do código de verificação.
+■ Essencial          ◻ Importante          ◻ Desejável
 
-6. RNF06 – INTERVALO PARA REENVIO DE CÓDIGO
-Determina um intervalo mínimo de 60 segundos entre as solicitações de reenvio do código de verificação.
+Entradas e pré-condições:
+- O usuário deve acessar a funcionalidade de cadastro.
+- O usuário deve preencher os campos obrigatórios solicitados pelo sistema.
+- As informações fornecidas devem atender às validações implementadas.
+Saídas e pós-condição:
+- O sistema processa a solicitação de cadastro.
+- O cadastro é encaminhado para a etapa de validação de e-mail, conforme o fluxo implementado.
+- O usuário recebe uma indicação do resultado da operação.
+[RF02] Validação de endereço de e-mail
+Descrição do caso de uso: O sistema deve permitir que o usuário confirme seu endereço de e-mail por meio de um código de verificação enviado ao endereço informado no cadastro.
 
-7. RNF07 – LIMITAÇÃO DE REQUISIÇÕES
-Estabelece a limitação de requisições por endereço IP nas rotas de envio de e-mails, evitando solicitações excessivas.
+Prioridade:
 
-8. RNF08 – BANCO DE DADOS
-Determina a utilização do MySQL para armazenar e persistir os dados da aplicação.
+■ Essencial          ◻ Importante          ◻ Desejável
 
-9. RNF09 – ENVIO DE E-MAILS
-Define a utilização da plataforma Brevo para realizar o envio de e-mails de verificação.
+Entradas e pré-condições:
+- O usuário deve ter iniciado o processo de cadastro.
+- O sistema deve ter disponibilizado o envio do código de verificação.
+- O usuário deve informar o código recebido por e-mail.
+Saídas e pós-condição:
+- O sistema verifica o código informado.
+- Quando a validação é bem-sucedida, o cadastro pode avançar para a próxima etapa prevista no fluxo.
+- Quando o código é inválido ou expirado, o sistema deve impedir a validação por aquele código.
+- O código de verificação possui prazo de validade de 15 minutos.
+- O fluxo estabelece um limite de cinco tentativas incorretas e um intervalo de 60 segundos para permitir um novo envio do código.
+[RF03] Reenvio do código de verificação
+Descrição do caso de uso: O sistema deve permitir a solicitação de um novo código de verificação de e-mail, respeitando as regras de tempo definidas na aplicação.
 
-10. RNF10 – COMUNICAÇÃO EM TEMPO REAL
-Estabelece a utilização do Socket.IO para permitir a comunicação em tempo real entre cliente e servidor 
-quando necessário.
+Prioridade:
 
-11. RNF11 – ORGANIZAÇÃO DO CÓDIGO
-Determina que o código-fonte seja organizado de maneira a facilitar a manutenção, as alterações e as correções 
-do sistema.
+■ Essencial          ◻ Importante          ◻ Desejável
 
-12. RNF12 – TRATAMENTO DE ERROS
-Estabelece que o sistema deve tratar erros e apresentar mensagens compreensíveis aos usuários, sem expor 
-informações internas sensíveis.
+Entradas e pré-condições:
+- O usuário deve estar no processo de validação de e-mail.
+- Deve existir uma solicitação de validação relacionada ao cadastro.
+Saídas e pós-condição:
+- O sistema processa a solicitação de reenvio.
+- Quando permitido, um novo código é enviado ao endereço de e-mail informado.
+- Caso o intervalo mínimo entre envios ainda não tenha sido atingido, o novo envio deve ser impedido.
+[RF04] Autenticação de usuário
+Descrição do caso de uso: O sistema deve permitir que usuários realizem login utilizando as credenciais solicitadas pela aplicação.
 
-13. RNF13 – COMPATIBILIDADE COM NAVEGADORES
-Determina que o sistema seja compatível com navegadores modernos, permitindo o acesso adequado às suas 
-funcionalidades.
+Prioridade:
 
-14. RNF14 – CONTROLE DE AUTORIZAÇÃO
-Estabelece que o servidor deve verificar as permissões dos usuários antes de executar operações administrativas 
-e de gerenciamento.
+■ Essencial          ◻ Importante          ◻ Desejável
 
-15. RNF15 – CONSISTÊNCIA DOS SCRIPTS DE BANCO DE DADOS
-Determina que os scripts SQL de criação e atualização do banco de dados possuam uma sequência documentada 
-e compatível com a versão da aplicação, evitando operações destrutivas acidentais.
+Entradas e pré-condições:
+- O usuário deve possuir um cadastro.
+- O usuário deve informar suas credenciais de acesso.
+Saídas e pós-condição:
+- O sistema verifica as credenciais informadas.
+- Quando válidas e aceitas pelas regras de acesso, o sistema permite a autenticação.
+- Quando inválidas, o acesso não deve ser concedido.
+- O sistema utiliza mecanismos de autenticação baseados em JWT para apoiar o controle de acesso.
+[RF05] Controle da situação do cadastro
+Descrição do caso de uso: O sistema deve permitir acompanhar e atualizar a situação do cadastro conforme as etapas do processo de validação e aprovação.
 
----------------------------------------------------------------------------------------------------------------------
+Prioridade:
 
-IMPORTÂNCIA DOS REQUISITOS
+■ Essencial          ◻ Importante          ◻ Desejável
 
-Os requisitos funcionais e não funcionais são fundamentais para definir o comportamento e as características 
-do sistema Morada Residências. Enquanto os requisitos funcionais descrevem as operações que a aplicação deve 
-oferecer, os requisitos não funcionais estabelecem critérios relacionados à segurança, tecnologias, organização, 
-compatibilidade e funcionamento.
+Entradas e pré-condições:
+- Deve existir um cadastro registrado no sistema.
+- O usuário deve ter realizado as etapas necessárias para a mudança de situação.
+Saídas e pós-condição:
 
-A documentação desses requisitos contribui para orientar o desenvolvimento, facilitar a manutenção e garantir 
-que as funcionalidades implementadas estejam de acordo com os objetivos propostos para o sistema.
+O sistema mantém a situação correspondente ao processo do cadastro.
 
----------------------------------------------------------------------------------------------------------------------
+Os estados previstos no projeto incluem:
+- AGUARDANDO_EMAIL;
+- PENDENTE_APROVACAO;
+- APROVADO;
+- REJEITADO.
+Esses estados representam, respectivamente, a espera pela validação do e-mail, a espera pela aprovação administrativa, a aprovação do cadastro e a rejeição do cadastro.
+[RF06] Consulta de cadastros pendentes
+Descrição do caso de uso: O sistema deve permitir que usuários autorizados consultem os cadastros pendentes de aprovação.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- Deve haver cadastros pendentes de aprovação.
+- O usuário deve possuir a função e as permissões necessárias para realizar a consulta.
+Saídas e pós-condição:
+- O sistema deve disponibilizar os cadastros pendentes conforme as regras da aplicação.
+- Os dados apresentados devem corresponder às informações armazenadas no sistema.
+- A autorização para consultar os cadastros pendentes deve ser verificada no servidor.
+[RF07] Aprovação de cadastro
+Descrição do caso de uso: O sistema deve permitir que um usuário autorizado aprove cadastros que estejam pendentes de aprovação.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- Deve existir um cadastro pendente de aprovação.
+- O usuário responsável pela operação deve possuir autorização para aprovar cadastros.
+Saídas e pós-condição:
+- O sistema registra a aprovação, conforme as regras implementadas.
+- A situação do cadastro passa a ser APROVADO.
+- O resultado da operação deve ser informado ao usuário responsável.
+[RF08] Rejeição de cadastro
+Descrição do caso de uso: O sistema deve permitir que um usuário autorizado rejeite cadastros que estejam pendentes de aprovação.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- Deve existir um cadastro pendente de aprovação.
+- O usuário responsável deve possuir autorização para realizar a rejeição.
+Saídas e pós-condição:
+- O sistema registra a rejeição conforme as regras implementadas.
+- A situação do cadastro passa a ser REJEITADO.
+- O sistema informa o resultado da operação.
+- A autorização para executar essa operação deve ser verificada no servidor.
+[RF09] Armazenamento das informações
+Descrição do caso de uso: O sistema deve utilizar o banco de dados MySQL para armazenar e recuperar as informações necessárias ao funcionamento da aplicação.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- O servidor deve conseguir estabelecer conexão com o banco de dados.
+- As informações devem ser enviadas por meio das operações previstas na aplicação.
+Saídas e pós-condição:
+- As informações processadas são armazenadas ou consultadas conforme a operação solicitada.
+- O sistema utiliza os dados persistidos para executar as funcionalidades correspondentes.
+[RF10] Comunicação entre interface e servidor
+Descrição do caso de uso: O sistema deve permitir a comunicação entre a interface web e o servidor, possibilitando o envio de solicitações e o recebimento das respostas necessárias ao funcionamento da aplicação.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- A interface deve estar acessível ao usuário.
+- O servidor deve estar disponível para processar as solicitações.
+- As requisições devem respeitar os formatos e as regras definidos pela aplicação.
+Saídas e pós-condição:
+- O servidor processa as solicitações recebidas.
+- A interface recebe os resultados e apresenta as informações correspondentes.
+[RF11] Envio de mensagens por e-mail
+Descrição do caso de uso: O sistema deve utilizar um serviço de envio de e-mails para encaminhar mensagens relacionadas ao processo de validação de endereço eletrônico.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- Deve existir uma solicitação de envio de mensagem.
+- O endereço de e-mail de destino deve estar disponível.
+- O serviço externo de envio deve estar configurado e acessível.
+Saídas e pós-condição:
+- O sistema solicita o envio da mensagem ao serviço de e-mail.
+- O resultado da solicitação é tratado pela aplicação.
+[RF12] Comunicação em tempo real
+Descrição do caso de uso: O sistema utiliza Socket.IO para permitir comunicação em tempo real entre o cliente e o servidor, conforme os recursos implementados na aplicação.
+
+Prioridade:
+
+◻ Essencial
+◻ Importante
+■ Desejável
+
+Entradas e pré-condições:
+- O cliente e o servidor devem conseguir estabelecer a comunicação necessária.
+- A funcionalidade correspondente deve estar disponível na aplicação.
+Saídas e pós-condição:
+- O sistema pode transmitir e receber eventos em tempo real conforme a implementação.
+- Os componentes envolvidos podem atualizar suas informações de acordo com os eventos recebidos.
+[RF13] Solicitação para se tornar síndico
+Descrição do caso de uso: O sistema deve permitir que um usuário solicite autorização para atuar como síndico.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- O usuário deve estar identificado conforme as regras da aplicação.
+- Os dados exigidos pela solicitação devem ser informados.
+Saídas e pós-condição:
+- O pedido é registrado e associado ao usuário.
+- O usuário recebe indicação do resultado da solicitação.
+[RF14] Consulta e análise de pedidos de síndico
+Descrição do caso de uso: O sistema deve permitir consultar pedidos para se tornar síndico e registrar a decisão de aprovação ou reprovação por um usuário autorizado.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- Deve existir um pedido registrado.
+- O responsável pela análise deve possuir permissão.
+Saídas e pós-condição:
+- A decisão é persistida.
+- O estado do pedido reflete a decisão tomada.
+- As permissões devem ser verificadas no servidor.
+[RF15] Cadastro e consulta de condomínios
+Descrição do caso de uso: O sistema deve permitir cadastrar e consultar condomínios conforme os campos definidos no modelo de dados.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- O solicitante possui a permissão necessária para a operação.
+- Os dados obrigatórios do condomínio devem ser informados.
+Saídas e pós-condição:
+- Os dados do condomínio são persistidos e podem ser consultados.
+- As operações devem validar os dados obrigatórios.
+[RF16] Remoção de condomínios
+Descrição do caso de uso: O sistema deve permitir a remoção de condomínios somente a usuários autorizados e de acordo com as regras de integridade dos dados.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- O condomínio existe.
+- O solicitante está autorizado.
+- Os vínculos relacionados são tratados conforme as regras do banco.
+Saídas e pós-condição:
+- A remoção é concluída ou recusada com mensagem adequada.
+- A operação não deve deixar relações inconsistentes.
+[RF17] Cadastro e consulta de blocos
+Descrição do caso de uso: O sistema deve permitir criar e consultar blocos associados a um condomínio.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- O condomínio associado deve existir.
+- O solicitante possui autorização para a operação.
+Saídas e pós-condição:
+- O bloco é associado ao condomínio correto.
+- Os blocos podem ser consultados conforme as permissões.
+[RF18] Gerenciamento de moradores e associação a blocos e unidades
+Descrição do caso de uso: O sistema deve permitir gerenciar moradores e realizar sua associação aos blocos e unidades correspondentes, conforme as informações e permissões definidas na aplicação.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- O usuário e o condomínio devem existir.
+- O bloco e a unidade relacionados devem estar cadastrados, quando aplicável.
+- O solicitante deve possuir autorização para realizar a associação.
+Saídas e pós-condição:
+- O morador é associado ao bloco e à unidade correspondentes.
+- As informações da associação ficam disponíveis para consulta conforme as permissões do sistema.
+[RF19] Associação de síndicos a condomínios e blocos
+Descrição do caso de uso: O sistema deve permitir associar síndicos a condomínios e blocos, conforme as permissões definidas na aplicação.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- O usuário e o condomínio ou bloco devem existir.
+- O solicitante possui autorização.
+Saídas e pós-condição:
+- A associação é persistente.
+- As operações posteriores devem respeitar o escopo de gerenciamento atribuído.
+[RF20] Acesso ao painel do condomínio
+Descrição do caso de uso: O sistema deve permitir que usuários autorizados acessem o painel de gerenciamento do condomínio, disponibilizando as funcionalidades correspondentes às suas permissões.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- O usuário deve estar autenticado.
+- O usuário deve possuir vínculo ou permissão de acesso ao condomínio.
+- O condomínio deve estar cadastrado no sistema.
+Saídas e pós-condição:
+- O sistema disponibiliza o painel correspondente ao condomínio.
+- As funcionalidades apresentadas devem respeitar as permissões do usuário.
+[RF21] Notificações
+Descrição do caso de uso: O backend deve permitir criar e consultar notificações e definir seus destinatários conforme as regras da aplicação.
+
+As notificações podem ser classificadas pelos tipos AVISO, MANUTENCAO e URGENTE, e possuir escopo PLATAFORMA ou CONDOMINIO.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- A notificação deve conter os dados obrigatórios.
+- O usuário que publica ou consulta deve ter a permissão correspondente.
+- O escopo e os destinatários devem respeitar as regras da aplicação.
+Saídas e pós-condição:
+- A notificação e seus destinatários são persistidos.
+- Os usuários autorizados podem consultar as notificações destinadas a eles.
+[RF22] Registro de leitura de notificações
+Descrição do caso de uso: O sistema deve registrar o estado de leitura de uma notificação por destinatário, permitindo identificar quais usuários já visualizaram determinada mensagem.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- A notificação está associada ao destinatário.
+- O usuário está autorizado a atualizar seu próprio estado de leitura.
+Saídas e pós-condição:
+- O estado de leitura é atualizado e persistente.
+- O sistema registra a data e o horário da leitura, conforme a implementação.
+- Um usuário não deve alterar o estado de leitura de outro destinatário sem permissão.
+[RF23] Agendamento e consulta de reuniões
+Descrição do caso de uso: O sistema deve permitir o agendamento e a consulta de reuniões relacionadas ao condomínio, conforme as funcionalidades disponibilizadas pela aplicação.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- O usuário deve estar autenticado.
+- O usuário deve possuir autorização para realizar a operação.
+- As informações necessárias para o agendamento devem ser fornecidas.
+Saídas e pós-condição:
+- A reunião é registrada no sistema.
+- As reuniões cadastradas podem ser consultadas pelos usuários autorizados.
+- As operações devem respeitar as regras de gerenciamento estabelecidas pela aplicação.
+[RF24] Reservas de churrasqueira
+Descrição do caso de uso: O sistema deve permitir consultar e criar reservas de churrasqueiras do condomínio, respeitando as regras de disponibilidade e os estados previstos na aplicação.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- O usuário deve estar autenticado.
+- A churrasqueira deve estar cadastrada ou disponível conforme as regras do sistema.
+- O usuário deve informar os dados necessários para a reserva.
+Saídas e pós-condição:
+- A solicitação de reserva é registrada.
+- As reservas podem ser consultadas conforme as permissões.
+- Os estados previstos incluem PENDENTE, CONFIRMADA e CANCELADA.
+[RF25] Reservas de salão de festas
+Descrição do caso de uso: O sistema deve permitir consultar, criar e cancelar reservas de salões de festas do condomínio, conforme as regras de utilização dos espaços comuns.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- O usuário deve estar autenticado.
+- O salão de festas deve estar disponível para reserva.
+- O usuário deve informar os dados necessários para a solicitação.
+- Para cancelar uma reserva, ela deve existir e estar vinculada ao usuário ou a uma operação autorizada.
+Saídas e pós-condição:
+- A reserva é registrada no sistema.
+- As reservas podem ser consultadas conforme as permissões.
+- O cancelamento é registrado quando autorizado.
+[RF26] Emissão de boletos individuais
+Descrição do caso de uso: O sistema deve permitir a emissão de boletos individuais relacionados às cobranças condominiais, utilizando os dados necessários para identificar a cobrança e o responsável pelo pagamento.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- O usuário responsável pela emissão deve possuir autorização.
+- O morador ou unidade de destino deve estar identificado.
+- Devem ser informados os dados necessários para a cobrança.
+Saídas e pós-condição:
+- O boleto é registrado no sistema.
+- O registro deve conter informações como mês de referência, valor, data de vencimento, código de barras e linha digitável.
+- O boleto pode ser consultado conforme as permissões.
+[RF27] Geração de boletos em lote
+Descrição do caso de uso: O sistema deve permitir a geração de boletos em lote, possibilitando o registro de cobranças para múltiplos moradores ou unidades de um condomínio.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- O usuário responsável deve possuir autorização para gerar cobranças.
+- O condomínio e os moradores ou unidades envolvidos devem estar cadastrados.
+- Os dados da cobrança devem ser informados.
+Saídas e pós-condição:
+- O sistema processa a solicitação de geração em lote.
+- Os boletos correspondentes são registrados conforme os dados fornecidos.
+- Os registros podem ser consultados posteriormente.
+[RF28] Consulta de boletos
+Descrição do caso de uso: O sistema deve permitir a consulta de boletos pelos moradores e pelos usuários responsáveis pela administração, respeitando as permissões de acesso.
+
+Prioridade:
+
+■ Essencial          ◻ Importante          ◻ Desejável
+
+Entradas e pré-condições:
+- Deve existir um boleto registrado.
+- O usuário deve estar autenticado.
+- O usuário deve possuir autorização para consultar o boleto solicitado.
+Saídas e pós-condição:
+- O sistema apresenta os boletos correspondentes ao usuário ou ao condomínio.
+- As informações exibidas devem corresponder aos registros armazenados no banco de dados.
+- A consulta deve respeitar as permissões de cada perfil.
+[RF29] Emissão de segunda via de boleto
+Descrição do caso de uso: O sistema deve permitir que o usuário solicite uma segunda via de um boleto previamente registrado.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- Deve existir um boleto cadastrado no sistema.
+- O usuário deve possuir autorização para acessar o boleto.
+- O boleto solicitado deve estar identificado.
+Saídas e pós-condição:
+- O sistema disponibiliza novamente as informações do boleto.
+- O usuário pode consultar os dados necessários para realizar o pagamento.
+- A operação deve respeitar as regras de acesso.
+[RF30] Pagamento de boletos
+Descrição do caso de uso: O sistema deve permitir o registro ou a simulação do pagamento de boletos, conforme o fluxo implementado na aplicação.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- Deve existir um boleto registrado.
+- O usuário deve estar autorizado a realizar a operação.
+- O boleto deve estar em uma situação que permita o processamento da operação.
+Saídas e pós-condição:
+- O sistema processa a solicitação de pagamento conforme as regras implementadas.
+- A situação do boleto pode ser atualizada no sistema.
+- O fluxo representa uma simulação de pagamento, não devendo ser interpretado como integração bancária efetiva.
+[RF31] Consulta da situação financeira do condomínio
+Descrição do caso de uso: O sistema deve permitir que usuários autorizados consultem informações sobre a situação financeira do condomínio, considerando os registros de boletos e pagamentos existentes.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- Devem existir registros financeiros relacionados ao condomínio.
+- O usuário deve estar autenticado.
+- O usuário deve possuir permissão para consultar as informações financeiras.
+Saídas e pós-condição:
+- O sistema apresenta as informações financeiras disponíveis.
+- Os dados apresentados devem corresponder aos registros armazenados.
+- A consulta deve respeitar as permissões de acesso.
+[RF32] Notificação de moradores com boletos pendentes
+Descrição do caso de uso: O sistema deve permitir identificar moradores que possuam boletos pendentes e disponibilizar informações relacionadas a essas pendências para os usuários responsáveis pelo gerenciamento do condomínio.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- Devem existir boletos registrados.
+- Os boletos devem possuir situação que indique pendência.
+- O usuário responsável pela consulta ou operação deve possuir autorização.
+Saídas e pós-condição:
+- O sistema identifica os moradores relacionados aos boletos pendentes.
+- As informações podem ser consultadas pelos usuários autorizados.
+- As notificações devem respeitar os destinatários e as regras definidas pela aplicação.
+[RF33] Exclusão de usuário
+Descrição do caso de uso: O sistema deve permitir a exclusão de usuários por meio de operação autorizada, tratando também as solicitações de síndico associadas ao usuário, conforme as regras implementadas.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- O usuário a ser excluído deve existir.
+- O solicitante deve possuir autorização para realizar a operação.
+- Devem ser identificados os registros relacionados ao usuário.
+Saídas e pós-condição:
+- O sistema processa a exclusão conforme as regras de integridade dos dados.
+- A solicitação de síndico associada ao usuário também deve ser tratada.
+- A operação deve evitar a permanência de relacionamentos inconsistentes.
+[RF34] Remoção da função de síndico
+Descrição do caso de uso: O sistema deve permitir a remoção da função de síndico de um usuário, atualizando suas permissões conforme as regras administrativas da aplicação.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- O usuário deve possuir a função de síndico.
+- O solicitante deve possuir autorização para realizar a operação.
+- O usuário e seus vínculos administrativos devem estar identificados.
+Saídas e pós-condição:
+- O sistema processa a remoção da função de síndico.
+- As permissões do usuário são atualizadas conforme as regras implementadas.
+- O usuário deixa de possuir as permissões administrativas relacionadas à função removida.
+
+4. Requisitos não funcionais
+Os requisitos não funcionais descrevem características de qualidade, segurança, implementação e operação do sistema Morada Residências.
+[RNF01] Tecnologia de desenvolvimento
+Descrição do caso de uso: O sistema deve utilizar as tecnologias empregadas em sua implementação, incluindo React e Vite na interface web, Node.js e Express no servidor e MySQL para persistência de dados.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições: Ambiente de desenvolvimento configurado e tecnologias necessárias disponíveis.
+
+Saídas e pós-condição: Sistema desenvolvido com as tecnologias especificadas.
+[RNF02] Segurança de autenticação
+Descrição do caso de uso: O sistema deve utilizar JWT para gerenciar a autenticação dos usuários.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições: Usuário cadastrado e credenciais informadas para autenticação.
+
+Saídas e pós-condição: Token de autenticação gerado após a autenticação bem-sucedida.
+[RNF03] Proteção de senhas
+Descrição do caso de uso: O sistema deve utilizar bcrypt para proteger as senhas armazenadas.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições: Senha informada durante o cadastro e mecanismo bcrypt disponível.
+
+Saídas e pós-condição: Hash da senha armazenado no banco de dados.
+[RNF04] Verificação de e-mail
+Descrição do caso de uso: O código de verificação deve possuir seis dígitos e validade de 15 minutos.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições: Usuário em processo de cadastro e endereço de e-mail informado.
+
+Saídas e pós-condição: E-mail validado quando o código correto for informado dentro do prazo.
+[RNF05] Limite de tentativas de validação
+Descrição do caso de uso: O sistema deve permitir, no máximo, cinco tentativas incorretas de validação do código.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições: Código de verificação gerado e tentativa de validação realizada pelo usuário.
+
+Saídas e pós-condição: Validação bloqueada após atingir o limite de tentativas incorretas.
+[RNF06] Intervalo para reenvio de código
+Descrição do caso de uso: O sistema deve respeitar um intervalo mínimo de 60 segundos entre solicitações de reenvio do código.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições: Código de verificação solicitado anteriormente e nova solicitação de reenvio.
+
+Saídas e pós-condição: Novo envio permitido após o intervalo mínimo estabelecido.
+[RNF07] Limitação de requisições
+Descrição do caso de uso: O sistema deve limitar requisições por endereço IP nas rotas de envio de e-mails.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições: Solicitação de envio de e-mail recebida pelo servidor e mecanismo de limitação configurado.
+
+Saídas e pós-condição: Requisição processada ou limitada conforme as regras configuradas.
+[RNF08] Banco de dados
+Descrição do caso de uso: O sistema deve utilizar MySQL para armazenar os dados da aplicação.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições: Dados a serem armazenados e conexão com o banco de dados disponível.
+
+Saídas e pós-condição: Dados persistidos no banco após operações realizadas com sucesso.
+[RNF09] Envio de e-mails
+Descrição do caso de uso: O sistema deve utilizar a plataforma Brevo para enviar e-mails de verificação.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições: Endereço de e-mail do destinatário e integração com a Brevo configurada.
+
+Saídas e pós-condição: Solicitação de envio realizada e resultado retornado pelo serviço.
+[RNF10] Comunicação em tempo real
+Descrição do caso de uso: O sistema deve utilizar Socket.IO para comunicação em tempo real quando necessário.
+
+Prioridade:
+
+◻ Essencial
+◻ Importante
+■ Desejável
+
+Entradas e pré-condições: Cliente e servidor configurados para estabelecer comunicação via Socket.IO.
+
+Saídas e pós-condição: Eventos transmitidos aos clientes conectados conforme a implementação.
+[RNF11] Organização do código
+Descrição do caso de uso: O código-fonte deve ser organizado para facilitar a manutenção do sistema, utilizando estruturas que permitam separar responsabilidades e facilitar alterações e correções.
+
+Prioridade:
+
+◻ Essencial
+◻ Importante
+■ Desejável
+
+Entradas e pré-condições: Código-fonte e estrutura do projeto disponíveis para desenvolvimento e manutenção.
+
+Saídas e pós-condição: Código organizado em uma estrutura que facilite alterações e correções, incluindo a separação de controladores, serviços, repositórios, componentes e páginas, conforme a arquitetura da aplicação.
+[RNF12] Tratamento de erros
+Descrição do caso de uso: O sistema deve tratar erros e apresentar mensagens compreensíveis aos usuários, evitando a exposição de informações internas sensíveis.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições: Operação realizada pelo usuário e ocorrência de erro durante o processamento.
+
+Saídas e pós-condição: Mensagem de erro apresentada sem expor informações internas sensíveis.
+[RNF13] Compatibilidade com navegadores
+Descrição do caso de uso: O sistema deve ser compatível com os navegadores modernos, permitindo que os usuários acessem e utilizem suas funcionalidades.
+
+Prioridade:
+
+◻ Essencial
+■ Importante
+◻ Desejável
+
+Entradas e pré-condições:
+- O usuário deve possuir um navegador moderno compatível.
+- O dispositivo deve ter acesso ao sistema.
+Saídas e pós-condição: As páginas e funcionalidades do sistema devem ser exibidas e funcionar adequadamente no navegador compatível.
+[RNF14] Controle de autorização
+Descrição do caso de uso: O servidor deve verificar as permissões do usuário em operações administrativas, de gestão de condomínios, blocos, usuários, notificações e demais funcionalidades protegidas.
+
+Prioridade:
+
+■ Essencial
+◻ Importante
+◻ Desejável
+
+Entradas e pré-condições: A solicitação acessa uma operação protegida e o usuário deve estar identificado conforme os mecanismos de autenticação da aplicação.
+
+Saídas e pós-condição:
+- A operação só é executada se o usuário estiver autorizado.
+- A proteção não deve depender apenas da interface.
+- As permissões devem ser verificadas no servidor.
+[RNF15] Consistência dos scripts de banco de dados
+Descrição do caso de uso: Os scripts SQL de criação e atualização do banco de dados devem possuir uma sequência documentada e compatível com a versão da aplicação, evitando a execução acidental de operações destrutivas.
+
+Prioridade:
+
+■ Essencial
+◻ Importante
+◻ Desejável
+
+Entradas e pré-condições: Existem scripts SQL de criação ou atualização do banco.
+
+Saídas e pós-condição:
+- A instalação de uma nova base deve seguir uma sequência documentada de scripts SQL.
+- A instalação não deve executar operações destrutivas inadvertidamente.
+- Os scripts devem manter compatibilidade com a estrutura de dados utilizada pela aplicação.
+
+5. Referências
+GITHUB. Morada — Sistema de gerenciamento de condomínios. Disponível em: https://github.com/n4ttan/trabalhoeng2.git. Acesso em: 26 out. 2026.
+
+REACT. Documentação oficial. Disponível em: https://react.dev/. Acesso em: 26 out. 2026.
+
+VITE. Documentação oficial. Disponível em: https://vite.dev/. Acesso em: 26 out. 2026.
+
+NODE.JS. Documentação oficial. Disponível em: https://nodejs.org/. Acesso em: 26 out. 2026.
+
+EXPRESS. Documentação oficial. Disponível em: https://expressjs.com/. Acesso em: 26 out. 2026.
+
+MYSQL. Documentação oficial. Disponível em: https://dev.mysql.com/doc/. Acesso em: 26 out. 2026.
+
+SOCKET.IO. Documentação oficial. Disponível em: https://socket.io/docs/v4/. Acesso em: 26 out. 2026.
+
+BREVO. Documentação da API de envio de e-mails. Disponível em: https://developers.brevo.com/. Acesso em: 26 out. 2026.
