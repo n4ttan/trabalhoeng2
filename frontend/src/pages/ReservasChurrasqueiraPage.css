@@ -62,18 +62,22 @@
 .churras-btn {
   grid-column: 1 / -1;
   padding: clamp(12px, 1.2vw, 18px);
-  border: none;
+  border: 1.5px solid #0284c7;
   border-radius: 8px;
-  background: var(--c-accent);
-  color: #fff;
+  background: #38bdf8;
+  color: #0f172a;
   font: inherit;
   font-size: clamp(16px, 1.15vw, 19px);
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: all 0.15s;
 }
 
-.churras-btn:hover { background: #1d4ed8; }
+.churras-btn:hover {
+  background: #0ea5e9;
+  border-color: #0284c7;
+  color: #ffffff;
+}
 
 .churras-msg {
   margin-bottom: 16px;

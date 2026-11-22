@@ -196,16 +196,20 @@
 
 .btn-primario {
   padding: 6px 14px;
-  border: 1px solid var(--b-accent);
+  border: 1.5px solid #0284c7;
   border-radius: 6px;
-  background: var(--b-accent);
-  color: #fff;
-  font-weight: 600;
+  background: #38bdf8;
+  color: #0f172a;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: all 0.15s;
 }
 
-.btn-primario:hover:not(:disabled) { background: var(--b-accent-strong); }
+.btn-primario:hover:not(:disabled) {
+  background: #0ea5e9;
+  border-color: #0284c7;
+  color: #ffffff;
+}
 
 .btn-primario:disabled,
 .btn-secundario:disabled {

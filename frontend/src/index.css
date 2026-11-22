@@ -12,13 +12,14 @@
 
     text-rendering: optimizeLegibility;
 
-    /* Variáveis Globais de Destaque Azul Opaco */
-    --cor-azul-opaco: #1d4ed8;          /* Azul primário sólido e opaco */
-    --cor-azul-opaco-hover: #1e40af;    /* Azul opaco mais profundo no hover */
-    --cor-azul-opaco-ativo: #1e3a8a;    /* Azul opaco marinho no clique */
-    --cor-azul-opaco-borda: #1d4ed8;    /* Borda sólida destacada */
-    --cor-azul-opaco-anel: rgba(29, 78, 216, 0.28); /* Anel de foco nítido */
-    --cor-azul-suave-fundo: #eff6ff;   /* Fundo sutil para itens interativos ativos */
+    /* Variáveis Globais de Destaque no tom #38bdf8 */
+    --cor-azul-opaco: #38bdf8;          /* Azul solicitado (#38bdf8) */
+    --cor-azul-opaco-hover: #0ea5e9;    /* Azul ligeiramente mais escuro no hover */
+    --cor-azul-opaco-ativo: #0284c7;    /* Azul no clique */
+    --cor-azul-opaco-borda: #0284c7;    /* Borda sólida destacada */
+    --cor-azul-opaco-texto: #0f172a;    /* Texto escuro com alto contraste sobre #38bdf8 */
+    --cor-azul-opaco-anel: rgba(56, 189, 248, 0.45); /* Anel de foco nítido */
+    --cor-azul-suave-fundo: #f0f9ff;   /* Fundo sutil para itens interativos ativos */
 }
 
 html,
@@ -82,9 +83,10 @@ button:not(.btn-cancelar):not(.btn-reprovar):not(.btn-secundario):not(.btn-hambu
 .btn-acao-primaria,
 .btn-confirmar {
     background-color: var(--cor-azul-opaco) !important;
-    color: #ffffff !important;
-    border: 1.5px solid var(--cor-azul-opaco-ativo) !important;
-    box-shadow: 0 2px 4px rgba(29, 78, 216, 0.2) !important;
+    color: var(--cor-azul-opaco-texto) !important;
+    border: 1.5px solid var(--cor-azul-opaco-borda) !important;
+    box-shadow: 0 2px 4px rgba(56, 189, 248, 0.25) !important;
+    font-weight: 700 !important;
 }
 
 button:not(.btn-cancelar):not(.btn-reprovar):not(.btn-secundario):not(.btn-hamburguer):not(.btn-fechar-modal):not(.btn-perigo):not(.btn-excluir):hover,
@@ -95,13 +97,15 @@ button:not(.btn-cancelar):not(.btn-reprovar):not(.btn-secundario):not(.btn-hambu
 .btn-acao-primaria:hover,
 .btn-confirmar:hover {
     background-color: var(--cor-azul-opaco-hover) !important;
-    border-color: #172554 !important;
+    border-color: var(--cor-azul-opaco-ativo) !important;
+    color: #ffffff !important;
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(29, 78, 216, 0.3) !important;
+    box-shadow: 0 4px 8px rgba(14, 165, 233, 0.35) !important;
 }
 
 button:not(.btn-cancelar):not(.btn-reprovar):not(.btn-secundario):not(.btn-hamburguer):not(.btn-fechar-modal):not(.btn-perigo):not(.btn-excluir):active {
     background-color: var(--cor-azul-opaco-ativo) !important;
+    color: #ffffff !important;
     transform: translateY(0);
 }
 
