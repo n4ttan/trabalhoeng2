@@ -21,40 +21,24 @@ Morada Residências - Modelo Relacional
 ============================================================
 
 USUARIOS (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    senha VARCHAR(255) NOT NULL,
-    perfil ENUM(
-        'ADMIN_PLATAFORMA',
-        'USUARIO',
-        'CANDIDATO',
-        'SINDICO',
-        'MORADOR',
-        'ADMIN'
-    ) NOT NULL,
-    id_condominio INT NULL,
-    id_bloco INT NULL,
-    bloco VARCHAR(100) NULL,
-    unidade VARCHAR(50) NULL,
-    status_cadastro ENUM(
-        'AGUARDANDO_EMAIL',
-        'PENDENTE_APROVACAO',
-        'APROVADO',
-        'REJEITADO'
-    ) DEFAULT 'AGUARDANDO_EMAIL',
-    token_validacao VARCHAR(255) NULL,
-    token_expira_em DATETIME NULL,
-    tentativas_validacao INT NOT NULL DEFAULT 0,
-
-    FOREIGN KEY (id_condominio)
-        REFERENCES CONDOMINIOS(id)
-        ON DELETE SET NULL,
-
-    FOREIGN KEY (id_bloco)
-        REFERENCES BLOCOS(id)
-        ON DELETE SET NULL
+    id (PK),
+    nome,
+    email (UNIQUE),
+    senha,
+    perfil,
+    id_condominio (FK),
+    id_bloco (FK),
+    bloco,
+    unidade,
+    status_cadastro,
+    token_validacao,
+    token_expira_em,
+    tentativas_validacao
 )
+
+RELACIONAMENTOS:
+- id_condominio referencia CONDOMINIOS(id).
+- id_bloco referencia BLOCOS(id).
 
 
 ============================================================
@@ -62,16 +46,16 @@ USUARIOS (
 ============================================================
 
 CONDOMINIOS (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(255) NOT NULL,
-    numero_moradores INT NOT NULL DEFAULT 0,
-    sindico_responsavel INT NULL
+    id (PK),
+    nome,
+    numero_moradores,
+    sindico_responsavel
 )
 
 OBSERVAÇÃO:
 O atributo sindico_responsavel armazena a identificação do síndico
-responsável pelo condomínio. No código SQL atual, esse campo não
-possui uma restrição FOREIGN KEY declarada.
+responsável pelo condomínio. No banco de dados atual, esse campo
+não possui uma restrição FOREIGN KEY declarada.
 
 
 ============================================================
@@ -79,14 +63,13 @@ possui uma restrição FOREIGN KEY declarada.
 ============================================================
 
 BLOCOS (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100) NOT NULL,
-    id_condominio INT NOT NULL,
-
-    FOREIGN KEY (id_condominio)
-        REFERENCES CONDOMINIOS(id)
-        ON DELETE CASCADE
+    id (PK),
+    nome,
+    id_condominio (FK)
 )
+
+RELACIONAMENTO:
+- id_condominio referencia CONDOMINIOS(id).
 
 
 ============================================================
@@ -94,23 +77,16 @@ BLOCOS (
 ============================================================
 
 GESTORES_CONDOMINIOS (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    usuario_id INT NOT NULL,
-    condominio_id INT NOT NULL,
-    bloco_id INT NULL,
-
-    FOREIGN KEY (usuario_id)
-        REFERENCES USUARIOS(id)
-        ON DELETE CASCADE,
-
-    FOREIGN KEY (condominio_id)
-        REFERENCES CONDOMINIOS(id)
-        ON DELETE CASCADE,
-
-    FOREIGN KEY (bloco_id)
-        REFERENCES BLOCOS(id)
-        ON DELETE CASCADE
+    id (PK),
+    usuario_id (FK),
+    condominio_id (FK),
+    bloco_id (FK)
 )
+
+RELACIONAMENTOS:
+- usuario_id referencia USUARIOS(id).
+- condominio_id referencia CONDOMINIOS(id).
+- bloco_id referencia BLOCOS(id).
 
 
 ============================================================
@@ -118,19 +94,15 @@ GESTORES_CONDOMINIOS (
 ============================================================
 
 PEDIDOS_SINDICO (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    usuario_id INT NOT NULL,
-    condominio_id INT NOT NULL,
-    deferido BOOLEAN NOT NULL DEFAULT FALSE,
-
-    FOREIGN KEY (usuario_id)
-        REFERENCES USUARIOS(id)
-        ON DELETE CASCADE,
-
-    FOREIGN KEY (condominio_id)
-        REFERENCES CONDOMINIOS(id)
-        ON DELETE CASCADE
+    id (PK),
+    usuario_id (FK),
+    condominio_id (FK),
+    deferido
 )
+
+RELACIONAMENTOS:
+- usuario_id referencia USUARIOS(id).
+- condominio_id referencia CONDOMINIOS(id).
 
 
 ============================================================
@@ -138,66 +110,146 @@ PEDIDOS_SINDICO (
 ============================================================
 
 MENSAGENS (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    texto VARCHAR(255) NOT NULL
+    id (PK),
+    texto
 )
 
 OBSERVAÇÃO:
 A tabela MENSAGENS não possui chaves estrangeiras nem
-relacionamentos com outras tabelas declarados no código SQL atual.
+relacionamentos com outras tabelas declarados no banco de dados atual.
 
 
 ============================================================
-7. NOTIFICAÇÕES (NOTIFICACOES)
+7. RESERVAS DE CHURRASQUEIRA (RESERVAS_CHURRASQUEIRA)
+============================================================
+
+RESERVAS_CHURRASQUEIRA (
+    id (PK),
+    id_usuario,
+    id_condominio,
+    data_reserva,
+    horario_inicio,
+    horario_fim,
+    status
+)
+
+OBSERVAÇÃO:
+Os atributos id_usuario e id_condominio identificam o usuário
+responsável pela reserva e o condomínio relacionado.
+
+No banco de dados atual, esses atributos não possuem restrições
+FOREIGN KEY declaradas.
+
+
+============================================================
+8. REUNIÕES (REUNIOES)
+============================================================
+
+REUNIOES (
+    id (PK),
+    id_condominio,
+    titulo,
+    pauta,
+    data_hora,
+    local_link
+)
+
+OBSERVAÇÃO:
+O atributo id_condominio identifica o condomínio relacionado
+à reunião, mas não possui uma restrição FOREIGN KEY declarada
+no banco de dados atual.
+
+
+============================================================
+9. RESERVAS DE SALÃO (RESERVAS_SALAO)
+============================================================
+
+RESERVAS_SALAO (
+    id (PK),
+    id_usuario,
+    id_condominio,
+    data_reserva,
+    horario_inicio,
+    horario_fim,
+    status
+)
+
+OBSERVAÇÃO:
+Os atributos id_usuario e id_condominio identificam o usuário
+responsável pela reserva e o condomínio relacionado.
+
+No banco de dados atual, esses atributos não possuem restrições
+FOREIGN KEY declaradas.
+
+
+============================================================
+10. BOLETOS (BOLETOS)
+============================================================
+
+BOLETOS (
+    id (PK),
+    id_condominio (FK),
+    id_usuario (FK),
+    mes_referencia,
+    valor,
+    data_vencimento,
+    status,
+    codigo_barras,
+    linha_digitavel,
+    data_pagamento,
+    valor_pago,
+    forma_pagamento,
+    codigo_autenticacao,
+    segunda_via_emitida_em,
+    criado_em
+)
+
+RELACIONAMENTOS:
+- id_condominio referencia CONDOMINIOS(id).
+- id_usuario referencia USUARIOS(id).
+
+
+============================================================
+11. NOTIFICAÇÕES (NOTIFICACOES)
 ============================================================
 
 NOTIFICACOES (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    titulo VARCHAR(150) NOT NULL,
-    mensagem TEXT NOT NULL,
-    tipo ENUM(
-        'AVISO',
-        'MANUTENCAO',
-        'URGENTE'
-    ) NOT NULL DEFAULT 'AVISO',
-    escopo ENUM(
-        'PLATAFORMA',
-        'CONDOMINIO'
-    ) NOT NULL,
-    condominio_id INT NULL,
-    criado_por INT NULL,
-    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (condominio_id)
-        REFERENCES CONDOMINIOS(id)
-        ON DELETE CASCADE,
-
-    FOREIGN KEY (criado_por)
-        REFERENCES USUARIOS(id)
-        ON DELETE SET NULL
+    id (PK),
+    titulo,
+    mensagem,
+    tipo,
+    escopo,
+    condominio_id (FK),
+    criado_por (FK),
+    criado_em
 )
+
+RELACIONAMENTOS:
+- condominio_id referencia CONDOMINIOS(id).
+- criado_por referencia USUARIOS(id).
+
+OBSERVAÇÃO:
+O atributo condominio_id pode ser nulo, permitindo notificações
+sem vínculo com um condomínio específico.
+
+O atributo criado_por identifica o usuário responsável pela criação
+da notificação e também pode ser nulo.
 
 
 ============================================================
-8. DESTINATÁRIOS DE NOTIFICAÇÕES
-   (NOTIFICACAO_DESTINATARIOS)
+12. DESTINATÁRIOS DE NOTIFICAÇÕES
+    (NOTIFICACAO_DESTINATARIOS)
 ============================================================
 
 NOTIFICACAO_DESTINATARIOS (
-    notificacao_id INT NOT NULL,
-    usuario_id INT NOT NULL,
-    lida_em TIMESTAMP NULL DEFAULT NULL,
-
-    PRIMARY KEY (notificacao_id, usuario_id),
-
-    FOREIGN KEY (notificacao_id)
-        REFERENCES NOTIFICACOES(id)
-        ON DELETE CASCADE,
-
-    FOREIGN KEY (usuario_id)
-        REFERENCES USUARIOS(id)
-        ON DELETE CASCADE
+    notificacao_id (PK, FK),
+    usuario_id (PK, FK),
+    lida_em
 )
+
+RELACIONAMENTOS:
+- notificacao_id referencia NOTIFICACOES(id).
+- usuario_id referencia USUARIOS(id).
 
 OBSERVAÇÃO:
 A tabela NOTIFICACAO_DESTINATARIOS possui uma chave primária
@@ -211,115 +263,6 @@ notificações.
 O atributo lida_em registra a data e o horário em que o usuário
 visualizou a notificação. Caso ainda não tenha sido lida,
 o valor permanece NULL.
-
-
-============================================================
-9. RESERVAS DE CHURRASQUEIRA (RESERVAS_CHURRASQUEIRA)
-============================================================
-
-RESERVAS_CHURRASQUEIRA (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_usuario INT NOT NULL,
-    id_condominio INT NOT NULL,
-    data_reserva VARCHAR(255) NOT NULL,
-    horario_inicio VARCHAR(255) NOT NULL,
-    horario_fim VARCHAR(255) NOT NULL,
-    status ENUM(
-        'PENDENTE',
-        'CONFIRMADA',
-        'CANCELADA'
-    ) NOT NULL DEFAULT 'CONFIRMADA'
-)
-
-OBSERVAÇÃO:
-Os atributos id_usuario e id_condominio identificam o usuário
-responsável pela reserva e o condomínio relacionado.
-
-No código SQL atual, esses atributos não possuem restrições
-FOREIGN KEY declaradas.
-
-
-============================================================
-10. RESERVAS DE SALÃO (RESERVAS_SALAO)
-============================================================
-
-RESERVAS_SALAO (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_usuario INT NOT NULL,
-    id_condominio INT NOT NULL,
-    data_reserva VARCHAR(255) NOT NULL,
-    horario_inicio VARCHAR(255) NOT NULL,
-    horario_fim VARCHAR(255) NOT NULL,
-    status ENUM(
-        'PENDENTE',
-        'CONFIRMADA',
-        'CANCELADA'
-    ) NOT NULL DEFAULT 'CONFIRMADA'
-)
-
-OBSERVAÇÃO:
-Os atributos id_usuario e id_condominio identificam o usuário
-responsável pela reserva e o condomínio relacionado.
-
-No código SQL atual, esses atributos não possuem restrições
-FOREIGN KEY declaradas.
-
-
-============================================================
-11. REUNIÕES (REUNIOES)
-============================================================
-
-REUNIOES (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_condominio INT NOT NULL,
-    titulo VARCHAR(255) NOT NULL,
-    pauta VARCHAR(255) NOT NULL,
-    data_hora VARCHAR(255) NOT NULL,
-    local_link VARCHAR(255) NOT NULL
-)
-
-OBSERVAÇÃO:
-O atributo id_condominio identifica o condomínio relacionado
-à reunião.
-
-No código SQL atual, esse atributo não possui uma restrição
-FOREIGN KEY declarada.
-
-
-============================================================
-12. BOLETOS (BOLETOS)
-============================================================
-
-BOLETOS (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_condominio INT NOT NULL,
-    id_usuario INT NOT NULL,
-    mes_referencia VARCHAR(20) NOT NULL,
-    valor DECIMAL(10,2) NOT NULL,
-    data_vencimento DATE NOT NULL,
-    status ENUM(
-        'PENDENTE',
-        'PAGO',
-        'ATRASADO',
-        'CANCELADO'
-    ) NOT NULL DEFAULT 'PENDENTE',
-    codigo_barras VARCHAR(100) NOT NULL,
-    linha_digitavel VARCHAR(100) NOT NULL,
-    data_pagamento DATETIME NULL,
-    valor_pago DECIMAL(10,2) NULL,
-    forma_pagamento VARCHAR(50) NULL,
-    codigo_autenticacao VARCHAR(100) NULL,
-    segunda_via_emitida_em DATETIME NULL,
-    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (id_condominio)
-        REFERENCES CONDOMINIOS(id)
-        ON DELETE CASCADE,
-
-    FOREIGN KEY (id_usuario)
-        REFERENCES USUARIOS(id)
-        ON DELETE CASCADE
-)
 
 
 ============================================================
@@ -344,23 +287,23 @@ PEDIDOS_SINDICO:
 MENSAGENS:
 - id
 
-NOTIFICACOES:
-- id
-
-NOTIFICACAO_DESTINATARIOS:
-- notificacao_id + usuario_id (chave composta)
-
 RESERVAS_CHURRASQUEIRA:
-- id
-
-RESERVAS_SALAO:
 - id
 
 REUNIOES:
 - id
 
+RESERVAS_SALAO:
+- id
+
 BOLETOS:
 - id
+
+NOTIFICACOES:
+- id
+
+NOTIFICACAO_DESTINATARIOS:
+- notificacao_id + usuario_id (chave primária composta)
 
 
 ============================================================
@@ -383,6 +326,10 @@ PEDIDOS_SINDICO:
 - usuario_id -> USUARIOS(id)
 - condominio_id -> CONDOMINIOS(id)
 
+BOLETOS:
+- id_condominio -> CONDOMINIOS(id)
+- id_usuario -> USUARIOS(id)
+
 NOTIFICACOES:
 - condominio_id -> CONDOMINIOS(id)
 - criado_por -> USUARIOS(id)
@@ -391,15 +338,11 @@ NOTIFICACAO_DESTINATARIOS:
 - notificacao_id -> NOTIFICACOES(id)
 - usuario_id -> USUARIOS(id)
 
-BOLETOS:
-- id_condominio -> CONDOMINIOS(id)
-- id_usuario -> USUARIOS(id)
-
 OBSERVAÇÃO:
 As tabelas RESERVAS_CHURRASQUEIRA, RESERVAS_SALAO e REUNIOES
 possuem atributos que identificam usuários ou condomínios,
 mas esses atributos não foram definidos como chaves estrangeiras
-no código SQL atual.
+no banco de dados atual.
 
 O atributo sindico_responsavel da tabela CONDOMINIOS também
 não possui uma restrição FOREIGN KEY declarada.
@@ -425,28 +368,27 @@ não possui uma restrição FOREIGN KEY declarada.
 
 8. CONDOMINIOS — PEDIDOS_SINDICO: 1:N
 
-9. CONDOMINIOS — NOTIFICACOES: 1:N
+9. CONDOMINIOS — BOLETOS: 1:N
 
-10. USUARIOS — NOTIFICACOES (AUTOR): 1:N
+10. USUARIOS — BOLETOS: 1:N
 
-11. NOTIFICACOES — NOTIFICACAO_DESTINATARIOS: 1:N
+11. CONDOMINIOS — NOTIFICACOES: 1:N
 
-12. USUARIOS — NOTIFICACAO_DESTINATARIOS: 1:N
+12. USUARIOS — NOTIFICACOES (AUTOR): 1:N
 
-13. USUARIOS — NOTIFICACOES (DESTINATÁRIO): N:M
+13. NOTIFICACOES — NOTIFICACAO_DESTINATARIOS: 1:N
 
-14. CONDOMINIOS — BOLETOS: 1:N
+14. USUARIOS — NOTIFICACAO_DESTINATARIOS: 1:N
 
-15. USUARIOS — BOLETOS: 1:N
+15. USUARIOS — NOTIFICACOES (DESTINATÁRIO): N:M
 
 
 ============================================================
 16. OBSERVAÇÕES SOBRE A ESTRUTURA DO BANCO DE DADOS
 ============================================================
 
-1. A tabela NOTIFICACAO_DESTINATARIOS é responsável por
-   implementar o relacionamento muitos-para-muitos (N:M)
-   entre usuários e notificações.
+1. A tabela NOTIFICACAO_DESTINATARIOS implementa o relacionamento
+   muitos-para-muitos (N:M) entre usuários e notificações.
 
 2. A tabela BOLETOS possui relacionamentos com CONDOMINIOS
    e USUARIOS por meio de chaves estrangeiras.
@@ -459,7 +401,7 @@ não possui uma restrição FOREIGN KEY declarada.
 
 5. As tabelas de reservas e reuniões possuem campos de
    identificação de usuários ou condomínios, mas não possuem
-   FOREIGN KEY declarada no SQL atual.
+   FOREIGN KEY declarada no banco de dados atual.
 
 6. A tabela CONDOMINIOS possui o atributo sindico_responsavel,
    mas não existe uma FOREIGN KEY declarada para esse campo.
@@ -469,8 +411,10 @@ não possui uma restrição FOREIGN KEY declarada.
    NOTIFICACOES gerencia avisos e comunicados destinados
    aos usuários.
 
-8. O arquivo 4_boletos.sql apresenta novamente a definição
-   da tabela BOLETOS. A estrutura dessa tabela também está
-   presente no arquivo 2_schema.sql.
+8. O modelo relacional contempla 12 tabelas, organizadas para
+   atender às funcionalidades de gerenciamento de condomínios,
+   usuários, reservas, reuniões, boletos e notificações.
 
+---------------------------------------------------------------------------------------------------------------------
+Fim do documento – Modelo Relacional do Banco de Dados Morada Residências.
 ---------------------------------------------------------------------------------------------------------------------
