@@ -293,9 +293,7 @@ Descrição do caso de uso: O sistema utiliza Socket.IO para permitir comunicaç
 
 Prioridade:
 
-◻ Essencial
-◻ Importante
-■ Desejável
+◻ Essencial          ◻ Importante          ■ Desejável
 
 Entradas e pré-condições:
 - O cliente e o servidor devem conseguir estabelecer a comunicação necessária.
@@ -348,9 +346,7 @@ Descrição do caso de uso: O sistema deve permitir a remoção de condomínios 
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - O condomínio existe.
@@ -420,9 +416,7 @@ As notificações podem ser classificadas pelos tipos AVISO, MANUTENCAO e URGENT
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - A notificação deve conter os dados obrigatórios.
@@ -436,9 +430,7 @@ Descrição do caso de uso: O sistema deve registrar o estado de leitura de uma 
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - A notificação está associada ao destinatário.
@@ -452,9 +444,7 @@ Descrição do caso de uso: O sistema deve permitir o agendamento e a consulta d
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - O usuário deve estar autenticado.
@@ -469,9 +459,7 @@ Descrição do caso de uso: O sistema deve permitir consultar e criar reservas d
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - O usuário deve estar autenticado.
@@ -486,9 +474,7 @@ Descrição do caso de uso: O sistema deve permitir consultar, criar e cancelar 
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - O usuário deve estar autenticado.
@@ -519,9 +505,7 @@ Descrição do caso de uso: O sistema deve permitir a geração de boletos em lo
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - O usuário responsável deve possuir autorização para gerar cobranças.
@@ -551,9 +535,7 @@ Descrição do caso de uso: O sistema deve permitir que o usuário solicite uma 
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - Deve existir um boleto cadastrado no sistema.
@@ -568,9 +550,7 @@ Descrição do caso de uso: O sistema deve permitir o registro ou a simulação 
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - Deve existir um boleto registrado.
@@ -585,9 +565,7 @@ Descrição do caso de uso: O sistema deve permitir que usuários autorizados co
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - Devem existir registros financeiros relacionados ao condomínio.
@@ -602,9 +580,7 @@ Descrição do caso de uso: O sistema deve permitir identificar moradores que po
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - Devem existir boletos registrados.
@@ -619,9 +595,7 @@ Descrição do caso de uso: O sistema deve permitir a exclusão de usuários por
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - O usuário a ser excluído deve existir.
@@ -636,9 +610,7 @@ Descrição do caso de uso: O sistema deve permitir a remoção da função de s
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - O usuário deve possuir a função de síndico.
@@ -656,9 +628,7 @@ Descrição do caso de uso: O sistema deve utilizar as tecnologias empregadas em
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Ambiente de desenvolvimento configurado e tecnologias necessárias disponíveis.
 
@@ -668,9 +638,7 @@ Descrição do caso de uso: O sistema deve utilizar JWT para gerenciar a autenti
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Usuário cadastrado e credenciais informadas para autenticação.
 
@@ -680,9 +648,7 @@ Descrição do caso de uso: O sistema deve utilizar bcrypt para proteger as senh
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Senha informada durante o cadastro e mecanismo bcrypt disponível.
 
@@ -692,9 +658,7 @@ Descrição do caso de uso: O código de verificação deve possuir seis dígito
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Usuário em processo de cadastro e endereço de e-mail informado.
 
@@ -704,9 +668,7 @@ Descrição do caso de uso: O sistema deve permitir, no máximo, cinco tentativa
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Código de verificação gerado e tentativa de validação realizada pelo usuário.
 
@@ -716,9 +678,7 @@ Descrição do caso de uso: O sistema deve respeitar um intervalo mínimo de 60 
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Código de verificação solicitado anteriormente e nova solicitação de reenvio.
 
@@ -728,9 +688,7 @@ Descrição do caso de uso: O sistema deve limitar requisições por endereço I
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Solicitação de envio de e-mail recebida pelo servidor e mecanismo de limitação configurado.
 
@@ -740,9 +698,7 @@ Descrição do caso de uso: O sistema deve utilizar MySQL para armazenar os dado
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Dados a serem armazenados e conexão com o banco de dados disponível.
 
@@ -752,9 +708,7 @@ Descrição do caso de uso: O sistema deve utilizar a plataforma Brevo para envi
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Endereço de e-mail do destinatário e integração com a Brevo configurada.
 
@@ -764,9 +718,7 @@ Descrição do caso de uso: O sistema deve utilizar Socket.IO para comunicação
 
 Prioridade:
 
-◻ Essencial
-◻ Importante
-■ Desejável
+◻ Essencial          ◻ Importante          ■ Desejável
 
 Entradas e pré-condições: Cliente e servidor configurados para estabelecer comunicação via Socket.IO.
 
@@ -776,9 +728,7 @@ Descrição do caso de uso: O código-fonte deve ser organizado para facilitar a
 
 Prioridade:
 
-◻ Essencial
-◻ Importante
-■ Desejável
+◻ Essencial          ◻ Importante          ■ Desejável
 
 Entradas e pré-condições: Código-fonte e estrutura do projeto disponíveis para desenvolvimento e manutenção.
 
@@ -788,9 +738,7 @@ Descrição do caso de uso: O sistema deve tratar erros e apresentar mensagens c
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Operação realizada pelo usuário e ocorrência de erro durante o processamento.
 
@@ -800,9 +748,7 @@ Descrição do caso de uso: O sistema deve ser compatível com os navegadores mo
 
 Prioridade:
 
-◻ Essencial
-■ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições:
 - O usuário deve possuir um navegador moderno compatível.
@@ -813,9 +759,7 @@ Descrição do caso de uso: O servidor deve verificar as permissões do usuário
 
 Prioridade:
 
-■ Essencial
-◻ Importante
-◻ Desejável
+■ Essencial          ◻ Importante          ◻ Desejável
 
 Entradas e pré-condições: A solicitação acessa uma operação protegida e o usuário deve estar identificado conforme os mecanismos de autenticação da aplicação.
 
@@ -828,9 +772,7 @@ Descrição do caso de uso: Os scripts SQL de criação e atualização do banco
 
 Prioridade:
 
-■ Essencial
-◻ Importante
-◻ Desejável
+◻ Essencial          ■ Importante          ◻ Desejável
 
 Entradas e pré-condições: Existem scripts SQL de criação ou atualização do banco.
 
