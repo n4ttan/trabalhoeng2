@@ -1,35 +1,50 @@
 ---------------------------------------------------------------------------------------------------------------
 DESCRIÇÃO DO DIAGRAMA DE CASOS DE USO
 
-O diagrama de casos de uso tem como objetivo representar as principais funcionalidades do sistema, 
-demonstrando as interações entre os atores e as operações disponibilizadas. Ele permite compreender 
-como os usuários utilizam o sistema
-e quais são as relações existentes entre suas funcionalidades.
+O diagrama de casos de uso tem como objetivo representar as principais funcionalidades do sistema de gerenciamento de condomínios, demonstrando as interações entre os diferentes atores e as operações disponibilizadas pela aplicação.
+
+Por meio dele, é possível compreender como os usuários interagem com o sistema para realizar atividades como gerenciamento de usuários e condomínios, administração de blocos, solicitação de síndico, envio de mensagens, recebimento de notificações, realização de reservas de espaços comuns, consulta de reuniões e gerenciamento de boletos.
+
+O diagrama também permite identificar as responsabilidades de cada ator e os limites das funcionalidades oferecidas pelo sistema.
 
 ---------------------------------------------------------------------------------------------------------------
 
 DESCRIÇÃO DAS LIGAÇÕES
 
 1. ASSOCIAÇÃO
-Representa a interação entre um ator e um caso de uso, indicando que determinado usuário pode 
-executar uma funcionalidade do sistema.
+
+Representa a interação entre um ator e um caso de uso, indicando que determinado tipo de usuário pode acessar ou executar uma funcionalidade do sistema.
+
+No sistema de gerenciamento de condomínios, essa relação representa, por exemplo, a interação dos moradores com as funcionalidades de reserva de espaços comuns, consulta de notificações e visualização de boletos, assim como a interação dos síndicos com as funcionalidades administrativas do condomínio.
 
 2. INCLUSÃO (<<include>>)
-Representa uma relação obrigatória, na qual um caso de uso necessita executar outro para concluir sua operação.
+
+Representa uma relação obrigatória entre casos de uso, na qual a execução de uma funcionalidade depende necessariamente da execução de outra.
+
+Essa relação pode representar etapas obrigatórias de uma operação, como a necessidade de realizar uma validação ou verificar informações antes de concluir determinada ação no sistema.
 
 3. EXTENSÃO (<<extend>>)
-Representa uma funcionalidade complementar, executada somente quando determinada condição é atendida.
+
+Representa uma funcionalidade complementar, executada somente quando uma condição específica é atendida.
+
+No sistema, essa relação pode ser utilizada para representar operações opcionais ou condicionais, como a emissão de uma segunda via de boleto ou a realização de ações adicionais durante o gerenciamento de uma reserva.
 
 4. GENERALIZAÇÃO
-Representa uma relação de herança, na qual um ator ou caso de uso especializado herda características de outro.
+
+Representa uma relação de especialização, na qual um ator ou caso de uso específico herda características de outro mais geral.
+
+No sistema, pode representar a existência de diferentes perfis de usuários, como administrador da plataforma, síndico e morador, que possuem permissões e responsabilidades distintas de acordo com sua função.
 
 ---------------------------------------------------------------------------------------------------------------
 
 IMPORTÂNCIA DOS RELACIONAMENTOS
 
-As ligações presentes no diagrama permitem identificar as dependências entre as funcionalidades, 
-as responsabilidades de cada ator e as interações com o sistema. Dessa forma, contribuem para 
-uma melhor compreensão dos requisitos funcionais e do comportamento esperado da aplicação.
+As ligações presentes no diagrama permitem identificar as dependências entre as funcionalidades, as responsabilidades dos diferentes perfis de usuários e as formas de interação com o sistema.
+
+No contexto do gerenciamento de condomínios, esses relacionamentos ajudam a compreender quais operações podem ser realizadas por cada perfil, quais funcionalidades dependem de outras e quais ações são complementares ou condicionais.
+
+Dessa forma, o diagrama contribui para a organização dos requisitos funcionais, facilita a compreensão do funcionamento da aplicação e auxilia no desenvolvimento e na manutenção do sistema.
+
 ---------------------------------------------------------------------------------------------------------------
 Link do diagrama de casos de uso
 
