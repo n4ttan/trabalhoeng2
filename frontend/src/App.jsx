@@ -20,6 +20,7 @@ import CondominiosPage from './pages/CondominiosPage';
 import ReunioesPage from './pages/ReunioesPage';
 import ReservasChurrasqueiraPage from './pages/ReservasChurrasqueiraPage';
 import ReservasSalaoPage from './pages/ReservasSalaoPage';
+import VisitantesPage from './pages/VisitantesPage';
 import MoradoresPage from './pages/MoradoresPage';
 import MeusBoletosPage from './pages/MeusBoletosPage';
 import GestaoBoletosPage from './pages/GestaoBoletosPage';
@@ -76,6 +77,9 @@ function App() {
 
                     {/* Reservas de Salão de Festas */}
                     <Route path="/reservas-salao" element={<RotaProtegida><ReservasSalaoPage /></RotaProtegida>} />
+
+                    {/* Visitantes (morador pré-autoriza; síndico opera a portaria) */}
+                    <Route path="/visitantes" element={<RotaProtegida><VisitantesPage /></RotaProtegida>} />
 
                     {/* Gestão de Moradores e Blocos (Síndico/Admin) */}
                     <Route path="/moradores" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><MoradoresPage /></RotaProtegida>} />

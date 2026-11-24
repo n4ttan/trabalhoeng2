@@ -1,0 +1,16 @@
+.visitantes-page { min-height: calc(100vh - 64px); background: #f8fafc; padding: 30px 20px; color: #1e293b; }
+.visitantes-container { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.visitantes-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow-x: auto; }
+.visitantes-form { display: flex; flex-direction: column; gap: 8px; max-width: 420px; }
+.visitantes-form input { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; }
+.visitantes-page button { padding: 8px 14px; border: 0; border-radius: 6px; background: #2563eb; color: #fff; cursor: pointer; }
+.visitantes-page button:disabled { opacity: .6; cursor: not-allowed; }
+.visitantes-alerta { padding: 10px 14px; border-radius: 8px; }
+.visitantes-alerta--erro { background: #fee2e2; color: #991b1b; }
+.visitantes-alerta--sucesso { background: #dcfce7; color: #166534; }
+.visitantes-tabela { width: 100%; border-collapse: collapse; }
+.visitantes-tabela th, .visitantes-tabela td { text-align: left; padding: 8px; border-bottom: 1px solid #e2e8f0; }
+.visitantes-status { padding: 2px 8px; border-radius: 10px; font-size: 12px; background: #e2e8f0; }
+.visitantes-status--AUTORIZADO { background: #dbeafe; }
+.visitantes-status--ENTROU { background: #dcfce7; }
+.visitantes-status--CANCELADO { background: #fee2e2; }

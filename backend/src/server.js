@@ -18,6 +18,7 @@ const boletoController = require('./controllers/boletoController');
 const ocorrenciaController = require('./controllers/ocorrenciaController');
 const relatorioController = require('./controllers/relatorioController');
 const multaController = require('./controllers/multaController');
+const visitanteController = require('./controllers/visitanteController');
 const {
     verificarToken,
     verificarSindico,
@@ -323,6 +324,15 @@ app.get(
     verificarToken,
     reservaSalaoController.obterPorId
 );
+
+// ======================== VISITANTES (KAN-13) ========================
+
+app.post('/condominios/:idCondominio/visitantes', verificarToken, verificarMorador, verificarCondominioMorador, visitanteController.autorizar);
+app.get('/condominios/:idCondominio/visitantes/meus', verificarToken, verificarMorador, verificarCondominioMorador, visitanteController.listarMeus);
+app.patch('/condominios/:idCondominio/visitantes/:id/cancelar', verificarToken, verificarMorador, verificarCondominioMorador, visitanteController.cancelar);
+app.get('/condominios/:idCondominio/visitantes', verificarToken, verificarSindico, verificarCondominioSindico, visitanteController.listar);
+app.patch('/condominios/:idCondominio/visitantes/:id/entrada', verificarToken, verificarSindico, verificarCondominioSindico, visitanteController.registrarEntrada);
+app.patch('/condominios/:idCondominio/visitantes/:id/saida', verificarToken, verificarSindico, verificarCondominioSindico, visitanteController.registrarSaida);
 
 // ======================== BOLETOS, SEGUNDA VIA E PAGAMENTO TEMPLATE ========================
 
