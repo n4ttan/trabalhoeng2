@@ -15,6 +15,7 @@ const reuniaoController = require('./controllers/reuniaoController');
 const reservaController = require('./controllers/reservaController'); // Importado para KAN-14
 const reservaSalaoController = require('./controllers/reservaSalaoController');
 const boletoController = require('./controllers/boletoController');
+const relatorioController = require('./controllers/relatorioController');
 const {
     verificarToken,
     verificarSindico,
@@ -466,5 +467,14 @@ if (require.main === module) {
         console.log('Servidor rodando na porta 3000');
     });
 }
+
+// Relatório agregado de métricas do condomínio (Síndico do condomínio ou Admin)
+app.get(
+    '/condominios/:idCondominio/relatorios',
+    verificarToken,
+    verificarSindico,
+    verificarCondominioSindico,
+    relatorioController.obter
+);
 
 module.exports = app;

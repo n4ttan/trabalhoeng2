@@ -24,6 +24,7 @@ import MoradoresPage from './pages/MoradoresPage';
 import MeusBoletosPage from './pages/MeusBoletosPage';
 import GestaoBoletosPage from './pages/GestaoBoletosPage';
 import PainelFinanceiroPage from './pages/PainelFinanceiroPage';
+import RelatoriosPage from './pages/RelatoriosPage';
 import GerenciamentoPage from './pages/GerenciamentoPage';
 
 function App() {
@@ -81,6 +82,7 @@ function App() {
 
                     {/* Painel Financeiro (síndico) */}
                     <Route path="/painel-financeiro" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><PainelFinanceiroPage /></RotaProtegida>} />
+                    <Route path="/relatorios" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><RelatoriosPage /></RotaProtegida>} />
 
                     {/* Atribuir e Desassociar Gerenciamento (Admin) */}
                     <Route path="/gerenciamento" element={<RotaProtegida perfis={['ADMIN']}><GerenciamentoPage /></RotaProtegida>} />
