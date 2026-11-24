@@ -544,6 +544,8 @@ app.patch(
     verificarSindico,
     verificarCondominioSindico,
     ocorrenciaController.atualizar
+);
+
 // ======================== MANUTENÇÃO NO CONDOMÍNIO (KAN-16) ========================
 
 // Abrir chamado de manutenção (Morador ou Síndico)
@@ -568,13 +570,6 @@ app.patch(
     manutencaoController.atualizarStatus
 );
 
-// Inicia o servidor na porta 3000 se executado diretamente.
-if (require.main === module) {
-    httpServer.listen(3000, () => {
-        console.log('Servidor rodando na porta 3000');
-    });
-}
-
 // Relatório agregado de métricas do condomínio (Síndico do condomínio ou Admin)
 app.get(
     '/condominios/:idCondominio/relatorios',
@@ -583,5 +578,12 @@ app.get(
     verificarCondominioSindico,
     relatorioController.obter
 );
+
+// Inicia o servidor na porta 3000 se executado diretamente.
+if (require.main === module) {
+    httpServer.listen(3000, () => {
+        console.log('Servidor rodando na porta 3000');
+    });
+}
 
 module.exports = app;
