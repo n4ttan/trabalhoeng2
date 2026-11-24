@@ -15,6 +15,7 @@ const reuniaoController = require('./controllers/reuniaoController');
 const reservaController = require('./controllers/reservaController'); // Importado para KAN-14
 const reservaSalaoController = require('./controllers/reservaSalaoController');
 const boletoController = require('./controllers/boletoController');
+const multaController = require('./controllers/multaController');
 const {
     verificarToken,
     verificarSindico,
@@ -384,6 +385,40 @@ app.post(
     verificarToken,
     verificarCondominioSindico,
     boletoController.notificarInadimplentes
+);
+
+// ======================== MULTAS DE MORADORES (KAN-12) ========================
+
+// Registrar multa (Síndico do condomínio ou Admin)
+app.post(
+    '/condominios/:idCondominio/multas',
+    verificarToken,
+    verificarCondominioSindico,
+    multaController.criar
+);
+
+// Listar multas do condomínio (Síndico do condomínio ou Admin)
+app.get(
+    '/condominios/:idCondominio/multas',
+    verificarToken,
+    verificarCondominioSindico,
+    multaController.listar
+);
+
+// Multas do morador autenticado
+app.get(
+    '/condominios/:idCondominio/multas/minhas',
+    verificarToken,
+    verificarCondominioMorador,
+    multaController.listarMinhas
+);
+
+// Marcar multa como paga ou cancelada (Síndico do condomínio ou Admin)
+app.patch(
+    '/condominios/:idCondominio/multas/:id/status',
+    verificarToken,
+    verificarCondominioSindico,
+    multaController.atualizarStatus
 );
 
 // ======================== ADMIN E GERÊNCIA DE USUÁRIOS ========================

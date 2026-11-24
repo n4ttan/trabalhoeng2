@@ -280,8 +280,30 @@ export default function Navbar() {
               </button>
             )}
 
+            {ehMorador && (
+              <button
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/minhas-multas') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/minhas-multas')}
+              >
+                <span className="item-icon">⚠️</span>
+                <span>Minhas Multas</span>
+              </button>
+            )}
+
             {ehSindico && (
-              <button 
+              <button
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/gestao-multas') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/gestao-multas')}
+              >
+                <span className="item-icon">⚠️</span>
+                <span>Multas</span>
+              </button>
+            )}
+
+            {ehSindico && (
+              <button
                 type="button"
                 className={`sidebar-item ${isRotaAtiva('/gestao-boletos') ? 'ativo' : ''}`}
                 onClick={() => handleNavegar('/gestao-boletos')}

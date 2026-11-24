@@ -23,6 +23,8 @@ import ReservasSalaoPage from './pages/ReservasSalaoPage';
 import MoradoresPage from './pages/MoradoresPage';
 import MeusBoletosPage from './pages/MeusBoletosPage';
 import GestaoBoletosPage from './pages/GestaoBoletosPage';
+import GestaoMultasPage from './pages/GestaoMultasPage';
+import MinhasMultasPage from './pages/MinhasMultasPage';
 import PainelFinanceiroPage from './pages/PainelFinanceiroPage';
 import GerenciamentoPage from './pages/GerenciamentoPage';
 
@@ -78,6 +80,10 @@ function App() {
 
                     {/* Boletos do condomínio (síndico) */}
                     <Route path="/gestao-boletos" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><GestaoBoletosPage /></RotaProtegida>} />
+
+                    {/* Multas (KAN-12) */}
+                    <Route path="/minhas-multas" element={<RotaProtegida perfis={['MORADOR', 'ADMIN']}><MinhasMultasPage /></RotaProtegida>} />
+                    <Route path="/gestao-multas" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><GestaoMultasPage /></RotaProtegida>} />
 
                     {/* Painel Financeiro (síndico) */}
                     <Route path="/painel-financeiro" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><PainelFinanceiroPage /></RotaProtegida>} />

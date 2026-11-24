@@ -1,0 +1,67 @@
+.multas-page {
+  max-width: 860px;
+  margin: 30px auto;
+  padding: 0 20px;
+  color: #0f172a;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.multas-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 16px 0 24px;
+}
+
+.multas-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.multas-form input,
+.multas-form select {
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+.multas-form button,
+.multa-acoes button {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}
+
+.multa-acoes button + button {
+  background: #64748b;
+  margin-left: 6px;
+}
+
+.multa-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.multa-status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fef3c7;
+}
+
+.multa-status.paga { background: #dcfce7; }
+.multa-status.cancelada { background: #e2e8f0; }
+
+.multas-erro { color: #b91c1c; }
