@@ -25,6 +25,7 @@ import MeusBoletosPage from './pages/MeusBoletosPage';
 import GestaoBoletosPage from './pages/GestaoBoletosPage';
 import PainelFinanceiroPage from './pages/PainelFinanceiroPage';
 import GerenciamentoPage from './pages/GerenciamentoPage';
+import ManutencaoPage from './pages/ManutencaoPage';
 
 function App() {
     return (
@@ -69,6 +70,9 @@ function App() {
 
                     {/* Reservas de Salão de Festas */}
                     <Route path="/reservas-salao" element={<RotaProtegida><ReservasSalaoPage /></RotaProtegida>} />
+
+                    {/* Manutenção no condomínio */}
+                    <Route path="/manutencao" element={<RotaProtegida><ManutencaoPage /></RotaProtegida>} />
 
                     {/* Gestão de Moradores e Blocos (Síndico/Admin) */}
                     <Route path="/moradores" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><MoradoresPage /></RotaProtegida>} />
