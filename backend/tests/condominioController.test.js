@@ -232,6 +232,23 @@ describe('condominioController', () => {
             expect(condominioService.buscarCondominioPorId).not.toHaveBeenCalled();
         });
 
+        it('deve negar síndico tentando obter detalhes de outro condomínio que não gerencia', async () => {
+            const req = {
+                params: { idCondominio: '8' },
+                usuario: { id: 10, perfil: 'SINDICO', id_condominio: 2 }
+            };
+            const res = criarResposta();
+
+            await condominioController.obterCondominio(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(403);
+            expect(res.json).toHaveBeenCalledWith({
+                erro: 'Acesso negado. Você só pode acessar o condomínio que gerencia.',
+                codigo: 'ACESSO_NEGADO'
+            });
+            expect(condominioService.buscarCondominioPorId).not.toHaveBeenCalled();
+        });
+
         it('deve permitir morador obter detalhes do seu próprio condomínio', async () => {
             const req = {
                 params: { idCondominio: '2' },

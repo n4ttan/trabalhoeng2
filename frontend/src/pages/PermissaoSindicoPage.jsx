@@ -263,7 +263,7 @@ function PermissaoSindicoPage() {
                             <div>
 
                                 <b>
-                                    Envie a solicitação
+                                    Envie a solicitação:  <></>
                                 </b>
 
                                 <span>
@@ -286,7 +286,7 @@ function PermissaoSindicoPage() {
                             <div>
 
                                 <b>
-                                    Aguarde a análise
+                                    Aguarde a análise:  <></>
                                 </b>
 
                                 <span>
@@ -309,7 +309,7 @@ function PermissaoSindicoPage() {
                             <div>
 
                                 <b>
-                                    Acesso liberado
+                                    Acesso liberado:  <></>
                                 </b>
 
                                 <span>

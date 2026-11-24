@@ -20,11 +20,17 @@ import CondominiosPage from './pages/CondominiosPage';
 import ReunioesPage from './pages/ReunioesPage';
 import ReservasChurrasqueiraPage from './pages/ReservasChurrasqueiraPage';
 import ReservasSalaoPage from './pages/ReservasSalaoPage';
+import VisitantesPage from './pages/VisitantesPage';
 import MoradoresPage from './pages/MoradoresPage';
 import MeusBoletosPage from './pages/MeusBoletosPage';
 import GestaoBoletosPage from './pages/GestaoBoletosPage';
+import GestaoMultasPage from './pages/GestaoMultasPage';
+import MinhasMultasPage from './pages/MinhasMultasPage';
 import PainelFinanceiroPage from './pages/PainelFinanceiroPage';
+import RelatoriosPage from './pages/RelatoriosPage';
 import GerenciamentoPage from './pages/GerenciamentoPage';
+import OcorrenciasPage from './pages/OcorrenciasPage';
+import ManutencaoPage from './pages/ManutencaoPage';
 
 function App() {
     return (
@@ -64,11 +70,19 @@ function App() {
                     {/* Reuniões */}
                     <Route path="/reunioes" element={<RotaProtegida><ReunioesPage /></RotaProtegida>} />
 
+                    {/* Ocorrências */}
+                    <Route path="/ocorrencias" element={<RotaProtegida perfis={['MORADOR', 'SINDICO', 'ADMIN']}><OcorrenciasPage /></RotaProtegida>} />
+
                     {/* Reservas de Churrasqueira */}
                     <Route path="/reservas-churrasqueira" element={<RotaProtegida><ReservasChurrasqueiraPage /></RotaProtegida>} />
 
                     {/* Reservas de Salão de Festas */}
                     <Route path="/reservas-salao" element={<RotaProtegida><ReservasSalaoPage /></RotaProtegida>} />
+
+                    {/* Visitantes (morador pré-autoriza; síndico opera a portaria) */}
+                    <Route path="/visitantes" element={<RotaProtegida><VisitantesPage /></RotaProtegida>} />
+                    {/* Manutenção no condomínio */}
+                    <Route path="/manutencao" element={<RotaProtegida><ManutencaoPage /></RotaProtegida>} />
 
                     {/* Gestão de Moradores e Blocos (Síndico/Admin) */}
                     <Route path="/moradores" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><MoradoresPage /></RotaProtegida>} />
@@ -79,8 +93,13 @@ function App() {
                     {/* Boletos do condomínio (síndico) */}
                     <Route path="/gestao-boletos" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><GestaoBoletosPage /></RotaProtegida>} />
 
+                    {/* Multas (KAN-12) */}
+                    <Route path="/minhas-multas" element={<RotaProtegida perfis={['MORADOR', 'ADMIN']}><MinhasMultasPage /></RotaProtegida>} />
+                    <Route path="/gestao-multas" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><GestaoMultasPage /></RotaProtegida>} />
+
                     {/* Painel Financeiro (síndico) */}
                     <Route path="/painel-financeiro" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><PainelFinanceiroPage /></RotaProtegida>} />
+                    <Route path="/relatorios" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><RelatoriosPage /></RotaProtegida>} />
 
                     {/* Atribuir e Desassociar Gerenciamento (Admin) */}
                     <Route path="/gerenciamento" element={<RotaProtegida perfis={['ADMIN']}><GerenciamentoPage /></RotaProtegida>} />

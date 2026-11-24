@@ -15,6 +15,11 @@ const reuniaoController = require('./controllers/reuniaoController');
 const reservaController = require('./controllers/reservaController'); // Importado para KAN-14
 const reservaSalaoController = require('./controllers/reservaSalaoController');
 const boletoController = require('./controllers/boletoController');
+const ocorrenciaController = require('./controllers/ocorrenciaController');
+const relatorioController = require('./controllers/relatorioController');
+const multaController = require('./controllers/multaController');
+const visitanteController = require('./controllers/visitanteController');
+const manutencaoController = require('./controllers/manutencaoController');
 const {
     verificarToken,
     verificarSindico,
@@ -321,6 +326,15 @@ app.get(
     reservaSalaoController.obterPorId
 );
 
+// ======================== VISITANTES (KAN-13) ========================
+
+app.post('/condominios/:idCondominio/visitantes', verificarToken, verificarMorador, verificarCondominioMorador, visitanteController.autorizar);
+app.get('/condominios/:idCondominio/visitantes/meus', verificarToken, verificarMorador, verificarCondominioMorador, visitanteController.listarMeus);
+app.patch('/condominios/:idCondominio/visitantes/:id/cancelar', verificarToken, verificarMorador, verificarCondominioMorador, visitanteController.cancelar);
+app.get('/condominios/:idCondominio/visitantes', verificarToken, verificarSindico, verificarCondominioSindico, visitanteController.listar);
+app.patch('/condominios/:idCondominio/visitantes/:id/entrada', verificarToken, verificarSindico, verificarCondominioSindico, visitanteController.registrarEntrada);
+app.patch('/condominios/:idCondominio/visitantes/:id/saida', verificarToken, verificarSindico, verificarCondominioSindico, visitanteController.registrarSaida);
+
 // ======================== BOLETOS, SEGUNDA VIA E PAGAMENTO TEMPLATE ========================
 
 // Criar boleto individual (Admin ou Síndico)
@@ -384,6 +398,40 @@ app.post(
     verificarToken,
     verificarCondominioSindico,
     boletoController.notificarInadimplentes
+);
+
+// ======================== MULTAS DE MORADORES (KAN-12) ========================
+
+// Registrar multa (Síndico do condomínio ou Admin)
+app.post(
+    '/condominios/:idCondominio/multas',
+    verificarToken,
+    verificarCondominioSindico,
+    multaController.criar
+);
+
+// Listar multas do condomínio (Síndico do condomínio ou Admin)
+app.get(
+    '/condominios/:idCondominio/multas',
+    verificarToken,
+    verificarCondominioSindico,
+    multaController.listar
+);
+
+// Multas do morador autenticado
+app.get(
+    '/condominios/:idCondominio/multas/minhas',
+    verificarToken,
+    verificarCondominioMorador,
+    multaController.listarMinhas
+);
+
+// Marcar multa como paga ou cancelada (Síndico do condomínio ou Admin)
+app.patch(
+    '/condominios/:idCondominio/multas/:id/status',
+    verificarToken,
+    verificarCondominioSindico,
+    multaController.atualizarStatus
 );
 
 // ======================== ADMIN E GERÊNCIA DE USUÁRIOS ========================
@@ -458,6 +506,77 @@ app.post(
     '/notificacoes',
     verificarToken,
     notificacaoController.publicar
+);
+
+// ======================== OCORRÊNCIAS (KAN-8) ========================
+
+// Morador registra uma ocorrência
+app.post(
+    '/condominios/:idCondominio/ocorrencias',
+    verificarToken,
+    verificarMorador,
+    verificarCondominioMorador,
+    ocorrenciaController.registrar
+);
+
+// Morador lista as suas ocorrências
+app.get(
+    '/condominios/:idCondominio/ocorrencias/minhas',
+    verificarToken,
+    verificarMorador,
+    verificarCondominioMorador,
+    ocorrenciaController.listarMinhas
+);
+
+// Síndico lista as ocorrências do condomínio
+app.get(
+    '/condominios/:idCondominio/ocorrencias',
+    verificarToken,
+    verificarSindico,
+    verificarCondominioSindico,
+    ocorrenciaController.listar
+);
+
+// Síndico altera status e adiciona resposta
+app.patch(
+    '/condominios/:idCondominio/ocorrencias/:id',
+    verificarToken,
+    verificarSindico,
+    verificarCondominioSindico,
+    ocorrenciaController.atualizar
+);
+
+// ======================== MANUTENÇÃO NO CONDOMÍNIO (KAN-16) ========================
+
+// Abrir chamado de manutenção (Morador ou Síndico)
+app.post(
+    '/condominios/:idCondominio/manutencoes',
+    verificarToken,
+    manutencaoController.criar
+);
+
+// Listar chamados (Síndico: todos; Morador: os seus)
+app.get(
+    '/condominios/:idCondominio/manutencoes',
+    verificarToken,
+    manutencaoController.listar
+);
+
+// Atualizar status do chamado (Síndico ou Admin)
+app.patch(
+    '/condominios/:idCondominio/manutencoes/:id/status',
+    verificarToken,
+    verificarSindico,
+    manutencaoController.atualizarStatus
+);
+
+// Relatório agregado de métricas do condomínio (Síndico do condomínio ou Admin)
+app.get(
+    '/condominios/:idCondominio/relatorios',
+    verificarToken,
+    verificarSindico,
+    verificarCondominioSindico,
+    relatorioController.obter
 );
 
 // Inicia o servidor na porta 3000 se executado diretamente.

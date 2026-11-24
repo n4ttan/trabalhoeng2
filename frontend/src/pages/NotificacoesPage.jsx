@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { listarNotificacoes, publicarNotificacao, marcarNotificacaoComoLida } from '../services/notificacaoApi';
+import { assinarNotificacoes } from '../services/socketService';
 import './NotificacoesPage.css';
 
 function decodificarToken(token) {
@@ -18,15 +20,36 @@ function decodificarToken(token) {
   }
 }
 
+export function ehNotificacaoCobranca(aviso) {
+  if (!aviso) return false;
+  const texto = `${aviso.titulo || ''} ${aviso.mensagem || aviso.descricao || ''}`.toLowerCase();
+  return (
+    texto.includes('cobrança') ||
+    texto.includes('cobranca') ||
+    texto.includes('taxa condominial') ||
+    texto.includes('fatura') ||
+    texto.includes('boleto') ||
+    texto.includes('inadimpl') ||
+    texto.includes('pendente') ||
+    texto.includes('em aberto') ||
+    (aviso.tipo === 'URGENTE' && (texto.includes('pagamento') || texto.includes('valor')))
+  );
+}
+
 export default function NotificacoesPage() {
+  const navigate = useNavigate();
   const [avisos, setAvisos] = useState([]);
   const [condominios, setCondominios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState('');
+  const [alertaTempoReal, setAlertaTempoReal] = useState(null);
 
-  // Formulário de publicação
+  // Aba selecionada: 'TODAS' | 'COBRANCAS' | 'NAO_LIDAS' | 'COMUNICADOS'
+  const [abaAtiva, setAbaAtiva] = useState('TODAS');
+
+  // Formulário de publicação (para Síndico/Admin)
   const [mostrarForm, setMostrarForm] = useState(false);
   const [novoTitulo, setNovoTitulo] = useState('');
   const [novaMensagem, setNovaMensagem] = useState('');
@@ -47,11 +70,10 @@ export default function NotificacoesPage() {
         const lista = Array.isArray(dados) ? dados : [];
         setCondominios(lista);
 
-        // Se o usuário tiver um condomínio padrão no token, usa ele; senão o primeiro da lista
         const token = localStorage.getItem('morada_token');
         const tokenData = token ? decodificarToken(token) : null;
-        if (tokenData && tokenData.condominio) {
-          setNovoCondominioId(String(tokenData.condominio));
+        if (tokenData && tokenData.id_condominio) {
+          setNovoCondominioId(String(tokenData.id_condominio));
         } else if (lista.length > 0) {
           setNovoCondominioId(String(lista[0].id));
         }
@@ -80,7 +102,38 @@ export default function NotificacoesPage() {
     carregarAvisos();
   }, []);
 
-  // Publica novo aviso no backend com tratamento para múltiplos condomínios
+  // Assinatura do Socket.IO para receber notificações em tempo real
+  useEffect(() => {
+    const cancelarAssinatura = assinarNotificacoes((nova) => {
+      setAvisos((prev) => {
+        if (prev.some((a) => a.id === nova.id)) return prev;
+        return [nova, ...prev];
+      });
+
+      const cobranca = ehNotificacaoCobranca(nova);
+      setAlertaTempoReal({
+        id: nova.id,
+        titulo: nova.titulo,
+        mensagem: nova.mensagem,
+        ehCobranca: cobranca
+      });
+
+      // Se for notificação de cobrança pendente, muda automaticamente para a aba de cobranças
+      if (cobranca) {
+        setAbaAtiva('COBRANCAS');
+      }
+
+      setTimeout(() => {
+        setAlertaTempoReal(null);
+      }, 9000);
+    });
+
+    return () => {
+      cancelarAssinatura();
+    };
+  }, []);
+
+  // Publica novo aviso no backend
   const handleCriarAviso = async (e) => {
     e.preventDefault();
     setErro('');
@@ -115,7 +168,6 @@ export default function NotificacoesPage() {
       setNovoTipo('AVISO');
       setMostrarForm(false);
 
-      // Atualiza a lista com o novo aviso
       await carregarAvisos();
     } catch (err) {
       setErro(err.message || 'Erro ao publicar aviso.');
@@ -124,29 +176,11 @@ export default function NotificacoesPage() {
     }
   };
 
-  // Mapeia id do condomínio para o nome legível
   const obterNomeCondominio = (idCondo) => {
     if (!idCondo) return null;
     const condo = condominios.find((c) => String(c.id) === String(idCondo));
     return condo ? condo.nome : `Condomínio #${idCondo}`;
   };
-
-  // Filtragem dos avisos
-  const avisosFiltrados = avisos.filter((aviso) => {
-    if (filtroCondominio !== 'TODOS') {
-      if (filtroCondominio === 'PLATAFORMA') {
-        if (aviso.escopo !== 'PLATAFORMA') return false;
-      } else {
-        if (String(aviso.condominio_id) !== String(filtroCondominio)) return false;
-      }
-    }
-
-    if (filtroTipo !== 'TODOS') {
-      if (aviso.tipo !== filtroTipo) return false;
-    }
-
-    return true;
-  });
 
   const handleMarcarLida = async (id) => {
     try {
@@ -161,24 +195,91 @@ export default function NotificacoesPage() {
     }
   };
 
+  // Contadores para as abas
+  const totalCobrancas = avisos.filter(ehNotificacaoCobranca).length;
+  const totalNaoLidas = avisos.filter((a) => !a.lida).length;
+  const totalComunicados = avisos.filter((a) => !ehNotificacaoCobranca(a)).length;
+
+  // Filtragem dos avisos por condomínio, tipo e aba ativa
+  const avisosFiltrados = avisos.filter((aviso) => {
+    // Filtro da Aba
+    if (abaAtiva === 'COBRANCAS' && !ehNotificacaoCobranca(aviso)) {
+      return false;
+    }
+    if (abaAtiva === 'NAO_LIDAS' && aviso.lida) {
+      return false;
+    }
+    if (abaAtiva === 'COMUNICADOS' && ehNotificacaoCobranca(aviso)) {
+      return false;
+    }
+
+    // Filtro por Condomínio
+    if (filtroCondominio !== 'TODOS') {
+      if (filtroCondominio === 'PLATAFORMA') {
+        if (aviso.escopo !== 'PLATAFORMA') return false;
+      } else {
+        if (String(aviso.condominio_id) !== String(filtroCondominio)) return false;
+      }
+    }
+
+    // Filtro por Tipo
+    if (filtroTipo !== 'TODOS') {
+      if (aviso.tipo !== filtroTipo) return false;
+    }
+
+    return true;
+  });
+
   if (loading) {
     return (
       <div className="notificacoes-container">
-        <p>Carregando avisos...</p>
+        <p>Carregando notificações e avisos...</p>
       </div>
     );
   }
 
   return (
     <div className="notificacoes-container">
+      {/* Alerta em tempo real via Socket.IO */}
+      {alertaTempoReal && (
+        <div className={`alerta-socket-banner ${alertaTempoReal.ehCobranca ? 'cobranca' : ''}`}>
+          <div className="alerta-socket-conteudo">
+            <span className="alerta-socket-icone">
+              {alertaTempoReal.ehCobranca ? '💳' : '🔔'}
+            </span>
+            <div>
+              <strong>Nova notificação recebida em tempo real via WebSocket:</strong>
+              <p>{alertaTempoReal.titulo}</p>
+            </div>
+          </div>
+          {alertaTempoReal.ehCobranca && (
+            <button
+              type="button"
+              className="btn-ir-boletos"
+              onClick={() => navigate('/meus-boletos')}
+            >
+              Ver Meus Boletos →
+            </button>
+          )}
+          <button 
+            type="button" 
+            className="btn-fechar-alerta-socket"
+            onClick={() => setAlertaTempoReal(null)}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       <div className="notificacoes-header">
         <div>
-          <h2>Mural de Avisos e Notificações</h2>
+          <h2>Central de Notificações & Avisos</h2>
           <span className="notificacoes-subtitulo">
-            Gerenciamento e comunicados por condomínio
+            Acompanhe comunicados, notificações de cobrança e avisos do condomínio em tempo real
           </span>
         </div>
         <button
+          type="button"
           className="btn-novo-aviso"
           onClick={() => {
             setMostrarForm(!mostrarForm);
@@ -192,6 +293,53 @@ export default function NotificacoesPage() {
 
       {erro && <div className="notificacao-alerta erro">{erro}</div>}
       {sucesso && <div className="notificacao-alerta sucesso">{sucesso}</div>}
+
+      {/* Abas Principais de Notificações */}
+      <div className="abas-notificacoes-container">
+        <button
+          type="button"
+          className={`aba-item ${abaAtiva === 'TODAS' ? 'ativa' : ''}`}
+          onClick={() => setAbaAtiva('TODAS')}
+        >
+          <span className="aba-icone">📋</span>
+          <span>Todas</span>
+          <span className="aba-contador">{avisos.length}</span>
+        </button>
+
+        <button
+          type="button"
+          className={`aba-item aba-cobrancas ${abaAtiva === 'COBRANCAS' ? 'ativa' : ''}`}
+          onClick={() => setAbaAtiva('COBRANCAS')}
+        >
+          <span className="aba-icone">💳</span>
+          <span>Contas & Cobranças</span>
+          {totalCobrancas > 0 && (
+            <span className="aba-contador contador-cobranca">{totalCobrancas}</span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          className={`aba-item ${abaAtiva === 'NAO_LIDAS' ? 'ativa' : ''}`}
+          onClick={() => setAbaAtiva('NAO_LIDAS')}
+        >
+          <span className="aba-icone">🔔</span>
+          <span>Não Lidas</span>
+          {totalNaoLidas > 0 && (
+            <span className="aba-contador contador-nao-lidas">{totalNaoLidas}</span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          className={`aba-item ${abaAtiva === 'COMUNICADOS' ? 'ativa' : ''}`}
+          onClick={() => setAbaAtiva('COMUNICADOS')}
+        >
+          <span className="aba-icone">📢</span>
+          <span>Comunicados Gerais</span>
+          <span className="aba-contador">{totalComunicados}</span>
+        </button>
+      </div>
 
       {mostrarForm && (
         <form className="form-aviso" onSubmit={handleCriarAviso}>
@@ -250,7 +398,7 @@ export default function NotificacoesPage() {
               >
                 <option value="AVISO">Aviso Geral</option>
                 <option value="MANUTENCAO">Manutenção</option>
-                <option value="URGENTE">Urgente</option>
+                <option value="URGENTE">Urgente / Cobrança</option>
               </select>
             </div>
           </div>
@@ -285,10 +433,10 @@ export default function NotificacoesPage() {
         </form>
       )}
 
-      {/* Barra de Filtros */}
+      {/* Barra de Filtros Complementares */}
       <div className="filtros-avisos-bar">
         <div className="filtro-item">
-          <label htmlFor="filtro-condo">Filtrar por Condomínio:</label>
+          <label htmlFor="filtro-condo">Condomínio:</label>
           <select
             id="filtro-condo"
             value={filtroCondominio}
@@ -305,7 +453,7 @@ export default function NotificacoesPage() {
         </div>
 
         <div className="filtro-item">
-          <label htmlFor="filtro-tipo-select">Filtrar por Tipo:</label>
+          <label htmlFor="filtro-tipo-select">Classificação:</label>
           <select
             id="filtro-tipo-select"
             value={filtroTipo}
@@ -314,30 +462,51 @@ export default function NotificacoesPage() {
             <option value="TODOS">Todos os tipos</option>
             <option value="AVISO">Avisos</option>
             <option value="MANUTENCAO">Manutenções</option>
-            <option value="URGENTE">Urgentes</option>
+            <option value="URGENTE">Urgentes / Cobranças</option>
           </select>
         </div>
       </div>
 
-      {/* Lista de Notificações com as Caixas de Mostragem Atualizadas */}
+      {/* Lista de Notificações com Destaque de Contas Pendentes */}
       <div className="lista-avisos">
         {avisosFiltrados.length === 0 ? (
-          <p className="nenhum-aviso">Nenhum aviso encontrado para os critérios selecionados.</p>
+          <div className="painel-sem-avisos">
+            <span className="icone-vazio">
+              {abaAtiva === 'COBRANCAS' ? '✅' : '📭'}
+            </span>
+            <h3>
+              {abaAtiva === 'COBRANCAS'
+                ? 'Nenhuma notificação de conta pendente encontrada'
+                : 'Nenhum aviso encontrado'}
+            </h3>
+            <p>
+              {abaAtiva === 'COBRANCAS'
+                ? 'Suas taxas condominiais estão em dia ou não há notificações de cobrança pendente para você.'
+                : 'Não há avisos para os filtros selecionados no momento.'}
+            </p>
+          </div>
         ) : (
           avisosFiltrados.map((aviso) => {
+            const ehCobranca = ehNotificacaoCobranca(aviso);
             const tipoClasse = (aviso.tipo || 'AVISO').toLowerCase();
             const nomeCondo = obterNomeCondominio(aviso.condominio_id);
 
             return (
               <div
                 key={aviso.id || aviso.idNotificacao}
-                className={`card-aviso card-aviso-${tipoClasse}`}
+                className={`card-aviso card-aviso-${tipoClasse} ${ehCobranca ? 'card-aviso-cobranca' : ''}`}
               >
                 <div className="card-aviso-top">
                   <div className="card-aviso-badges">
-                    <span className={`badge-tag badge-tipo badge-${tipoClasse}`}>
-                      {aviso.tipo || 'AVISO'}
-                    </span>
+                    {ehCobranca ? (
+                      <span className="badge-tag badge-cobranca-destaque">
+                        ⚠️ Pendência Financeira
+                      </span>
+                    ) : (
+                      <span className={`badge-tag badge-tipo badge-${tipoClasse}`}>
+                        {aviso.tipo || 'AVISO'}
+                      </span>
+                    )}
 
                     {aviso.escopo === 'PLATAFORMA' ? (
                       <span className="badge-tag badge-escopo-plataforma">
@@ -355,7 +524,7 @@ export default function NotificacoesPage() {
                           aviso.lida ? 'badge-lida' : 'badge-nao-lida'
                         }`}
                       >
-                        {aviso.lida ? 'Lida' : 'Nova'}
+                        {aviso.lida ? '✓ Lida' : '● Nova'}
                       </span>
                     )}
                   </div>
@@ -383,8 +552,18 @@ export default function NotificacoesPage() {
                   {aviso.mensagem || aviso.descricao}
                 </p>
 
-                {!aviso.lida && (
-                  <div className="card-aviso-acoes">
+                <div className="card-aviso-rodape-acoes">
+                  {ehCobranca && (
+                    <button
+                      type="button"
+                      className="btn-ir-boletos"
+                      onClick={() => navigate('/meus-boletos')}
+                    >
+                      💳 Ver e Pagar Boletos Pendentes →
+                    </button>
+                  )}
+
+                  {!aviso.lida && (
                     <button
                       type="button"
                       className="btn-marcar-lida"
@@ -392,8 +571,8 @@ export default function NotificacoesPage() {
                     >
                       ✓ Marcar como lida
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             );
           })
