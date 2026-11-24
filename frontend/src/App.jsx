@@ -25,6 +25,7 @@ import MeusBoletosPage from './pages/MeusBoletosPage';
 import GestaoBoletosPage from './pages/GestaoBoletosPage';
 import PainelFinanceiroPage from './pages/PainelFinanceiroPage';
 import GerenciamentoPage from './pages/GerenciamentoPage';
+import OcorrenciasPage from './pages/OcorrenciasPage';
 
 function App() {
     return (
@@ -63,6 +64,9 @@ function App() {
 
                     {/* Reuniões */}
                     <Route path="/reunioes" element={<RotaProtegida><ReunioesPage /></RotaProtegida>} />
+
+                    {/* Ocorrências */}
+                    <Route path="/ocorrencias" element={<RotaProtegida perfis={['MORADOR', 'SINDICO', 'ADMIN']}><OcorrenciasPage /></RotaProtegida>} />
 
                     {/* Reservas de Churrasqueira */}
                     <Route path="/reservas-churrasqueira" element={<RotaProtegida><ReservasChurrasqueiraPage /></RotaProtegida>} />

@@ -15,6 +15,7 @@ const reuniaoController = require('./controllers/reuniaoController');
 const reservaController = require('./controllers/reservaController'); // Importado para KAN-14
 const reservaSalaoController = require('./controllers/reservaSalaoController');
 const boletoController = require('./controllers/boletoController');
+const ocorrenciaController = require('./controllers/ocorrenciaController');
 const {
     verificarToken,
     verificarSindico,
@@ -458,6 +459,44 @@ app.post(
     '/notificacoes',
     verificarToken,
     notificacaoController.publicar
+);
+
+// ======================== OCORRÊNCIAS (KAN-8) ========================
+
+// Morador registra uma ocorrência
+app.post(
+    '/condominios/:idCondominio/ocorrencias',
+    verificarToken,
+    verificarMorador,
+    verificarCondominioMorador,
+    ocorrenciaController.registrar
+);
+
+// Morador lista as suas ocorrências
+app.get(
+    '/condominios/:idCondominio/ocorrencias/minhas',
+    verificarToken,
+    verificarMorador,
+    verificarCondominioMorador,
+    ocorrenciaController.listarMinhas
+);
+
+// Síndico lista as ocorrências do condomínio
+app.get(
+    '/condominios/:idCondominio/ocorrencias',
+    verificarToken,
+    verificarSindico,
+    verificarCondominioSindico,
+    ocorrenciaController.listar
+);
+
+// Síndico altera status e adiciona resposta
+app.patch(
+    '/condominios/:idCondominio/ocorrencias/:id',
+    verificarToken,
+    verificarSindico,
+    verificarCondominioSindico,
+    ocorrenciaController.atualizar
 );
 
 // Inicia o servidor na porta 3000 se executado diretamente.
