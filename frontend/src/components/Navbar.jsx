@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { obterPerfil, obterUsuario, logout, estaLogado } from '../services/authApi';
+import { listarNotificacoes, marcarNotificacaoComoLida } from '../services/notificacaoApi';
+import { assinarNotificacoes } from '../services/socketService';
+import { ehNotificacaoCobranca } from '../pages/NotificacoesPage';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -10,6 +13,8 @@ export default function Navbar() {
   const [aberto, setAberto] = useState(false);
   const [condominioAtivo, setCondominioAtivo] = useState(null);
   const [usuario, setUsuario] = useState(null);
+  const [notificacoes, setNotificacoes] = useState([]);
+  const [menuNotifAberto, setMenuNotifAberto] = useState(false);
 
   const perfil = obterPerfil();
   const logado = estaLogado();
@@ -48,7 +53,39 @@ export default function Navbar() {
 
     // Fecha a sidebar ao mudar de página
     setAberto(false);
+    setMenuNotifAberto(false);
   }, [location.pathname]);
+
+  // Carrega notificações e escuta eventos em tempo real via WebSocket
+  useEffect(() => {
+    if (!logado) return;
+
+    let cancelado = false;
+    async function buscar() {
+      try {
+        const dados = await listarNotificacoes();
+        if (!cancelado && Array.isArray(dados)) {
+          setNotificacoes(dados);
+        }
+      } catch (e) {
+        console.warn('Erro ao carregar notificações na Navbar:', e.message);
+      }
+    }
+    buscar();
+
+    // Escuta novas notificações emitidas via Socket.IO
+    const cancelarAssinatura = assinarNotificacoes((nova) => {
+      setNotificacoes((prev) => {
+        if (prev.some((n) => n.id === nova.id)) return prev;
+        return [nova, ...prev];
+      });
+    });
+
+    return () => {
+      cancelado = true;
+      cancelarAssinatura();
+    };
+  }, [logado, location.pathname]);
 
   if (!logado || paginasSemNavbar.includes(location.pathname)) {
     return null;
@@ -74,6 +111,9 @@ export default function Navbar() {
   };
 
   const isRotaAtiva = (caminho) => location.pathname === caminho;
+
+  const naoLidas = notificacoes.filter((n) => !n.lida).length;
+  const temCobrancaPendente = notificacoes.some((n) => !n.lida && ehNotificacaoCobranca(n));
 
   return (
     <>
@@ -124,6 +164,94 @@ export default function Navbar() {
         </div>
 
         <div className="topbar-right">
+          {/* Aba / Dropdown Rápido de Notificações */}
+          <div className="topbar-notif-wrapper">
+            <button
+              type="button"
+              className={`btn-topbar-notif ${temCobrancaPendente ? 'alerta-cobranca' : ''}`}
+              onClick={() => setMenuNotifAberto(!menuNotifAberto)}
+              title={temCobrancaPendente ? 'Aviso: você possui notificação de cobrança pendente!' : 'Notificações'}
+              aria-label="Abrir aba de notificações"
+            >
+              <span className="notif-icone">🔔</span>
+              {naoLidas > 0 && (
+                <span className={`notif-badge ${temCobrancaPendente ? 'badge-cobranca-pulsante' : ''}`}>
+                  {naoLidas > 99 ? '99+' : naoLidas}
+                </span>
+              )}
+            </button>
+
+            {menuNotifAberto && (
+              <div className="dropdown-notificacoes">
+                <div className="dropdown-notif-header">
+                  <strong>Notificações Rápidas</strong>
+                  <button 
+                    type="button"
+                    className="btn-ver-todas-notif"
+                    onClick={() => {
+                      setMenuNotifAberto(false);
+                      handleNavegar('/notificacoes');
+                    }}
+                  >
+                    Ver Central →
+                  </button>
+                </div>
+
+                <div className="dropdown-notif-lista">
+                  {notificacoes.length === 0 ? (
+                    <div className="dropdown-notif-vazio">
+                      <span>📭</span>
+                      <p>Nenhuma notificação encontrada</p>
+                    </div>
+                  ) : (
+                    notificacoes.slice(0, 5).map((n) => {
+                      const ehCobranca = ehNotificacaoCobranca(n);
+                      return (
+                        <div 
+                          key={n.id} 
+                          className={`dropdown-notif-item ${!n.lida ? 'nao-lida' : ''} ${ehCobranca ? 'item-cobranca' : ''}`}
+                          onClick={() => {
+                            setMenuNotifAberto(false);
+                            if (ehCobranca) {
+                              handleNavegar('/meus-boletos');
+                            } else {
+                              handleNavegar('/notificacoes');
+                            }
+                          }}
+                        >
+                          <div className="dropdown-notif-item-top">
+                            <span className="dropdown-notif-tipo">
+                              {ehCobranca ? '⚠️ Cobrança Pendente' : (n.tipo || 'Aviso')}
+                            </span>
+                            {!n.lida && <span className="ponto-novo" />}
+                          </div>
+                          <strong className="dropdown-notif-item-titulo">{n.titulo}</strong>
+                          <p className="dropdown-notif-item-msg">{n.mensagem}</p>
+                          {ehCobranca && (
+                            <span className="link-pagar-rapido">💳 Ver Boletos e Pagar →</span>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                <div className="dropdown-notif-footer">
+                  <button
+                    type="button"
+                    className="btn-dropdown-ir-central"
+                    onClick={() => {
+                      setMenuNotifAberto(false);
+                      handleNavegar('/notificacoes');
+                    }}
+                  >
+                    Abrir Central de Notificações
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="usuario-badge" onClick={() => handleNavegar('/perfil')} title="Ver meu perfil">
             <span className="usuario-avatar-circulo">
               {usuario?.nome ? usuario.nome.charAt(0).toUpperCase() : '👤'}
@@ -221,6 +349,11 @@ export default function Navbar() {
             >
               <span className="item-icon">📢</span>
               <span>Mural de Avisos</span>
+              {naoLidas > 0 && (
+                <span className={`sidebar-badge-notif ${temCobrancaPendente ? 'cobranca' : ''}`}>
+                  {naoLidas}
+                </span>
+              )}
             </button>
 
             <button 

@@ -73,6 +73,16 @@ async function obterCondominio(req, res) {
                 codigo: 'ACESSO_NEGADO'
             });
         }
+        if (
+            req.usuario &&
+            req.usuario.perfil === 'SINDICO' &&
+            Number(req.usuario.id_condominio) !== Number(idCondominio)
+        ) {
+            return res.status(403).json({
+                erro: 'Acesso negado. Você só pode acessar o condomínio que gerencia.',
+                codigo: 'ACESSO_NEGADO'
+            });
+        }
         const condominio = await condominioService.buscarCondominioPorId(idCondominio);
         return res.status(200).json(condominio);
     } catch (error) {
