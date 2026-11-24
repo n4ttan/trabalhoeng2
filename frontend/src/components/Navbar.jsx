@@ -310,6 +310,17 @@ export default function Navbar() {
                 <span>Painel Financeiro</span>
               </button>
             )}
+
+            {ehSindico && (
+              <button
+                type="button"
+                className={`sidebar-item ${isRotaAtiva('/relatorios') ? 'ativo' : ''}`}
+                onClick={() => handleNavegar('/relatorios')}
+              >
+                <span className="item-icon">📈</span>
+                <span>Relatórios</span>
+              </button>
+            )}
           </div>
 
           {/* Seção Gestão e Síndico */}

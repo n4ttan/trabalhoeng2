@@ -16,6 +16,7 @@ const reservaController = require('./controllers/reservaController'); // Importa
 const reservaSalaoController = require('./controllers/reservaSalaoController');
 const boletoController = require('./controllers/boletoController');
 const ocorrenciaController = require('./controllers/ocorrenciaController');
+const relatorioController = require('./controllers/relatorioController');
 const {
     verificarToken,
     verificarSindico,
@@ -505,5 +506,14 @@ if (require.main === module) {
         console.log('Servidor rodando na porta 3000');
     });
 }
+
+// Relatório agregado de métricas do condomínio (Síndico do condomínio ou Admin)
+app.get(
+    '/condominios/:idCondominio/relatorios',
+    verificarToken,
+    verificarSindico,
+    verificarCondominioSindico,
+    relatorioController.obter
+);
 
 module.exports = app;
