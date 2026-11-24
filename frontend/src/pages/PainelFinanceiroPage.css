@@ -1,3 +1,4 @@
+
 .financeiro-container {
   max-width: 1200px;
   margin: 32px auto;
@@ -32,7 +33,7 @@
 }
 
 .financeiro-header h2 {
-  margin: 10px 0 4px 0;
+  margin: 10px 0 4px;
   font-size: 1.75rem;
   color: #0f172a;
 }
@@ -41,6 +42,25 @@
   margin: 0;
   color: #64748b;
   font-size: 0.95rem;
+}
+
+.financeiro-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Botões */
+
+.fin-btn-atualizar {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .btn-notificar-inadimplentes {
@@ -63,6 +83,8 @@
   cursor: not-allowed;
 }
 
+/* Mensagens */
+
 .financeiro-alerta {
   padding: 14px 18px;
   border-radius: 10px;
@@ -81,6 +103,8 @@
   color: #991b1b;
   border: 1px solid #fecaca;
 }
+
+/* Item 4 - Cards financeiros */
 
 .financeiro-cards-grid {
   display: grid;
@@ -132,6 +156,8 @@
   font-size: 0.8rem;
 }
 
+/* Tabela financeira */
+
 .financeiro-tabela-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -141,7 +167,7 @@
 }
 
 .financeiro-tabela-card h3 {
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
   font-size: 1.15rem;
   color: #0f172a;
 }
@@ -169,6 +195,8 @@
   padding: 12px 14px;
   border-bottom: 1px solid #f1f5f9;
 }
+
+/* Status dos boletos */
 
 .status-pill {
   padding: 4px 10px;
@@ -204,7 +232,8 @@
   padding: 24px 0;
 }
 
-/* Modal */
+/* Item 5 - Modal de notificações */
+
 .fin-modal-overlay {
   position: fixed;
   inset: 0;
@@ -222,16 +251,19 @@
   padding: 24px;
   width: 100%;
   max-width: 480px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  box-sizing: border-box;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
 }
 
 .fin-modal h3 {
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   color: #0f172a;
 }
 
 .fin-modal-desc {
-  margin: 0 0 18px 0;
+  margin: 0 0 18px;
   font-size: 0.9rem;
   color: #64748b;
 }
@@ -253,6 +285,8 @@
   border-radius: 8px;
   font-family: inherit;
   font-size: 0.92rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .fin-modal-acoes {
@@ -280,4 +314,40 @@
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.fin-modal button:disabled,
+.fin-btn-atualizar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsividade */
+
+@media (max-width: 600px) {
+  .financeiro-container {
+    padding: 0 14px;
+    margin: 20px auto;
+  }
+
+  .financeiro-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .financeiro-tabela-card {
+    padding: 14px;
+  }
+
+  .financeiro-acoes {
+    width: 100%;
+  }
+
+  .financeiro-acoes button {
+    flex: 1;
+  }
+
+  .fin-modal-acoes {
+    flex-wrap: wrap;
+  }
 }
