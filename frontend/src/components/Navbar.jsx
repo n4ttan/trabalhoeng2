@@ -246,6 +246,15 @@ export default function Navbar() {
               <span>Reuniões</span>
             </button>
 
+            <button
+              type="button"
+              className={`sidebar-item ${isRotaAtiva('/ocorrencias') ? 'ativo' : ''}`}
+              onClick={() => handleNavegar('/ocorrencias')}
+            >
+              <span className="item-icon">📢</span>
+              <span>Ocorrências</span>
+            </button>
+
             <button 
               type="button"
               className={`sidebar-item ${isRotaAtiva('/reservas-salao') ? 'ativo' : ''}`}
