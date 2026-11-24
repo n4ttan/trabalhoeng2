@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:cov": "jest --coverage --testPathIgnorePatterns integration",
     "seed": "node scripts/criar_condominios_teste.js"
   },
   "keywords": [],
