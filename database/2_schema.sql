@@ -139,12 +139,11 @@ CREATE TABLE IF NOT EXISTS boletos (
         REFERENCES usuarios(id)
         ON DELETE CASCADE
 );
-
 INSERT INTO usuarios (nome, email, senha, perfil, id_condominio, status_cadastro) 
 VALUES (
     'Administrador Geral', 
     'admin@condominio.com', 
-    '$2b$10$Nx.nvEbDklACp6msJ4t1XOqnZ9C3bhiKuPvHL4fGC2KSmzvkh6MJi', 
+    '$2b$10$acpiNqrK5MHsklEIPqtsyOX5hlUB.mVN96OxnGvEORpgL/LRoaPUe', 
     'ADMIN', 
     NULL,
     'APROVADO' 
