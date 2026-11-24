@@ -30,6 +30,7 @@ import PainelFinanceiroPage from './pages/PainelFinanceiroPage';
 import RelatoriosPage from './pages/RelatoriosPage';
 import GerenciamentoPage from './pages/GerenciamentoPage';
 import OcorrenciasPage from './pages/OcorrenciasPage';
+import ManutencaoPage from './pages/ManutencaoPage';
 
 function App() {
     return (
@@ -80,6 +81,8 @@ function App() {
 
                     {/* Visitantes (morador pré-autoriza; síndico opera a portaria) */}
                     <Route path="/visitantes" element={<RotaProtegida><VisitantesPage /></RotaProtegida>} />
+                    {/* Manutenção no condomínio */}
+                    <Route path="/manutencao" element={<RotaProtegida><ManutencaoPage /></RotaProtegida>} />
 
                     {/* Gestão de Moradores e Blocos (Síndico/Admin) */}
                     <Route path="/moradores" element={<RotaProtegida perfis={['SINDICO', 'ADMIN']}><MoradoresPage /></RotaProtegida>} />

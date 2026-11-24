@@ -19,6 +19,7 @@ const ocorrenciaController = require('./controllers/ocorrenciaController');
 const relatorioController = require('./controllers/relatorioController');
 const multaController = require('./controllers/multaController');
 const visitanteController = require('./controllers/visitanteController');
+const manutencaoController = require('./controllers/manutencaoController');
 const {
     verificarToken,
     verificarSindico,
@@ -543,6 +544,28 @@ app.patch(
     verificarSindico,
     verificarCondominioSindico,
     ocorrenciaController.atualizar
+// ======================== MANUTENÇÃO NO CONDOMÍNIO (KAN-16) ========================
+
+// Abrir chamado de manutenção (Morador ou Síndico)
+app.post(
+    '/condominios/:idCondominio/manutencoes',
+    verificarToken,
+    manutencaoController.criar
+);
+
+// Listar chamados (Síndico: todos; Morador: os seus)
+app.get(
+    '/condominios/:idCondominio/manutencoes',
+    verificarToken,
+    manutencaoController.listar
+);
+
+// Atualizar status do chamado (Síndico ou Admin)
+app.patch(
+    '/condominios/:idCondominio/manutencoes/:id/status',
+    verificarToken,
+    verificarSindico,
+    manutencaoController.atualizarStatus
 );
 
 // Inicia o servidor na porta 3000 se executado diretamente.

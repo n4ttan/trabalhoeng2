@@ -281,6 +281,15 @@ export default function Navbar() {
               <span className="item-icon">🍖</span>
               <span>Churrasqueira</span>
             </button>
+
+            <button
+              type="button"
+              className={`sidebar-item ${isRotaAtiva('/manutencao') ? 'ativo' : ''}`}
+              onClick={() => handleNavegar('/manutencao')}
+            >
+              <span className="item-icon">🛠️</span>
+              <span>Manutenção</span>
+            </button>
           </div>
 
           {/* Seção Financeira */}
